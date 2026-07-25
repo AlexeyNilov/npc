@@ -46,29 +46,6 @@ yet supplied by the user.
 
 ## Ordered future outcomes
 
-### 3. Run a stateful conversational trader playtest
-
-**Outcome:** a developer can meet the trader in a simple chat interface, discuss
-or propose the supported trades in natural language, and observe responses that
-reflect the authoritative state and relevant prior interaction.
-
-**Hypothesis:** connecting deterministic decisions to natural-language
-interaction produces a more engaging experience than a static chat character.
-
-**Smallest test:** conduct and record several hands-on sessions using the same
-scripted scenario; include a repeated proposal or follow-up that depends on an
-earlier interaction.
-
-**Support signal / pass criterion:** the developer can identify a material,
-state- or history-dependent difference in the trader's behaviour during each
-session, and can reproduce the underlying decision path. If the dialogue can
-be substituted with a fixed prompt without changing observed behaviour, the
-hypothesis is not supported.
-
-**Constraint:** language-model output may express or interpret a proposal, but
-the authoritative state transition and final trader choice must remain
-deterministic.
-
 ### 4. Decide whether to deepen the actor loop or broaden the model
 
 **Outcome:** use the playtest evidence to make an explicit next product choice:
