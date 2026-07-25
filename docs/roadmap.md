@@ -55,37 +55,6 @@ yet supplied by the user.
 
 ## Ordered future outcomes
 
-### 4. Establish an authoritative conversation contract
-
-**Outcome:** an LLM may extract a schema-aligned candidate from a player
-message, but only a deterministic validator can recognize one supported,
-explicit trade proposal. Each material field—offer direction, `healing herb`,
-quantity one, decimal price, and `gold`—must include verbatim evidence from the
-player message. Only the validated proposal can reach the deterministic
-evaluator. An omitted, zero, or negative price is rejected.
-
-**Hypothesis:** separating LLM-assisted extraction from deterministic,
-evidence-backed recognition will prevent the interface from inventing economic
-commitments while retaining varied natural-language interaction.
-
-**Smallest test:** use a fixed set of messages: a direct offer with one herb and
-a positive integer price; a question about buying; a price without an offer; an
-agreement after a prior refusal; and zero or negative prices. Record the
-extracted candidate, validation result, and state before and after each
-message. Include an extractor candidate whose evidence does not occur in the
-message.
-
-**Support signal / pass criterion:** only a direct offer whose extractor
-evidence proves every required field reaches the evaluator. Every other message
-leaves authoritative state unchanged. Given the same player message and
-extractor response, validation produces the same recognized intent. Any
-inferred item, price, direction, quantity, currency, or transaction rejects the
-hypothesis.
-
-**Scope guard:** do not broaden the supported economy or add new player actions
-to solve this boundary problem. The LLM is not authoritative merely because it
-returns structured output.
-
 ### 5. Make player-facing trade outcomes state-grounded
 
 **Outcome:** after a proposed trade is evaluated, the player receives one
