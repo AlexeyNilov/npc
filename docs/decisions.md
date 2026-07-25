@@ -55,6 +55,29 @@ false or rejected result does nothing. Certainty is trace-only.
 generic actor framework. A later abstraction needs new evidence from a
 materially different capability or creature policy.
 
+### 2026-07-25: Render completed actor outcomes with a non-authoritative LLM narrator
+
+**Status:** Accepted
+
+**Context:** In the text-based actor reality, the player needs a textual account
+of what the fox did. The completed closed rendering experiment preserves the
+authority boundary, but its two preapproved sentences and fixture renderer do
+not exercise an LLM narrator.
+
+**Decision:** After deterministic perception, choice, action execution, and
+feedback are complete, use the configured LLM to narrate the completed action
+for the player. The narrator receives only the completed event data required to
+describe that action. Its response is presentation data: it cannot choose or
+change an action, distance, outcome, or feedback, and it never becomes
+canonical world state or input to a later turn. An unavailable or unusable
+response has a deterministic fallback.
+
+**Consequences:** The next outcome must demonstrate a real configured-model
+invocation rather than only a fixture renderer, while preserving an explicit
+trace boundary between the canonical event and narration. The initial narrator
+is limited to describing the completed action; whether to allow extra flavour
+or assertions beyond that action remains unresolved.
+
 ### 2026-07-25: Preserve experiment evidence independently of implementation
 
 **Status:** Accepted
