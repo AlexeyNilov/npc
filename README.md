@@ -17,3 +17,7 @@ python -m venv .venv
 source .venv/bin/activate
 make install
 ```
+
+```bash
+systemctl --user start llama-hauhau-gemma
+```
