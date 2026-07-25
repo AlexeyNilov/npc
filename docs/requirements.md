@@ -43,19 +43,21 @@ This document owns observable system behavior.
 
 ### Non-authoritative rendering of completed fox outcomes
 
-- **When** a developer runs the checked-in fox outcome-rendering corpus,
-  **the system shall** print one JSON-safe rendering trace per completed turn
-  containing the unmodified canonical turn, rendering prompt, raw renderer
-  output or null, validation result, rendered text, and an explicit
+- **When** a developer runs the checked-in fox outcome-rendering corpus with
+  its fixture renderer or `--configured-narrator`, **the system shall** print
+  one JSON-safe rendering trace per completed turn containing a by-value,
+  unmodified canonical turn, narration prompt, raw narrator response or null,
+  validation/failure status, rendered text, and an explicit
   non-authoritative marker.
 - **When** a completed action is `flee` or `do_nothing`, **the system shall**
-  call the renderer exactly once with only that completed action and accept
-  only a JSON object with exactly `action` and `message`, matching the action
-  and its exact approved sentence: `The fox flees.` or `The fox does nothing.`
-- **When** renderer output is malformed, has extra fields, mismatches the
-  completed action or approved message, or is unavailable, **the system
-  shall** return `The fox's response cannot be rendered.` and leave every
-  canonical-turn field, including action and feedback distance, unchanged.
+  call the selected narrator exactly once after completion. The configured
+  narrator shall receive only an action-derived prompt and a fixed instruction
+  that its response is presentation, not action selection or world state.
+- **When** a narrator returns nonblank text of at most 280 Unicode characters,
+  **the system shall** use that arbitrary text as non-authoritative narration.
+  Blank, oversized, unavailable, or exceptional responses shall return
+  `The fox's response cannot be rendered.` and leave every canonical-turn
+  field, including action and feedback distance, unchanged.
 
 ### Deterministic wolf sensemaking from two grounded perceptions
 

@@ -40,11 +40,11 @@ shared, bounded threat-detection capability: a territorial wolf deterministicall
 attacks an accepted threat, while a fox deterministically flees one. A fixed
 two-turn fox experiment also applies authoritative distance to gate hearing,
 executes `flee` as a fixed distance change, and feeds the resulting distance
-into the next turn. A completed fox action can then be rendered only as its
-approved factual sentence or a deterministic fallback; the rendering is
-non-authoritative. The LLM supplies only an evidence-grounded perception or
-bounded presentation; it never chooses an action, determines reachability, or
-changes distance.
+into the next turn. A completed fox action can then be rendered once by the
+configured LLM as arbitrary concise, non-authoritative presentation, or by a
+deterministic fallback when narration is unavailable or unusable. The LLM
+supplies only an evidence-grounded perception or bounded presentation; it
+never chooses an action, determines reachability, or changes distance.
 
 The central learning hypothesis is that small, deterministic decision scenarios
 can reveal which model elements survive a second, contrasting decision. Both

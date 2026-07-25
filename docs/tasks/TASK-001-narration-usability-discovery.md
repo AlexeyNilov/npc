@@ -1,8 +1,8 @@
 # TASK-001: Invoke an LLM as a non-authoritative fox outcome narrator
 
-**Status:** Ready
+**Status:** Blocked
 
-**Owner:** Unassigned
+**Owner:** Implementer
 
 **Delivery role:** [Implementer](../agent_roles/implementer.md)
 
@@ -131,10 +131,19 @@ frameworks, and changes to the completed canonical turn.
 
 ## Handoff
 
-**Status and outcome:** Pending
+**Status and outcome:** Blocked — implementation and fixture verification are
+complete, but the configured-narrator command exits without the required
+inspectable trace output. Live evidence for configured `flee`, `do_nothing`,
+and unusable/unavailable narration is therefore absent.
 
-**Changed files and ownership impact:** Pending
+**Changed files and ownership impact:** The listed application, fixture, test,
+requirements, architecture, README, and experiment-evidence files were
+changed. The roadmap remains incomplete until live evidence is captured.
 
-**Verification:** Pending
+**Verification:** Focused rendering tests, `make check`, and `git diff --check`
+passed. Fixture-mode traces print as required; configured mode prints none.
 
-**Assumptions, risks, and next action:** Pending
+**Assumptions, risks, and next action:** Re-run
+`python -m npc.experiments.fox_outcome_rendering --configured-narrator` in an
+environment that produces inspectable output, update the evidence record, then
+return the packet for Technical Lead reconciliation.

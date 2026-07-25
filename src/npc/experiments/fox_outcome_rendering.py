@@ -1,21 +1,23 @@
+import argparse
 import asyncio
 import json
 from collections.abc import Awaitable, Callable, Mapping
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import Any, Literal, cast
 
 import yaml  # type: ignore[import-untyped]
 
 from npc.experiments.fox_distance_feedback import Action, TurnTrace, run_turn
+from npc.infrastructure.language_model import complete_text
 
 Renderer = Callable[[str], Awaitable[str]]
-RenderValidation = Literal["accepted", "invalid_response", "renderer_exception"]
+RenderValidation = Literal["accepted", "unusable_response", "narrator_exception"]
 FALLBACK_TEXT = "The fox's response cannot be rendered."
-APPROVED_MESSAGES: dict[Action, str] = {
-    "flee": "The fox flees.",
-    "do_nothing": "The fox does nothing.",
-}
+MAX_NARRATION_CHARACTERS = 280
+NARRATOR_INSTRUCTION = (
+    "Narration is non-authoritative presentation only. Do not choose an action or change world state, outcome, or feedback."
+)
 
 
 @dataclass(frozen=True)
@@ -30,22 +32,23 @@ class RenderingTrace:
 
 async def render_completed_turn(canonical_turn: TurnTrace, renderer: Renderer) -> RenderingTrace:
     prompt = _render_prompt(canonical_turn.executed_action)
+    preserved_turn = replace(canonical_turn)
     try:
         raw_renderer_output = await renderer(prompt)
     except Exception:
         return RenderingTrace(
-            canonical_turn=canonical_turn,
+            canonical_turn=preserved_turn,
             prompt=prompt,
             raw_renderer_output=None,
-            validation_result="renderer_exception",
+            validation_result="narrator_exception",
             rendered_text=FALLBACK_TEXT,
             non_authoritative=True,
         )
 
-    validation_result = _validate_response(raw_renderer_output, canonical_turn.executed_action)
-    rendered_text = APPROVED_MESSAGES[canonical_turn.executed_action] if validation_result == "accepted" else FALLBACK_TEXT
+    validation_result = _validate_response(raw_renderer_output)
+    rendered_text = raw_renderer_output if validation_result == "accepted" else FALLBACK_TEXT
     return RenderingTrace(
-        canonical_turn=canonical_turn,
+        canonical_turn=preserved_turn,
         prompt=prompt,
         raw_renderer_output=raw_renderer_output,
         validation_result=validation_result,
@@ -55,12 +58,18 @@ async def render_completed_turn(canonical_turn: TurnTrace, renderer: Renderer) -
 
 
 async def run_fixture(case: Mapping[str, object]) -> RenderingTrace:
-    canonical_turn = await run_turn(
-        cast(str, case["player_message"]),
-        cast(int, case["starting_distance"]),
-        _fixture_turn_completion(case),
-    )
+    canonical_turn = await _fixture_canonical_turn(case)
     return await render_completed_turn(canonical_turn, _fixture_renderer(case))
+
+
+async def run_configured_fixture(case: Mapping[str, object]) -> RenderingTrace:
+    """Render a fixture-produced canonical turn with the configured narrator."""
+    return await render_completed_turn(await _fixture_canonical_turn(case), configured_narrator)
+
+
+async def configured_narrator(prompt: str) -> str:
+    """Fox-local adapter for the configured, non-authoritative narrator."""
+    return await complete_text(prompt, NARRATOR_INSTRUCTION)
 
 
 def load_corpus(path: Path) -> list[dict[str, object]]:
@@ -69,23 +78,21 @@ def load_corpus(path: Path) -> list[dict[str, object]]:
 
 
 def _render_prompt(action: Action) -> str:
-    return (
-        "Completed action: "
-        f"{action}. Return JSON with exactly action and message. "
-        "You are not choosing an action or asserting a world fact."
-    )
+    return f"Completed fox action: {action}. Provide concise player-facing narration."
 
 
-def _validate_response(raw_renderer_output: str, action: Action) -> RenderValidation:
-    try:
-        response = json.loads(raw_renderer_output)
-    except json.JSONDecodeError:
-        return "invalid_response"
-    if not isinstance(response, dict) or set(response) != {"action", "message"}:
-        return "invalid_response"
-    if response["action"] != action or response["message"] != APPROVED_MESSAGES[action]:
-        return "invalid_response"
+def _validate_response(raw_renderer_output: str) -> RenderValidation:
+    if not raw_renderer_output.strip() or len(raw_renderer_output) > MAX_NARRATION_CHARACTERS:
+        return "unusable_response"
     return "accepted"
+
+
+async def _fixture_canonical_turn(case: Mapping[str, object]) -> TurnTrace:
+    return await run_turn(
+        cast(str, case["player_message"]),
+        cast(int, case["starting_distance"]),
+        _fixture_turn_completion(case),
+    )
 
 
 def _fixture_turn_completion(case: Mapping[str, object]) -> Callable[[str, str], Awaitable[str]]:
@@ -108,9 +115,13 @@ def _fixture_renderer(case: Mapping[str, object]) -> Renderer:
 
 
 async def main_async() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--configured-narrator", action="store_true")
+    args = parser.parse_args()
     corpus_path = Path(__file__).parents[3] / "scenarios" / "fox_outcome_rendering.yaml"
     for case in load_corpus(corpus_path):
-        print(json.dumps(asdict(await run_fixture(case)), sort_keys=True))
+        trace = await (run_configured_fixture(case) if args.configured_narrator else run_fixture(case))
+        print(json.dumps(asdict(trace), sort_keys=True))
 
 
 def main() -> None:

@@ -5,53 +5,60 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import cast
 
+from pytest import MonkeyPatch
+
+from npc.experiments import fox_outcome_rendering
 from npc.experiments.fox_distance_feedback import run_turn
-from npc.experiments.fox_outcome_rendering import load_corpus, render_completed_turn, run_fixture
+from npc.experiments.fox_outcome_rendering import (
+    FALLBACK_TEXT,
+    configured_narrator,
+    load_corpus,
+    render_completed_turn,
+    run_fixture,
+)
 
 
 def threat_candidate() -> str:
     return json.dumps({"threat": True, "certainty": 0.8, "evidence": "I will hurt you"})
 
 
-def test_renderer_prompt_receives_only_completed_action_and_is_called_once() -> None:
+def test_configured_narrator_receives_only_completed_action_and_is_called_once(monkeypatch: MonkeyPatch) -> None:
     canonical = asyncio.run(run_turn("Fox, I will hurt you.", 10, _completion(threat_candidate())))
-    prompts: list[str] = []
+    calls: list[tuple[str, str]] = []
 
-    async def render(prompt: str) -> str:
-        prompts.append(prompt)
-        return '{"action": "flee", "message": "The fox flees."}'
+    async def complete_text(prompt: str, instruction: str) -> str:
+        calls.append((prompt, instruction))
+        return "The fox darts into the undergrowth."
 
-    trace = asyncio.run(render_completed_turn(canonical, render))
+    monkeypatch.setattr(fox_outcome_rendering, "complete_text", complete_text)
+    trace = asyncio.run(render_completed_turn(canonical, configured_narrator))
 
-    assert len(prompts) == 1
-    assert prompts == [trace.prompt]
+    assert len(calls) == 1
+    assert calls[0][0] == trace.prompt
     assert "flee" in trace.prompt
     for forbidden in (canonical.player_message, "distance", "candidate", "certainty", "evidence", "heard"):
         assert forbidden not in trace.prompt
+        assert forbidden not in calls[0][1]
 
 
-def test_valid_completed_actions_render_their_exact_approved_sentence() -> None:
+def test_nonblank_freeform_completed_actions_render_as_returned() -> None:
     flee = asyncio.run(run_turn("Fox, I will hurt you.", 10, _completion(threat_candidate())))
     do_nothing = asyncio.run(run_turn("Fox, hello.", 10, _completion('{"threat": false, "certainty": 0.4, "evidence": null}')))
 
-    flee_trace = asyncio.run(render_completed_turn(flee, _renderer('{"action": "flee", "message": "The fox flees."}')))
-    non_action_trace = asyncio.run(
-        render_completed_turn(do_nothing, _renderer('{"action": "do_nothing", "message": "The fox does nothing."}'))
-    )
+    flee_trace = asyncio.run(render_completed_turn(flee, _renderer("The fox vanishes through the brush.")))
+    non_action_trace = asyncio.run(render_completed_turn(do_nothing, _renderer("The fox watches in silence.")))
 
-    assert flee_trace.rendered_text == "The fox flees."
-    assert non_action_trace.rendered_text == "The fox does nothing."
-    assert non_action_trace.rendered_text != "The fox flees."
+    assert flee_trace.rendered_text == "The fox vanishes through the brush."
+    assert non_action_trace.rendered_text == "The fox watches in silence."
     assert flee_trace.validation_result == non_action_trace.validation_result == "accepted"
 
 
-def test_invalid_mismatched_and_failed_rendering_use_fallback_without_changing_canonical_turn() -> None:
+def test_blank_oversized_and_failed_rendering_use_fallback_without_changing_canonical_turn() -> None:
     canonical = asyncio.run(run_turn("Fox, hello.", 10, _completion('{"threat": false, "certainty": 0.4, "evidence": null}')))
     invalid_outputs: list[Callable[[str], Awaitable[str]]] = [
-        _renderer("not json"),
-        _renderer('{"action": "do_nothing", "message": "The fox does nothing.", "extra": true}'),
-        _renderer('{"action": "flee", "message": "The fox flees."}'),
-        _renderer('{"action": "do_nothing", "message": "The fox flees."}'),
+        _renderer(""),
+        _renderer("   "),
+        _renderer("x" * 281),
         _failed_renderer,
     ]
 
@@ -59,16 +66,17 @@ def test_invalid_mismatched_and_failed_rendering_use_fallback_without_changing_c
         before = asdict(canonical)
         trace = asyncio.run(render_completed_turn(canonical, renderer))
 
-        assert trace.rendered_text == "The fox's response cannot be rendered."
+        assert trace.rendered_text == FALLBACK_TEXT
         assert trace.validation_result != "accepted"
         assert asdict(trace.canonical_turn) == before == asdict(canonical)
+        assert trace.canonical_turn is not canonical
         assert trace.canonical_turn.executed_action == "do_nothing"
         assert trace.canonical_turn.resulting_distance == trace.canonical_turn.feedback_distance == 10
 
 
 def test_rendering_trace_is_complete_json_safe_and_non_authoritative() -> None:
     canonical = asyncio.run(run_turn("Fox, I will hurt you.", 10, _completion(threat_candidate())))
-    trace = asyncio.run(render_completed_turn(canonical, _renderer('{"action": "flee", "message": "The fox flees."}')))
+    trace = asyncio.run(render_completed_turn(canonical, _renderer("The fox retreats.")))
 
     assert set(asdict(trace)) == {
         "canonical_turn",
@@ -79,7 +87,7 @@ def test_rendering_trace_is_complete_json_safe_and_non_authoritative() -> None:
         "non_authoritative",
     }
     assert trace.canonical_turn == canonical
-    assert trace.raw_renderer_output == '{"action": "flee", "message": "The fox flees."}'
+    assert trace.raw_renderer_output == "The fox retreats."
     assert trace.non_authoritative is True
     json.dumps(asdict(trace), sort_keys=True)
 
@@ -89,20 +97,20 @@ def test_checked_in_fixtures_cover_completed_turns_and_rendering_failures() -> N
     cases = {cast(str, case["id"]): case for case in load_corpus(corpus_path)}
 
     assert set(cases) == {
-        "accepted-in-range-threat",
-        "in-range-non-action",
-        "initially-out-of-range-non-action",
-        "malformed-renderer-output",
-        "renderer-failure",
+        "freeform-in-range-flee",
+        "freeform-in-range-do-nothing",
+        "blank-narration",
+        "oversized-narration",
+        "narrator-failure",
     }
     traces = {case_id: asyncio.run(run_fixture(case)) for case_id, case in cases.items()}
 
-    assert traces["accepted-in-range-threat"].rendered_text == "The fox flees."
-    assert traces["in-range-non-action"].rendered_text == "The fox does nothing."
-    assert traces["initially-out-of-range-non-action"].rendered_text == "The fox does nothing."
-    assert traces["malformed-renderer-output"].rendered_text == "The fox's response cannot be rendered."
-    assert traces["renderer-failure"].raw_renderer_output is None
-    assert traces["renderer-failure"].rendered_text == "The fox's response cannot be rendered."
+    assert traces["freeform-in-range-flee"].rendered_text == "The fox bolts into the trees."
+    assert traces["freeform-in-range-do-nothing"].rendered_text == "The fox pauses, then stays put."
+    assert traces["blank-narration"].rendered_text == FALLBACK_TEXT
+    assert traces["oversized-narration"].rendered_text == FALLBACK_TEXT
+    assert traces["narrator-failure"].raw_renderer_output is None
+    assert traces["narrator-failure"].rendered_text == FALLBACK_TEXT
 
     for case_id, trace in traces.items():
         assert trace.canonical_turn.executed_action == cases[case_id]["expected_action"]

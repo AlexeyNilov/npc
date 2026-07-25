@@ -1,33 +1,33 @@
 cases:
-  - id: accepted-in-range-threat
+  - id: freeform-in-range-flee
     player_message: "Fox, I will hurt you."
     starting_distance: 10
     completion: '{"threat": true, "certainty": 0.8, "evidence": "I will hurt you"}'
-    renderer_output: '{"action": "flee", "message": "The fox flees."}'
+    renderer_output: "The fox bolts into the trees."
     expected_action: flee
     expected_resulting_distance: 15
-  - id: in-range-non-action
+  - id: freeform-in-range-do-nothing
     player_message: "Fox, hello."
     starting_distance: 10
     completion: '{"threat": false, "certainty": 0.4, "evidence": null}'
-    renderer_output: '{"action": "do_nothing", "message": "The fox does nothing."}'
+    renderer_output: "The fox pauses, then stays put."
     expected_action: do_nothing
     expected_resulting_distance: 10
-  - id: initially-out-of-range-non-action
-    player_message: "Fox, I will hurt you."
-    starting_distance: 11
-    completion: null
-    renderer_output: '{"action": "do_nothing", "message": "The fox does nothing."}'
-    expected_action: do_nothing
-    expected_resulting_distance: 11
-  - id: malformed-renderer-output
+  - id: blank-narration
     player_message: "Fox, hello."
     starting_distance: 10
     completion: '{"threat": false, "certainty": 0.4, "evidence": null}'
-    renderer_output: not-json
+    renderer_output: ""
     expected_action: do_nothing
     expected_resulting_distance: 10
-  - id: renderer-failure
+  - id: oversized-narration
+    player_message: "Fox, hello."
+    starting_distance: 10
+    completion: '{"threat": false, "certainty": 0.4, "evidence": null}'
+    renderer_output: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    expected_action: do_nothing
+    expected_resulting_distance: 10
+  - id: narrator-failure
     player_message: "Fox, hello."
     starting_distance: 10
     completion: '{"threat": false, "certainty": 0.4, "evidence": null}'
