@@ -84,6 +84,14 @@ One successful vertical slice does not establish a reusable abstraction. If a
 second scenario is not in scope, label the result as scaffolding and do not
 promote its structure as the system direction.
 
+## Roadmap handoff gate
+
+A roadmap outcome orders future learning; it does not make work Ready. Before
+preparing a packet from an outcome, the planner assembles the relevant vision,
+current architecture, requirements, decisions, and observed issues. The packet
+names those canonical sources and resolves material ambiguity, or is explicitly
+a discovery packet with a recommendation or decision as its outcome.
+
 ## Simplifier routing
 
 Route a draft packet or implementation diff to the simplifier only when it adds a

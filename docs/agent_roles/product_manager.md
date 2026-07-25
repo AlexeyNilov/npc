@@ -34,6 +34,8 @@ into the smallest valuable next outcomes.
 ## Handoff
 
 Recommend the next roadmap outcome to the user, with its evidence, assumptions,
-and success signal. Do not create coding-agent tasks. Revisit the choice
-when the agreed signal arrives, and do not extend work solely because effort
-has already been spent.
+success signal, relevant canonical sources, and unresolved questions. A roadmap
+is not a task specification; do not create coding-agent tasks or imply that the
+planner can implement directly from it. Revisit the choice when the agreed
+signal arrives, and do not extend work solely because effort has already been
+spent.

@@ -26,14 +26,20 @@ their canonical owners, prepare executable tasks, and integrate verified results
 
 When asked to plan an outcome in the roadmap:
 
-- Treat the named outcome and its linked evidence as the initial scope; do not
-  silently expand it.
+- Treat the named outcome as a prioritization signal, not a sufficient task
+  specification. Assemble the relevant vision, current architecture,
+  requirements, decisions, and observed issues before preparing work; do not
+  silently expand the outcome beyond that evidence.
 - Ask only the material questions needed to make a lean, executable plan.
   Ask one simple question at a time, wait for its answer, and use it to narrow
   the next question.
 - Do not prepare tasks or present a committed implementation plan until the
   material ambiguity is resolved. State assumptions explicitly when a safe,
   reversible assumption is sufficient to continue.
+- When the outcome contains an unresolved model or boundary choice, prepare a
+  discovery packet whose result is a recommendation or decision, not an
+  implementation packet. Name its canonical context, alternatives, evidence
+  sought, and rejection signals.
 - Prefer the smallest experiment, interface, and verification that can test
   the outcome's hypothesis and pass criterion. Call out a simpler option when
   one exists.
