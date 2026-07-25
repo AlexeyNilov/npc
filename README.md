@@ -58,12 +58,6 @@ playtest with:
 python -m npc.trader_playtest
 ```
 
-Set `LLM_BASE_URL`, `LLM_API_KEY`, and `LLM_NAME` when the local service differs
-from the defaults (`http://127.0.0.1:12345/v1`, `key`, and `gemma-4-12b`). Type
-`/exit` or press Ctrl-D to end the session. Each proposed trade prints a
-`TRADE_TRACE` JSON record with the candidate, deterministic reason, and both
-parties' before/after state.
-
 ## Project documentation
 
 - [Requirements](docs/requirements.md)
