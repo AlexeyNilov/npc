@@ -1,52 +1,51 @@
-# Contributing
+# Contributing rules
 
-- Never commit credentials, tokens, `.env`, or secret output.
-- Think before coding
+* Never commit credentials, tokens, `.env`, or secret output.
+* Think before coding and stay strictly within the prompt's scope.
 
 ## Simplicity First
 
 **Minimum code that solves the problem. Nothing speculative.**
 
-- No features beyond what was asked.
-- No abstractions for single-use code.
-- No "flexibility" or "configurability" that wasn't requested.
-- No error handling for impossible scenarios.
-- If you write 200 lines and it could be 50, rewrite it.
+* Write the minimum code required to satisfy the user's request.
+* No defensive error handling for impossible scenarios.
+* No new external dependencies without explicit permission.
+* If you write 200 lines and it could cleanly be 50, rewrite it.
+* The test: *Can this be implemented with less code without breaking requirements?* If yes, simplify.
 
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+## Focused & Modular Design
 
-## Follow TDD workflow
+**One responsibility per unit. Separate business logic from side effects.**
 
-- Inspect current Git state and preserve unrelated changes.
-- For application behavior, write a failing behavioral test before implementation.
-- Every test must detect meaningful project behavior that would regress if the code were wrong.
-- Prefer a few high-signal scenarios and avoid implementation-detail assertions.
-- Mock only external I/O, network, database, or service boundaries.
-- Use dependency injection when it makes behavior easier to test.
-- Use explicit type hints and keep functions and modules focused.
-- Keep business logic, I/O, and logging separate.
-- Use logging rather than print except in CLI-only scripts.
-- Do not swallow exceptions; re-raise or log them with useful context.
-- Omit obvious docstrings; use Google-style docstrings for non-obvious business rules.
-- Avoid speculative abstractions and unjustified dependencies.
-- Update only the documentation artifact that owns the changed information.
-- Bump the semantic version after significant application changes.
+* **Single Responsibility:** Each function, class, or module must do one thing well and have only one reason to change.
+* **Separation of Concerns:** Keep core business rules isolated from I/O, database access, network calls, and UI/presentation.
+* Avoid multi-purpose utility dumping grounds (`utils.py`) or "god" objects that handle unrelated tasks.
+* Keep functions small and focused - if a function evaluates logic *and* performs side effects, split it.
+* *Balance:* Separate concerns logically, but do not create unnecessary intermediate wrapper files or empty abstractions.
+
+## Follow TDD Workflow
+
+**Red, Green, Refactor. Test behavior, not implementation.**
+
+* Write a failing behavioral test before writing implementation code.
+* Every test must detect meaningful behavior that would regress if the code were wrong.
+* Avoid asserting on internal implementation details or private methods.
+* Mock only external boundaries (network, database, filesystem, third-party APIs).
+* Use dependency injection to keep business logic easy to test.
+* Omit obvious docstrings; use Google-style docstrings only for complex business logic.
+* Update only the documentation artifact that owns the changed information.
+* Bump the semantic version in the project manifest (`pyproject.toml`) after functional application changes.
 
 ## Surgical Changes
 
 **Touch only what you must. Clean up only your own mess.**
 
-When editing existing code:
-- Don't "improve" adjacent code, comments, or formatting.
-- Don't refactor things that aren't broken.
-- Match existing style, even if you'd do it differently.
-- If you notice unrelated dead code, mention it - don't delete it.
-
-When your changes create orphans:
-- Remove imports/variables/functions that YOUR changes made unused.
-- Don't remove pre-existing dead code unless asked.
-
-The test: Every changed line should trace directly to the user's request.
+* Match existing style, formatting, and conventions - even if you'd write it differently.
+* Don't "improve" or reformat adjacent code, comments, or styles.
+* Don't refactor things that aren't broken or explicitly requested.
+* **Self-created dead code:** Remove imports, variables, or functions that *your* changes made unused.
+* **Pre-existing dead code:** Mention it in your text response—do not delete or modify it.
+* The test: *Every changed line must trace directly to the user's request.*
 
 ## Verification
 
