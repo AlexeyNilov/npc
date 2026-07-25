@@ -77,7 +77,39 @@ action is claimed to have changed state. One contradiction fails the test.
 **Constraint:** an LLM may word a response, but it must not assert a state
 change or final trade outcome beyond the authoritative result supplied to it.
 
-### 6. Re-run the bounded trader playtest
+### 6. Evaluate LangExtract for grounded trade extraction
+
+**Outcome:** obtain reproducible evidence on whether
+[LangExtract](https://github.com/google/langextract) can improve varied
+natural-language trade extraction while preserving the authoritative
+conversation contract. This is an evaluation milestone, not a commitment to
+add LangExtract to the runtime.
+
+**Hypothesis:** LangExtract's schema-guided extraction and source character
+intervals can increase recognition of explicitly supported offers without
+increasing inferred transactions, compared with the current untrusted
+extraction plus deterministic validator.
+
+**Smallest test:** build a fixed, checked-in corpus containing the supported
+offer shape with varied filler, the existing non-offer cases, and the reported
+playtest sequence. Run both extractors against it using the configured local
+model path where possible. For every LangExtract result, verify its spans map
+to the original message, then pass only its normalized candidate through the
+same deterministic validator; record recognition, rejection reason, and
+latency.
+
+**Support signal / pass criterion:** LangExtract recognizes at least the
+baseline's valid supported offers, produces no validator-accepted transaction
+for a non-offer, and every field used by an accepted candidate has a valid
+source span. If it cannot operate through the configured local model boundary,
+or increases false positives, retain the existing extractor and record the
+evidence.
+
+**Scope guard:** do not replace the deterministic validator, change the
+economic evaluator, or add LangExtract to the live playtest during this
+milestone. Do not use cloud credentials merely to complete the comparison.
+
+### 7. Re-run the bounded trader playtest
 
 **Outcome:** the developer can conduct a small, repeatable chat playtest where
 the trader's trade behaviour and visible state remain consistent across
@@ -97,7 +129,7 @@ authoritative state or the trace, no unsolicited trade occurs, and the two runs
 produce the same authoritative state transitions. A trace is not a substitute
 for a correct player-facing response.
 
-### 7. Decide whether to deepen the actor loop or broaden the model
+### 8. Decide whether to deepen the actor loop or broaden the model
 
 **Outcome:** use the playtest evidence to make an explicit next product choice:
 improve the trader's perception, sensemaking, intent, action, outcome, and
