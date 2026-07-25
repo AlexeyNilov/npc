@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "local_llm_project_template"
+version = "0.1.0"
+description = "local_llm_project_template"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx2",
+    "openai",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy==2.2.0",
+    "pytest==9.1.1",
+    "ruff==0.15.21"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["local_llm_project_template*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+local_llm_project_template = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q --tb=short --maxfail=1"
+
+[tool.ruff]
+line-length = 128
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src/local_llm_project_template", "tests"]
+warn_unused_configs = true
+warn_return_any = true
+warn_unused_ignores = true
+no_implicit_optional = true
+check_untyped_defs = true
+show_error_context = false
+hide_error_codes = true
+no_error_summary = true
+color_output = false

@@ -1,0 +1,9 @@
+name = "implementer"
+description = "Executes one approved, bounded write task."
+model = "gpt-5.6-luna"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+developer_instructions = """
+Read AGENTS.md, the role guide named by the assigned task, and the task packet.
+Treat the task packet as the context router and stay within its authorized scope.
+"""
