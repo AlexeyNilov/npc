@@ -119,3 +119,26 @@ wording around the supported word-level grammar.
 without claiming the model itself is deterministic. Messages that cannot prove
 the sole offer shape remain narration-only, and future transaction shapes need
 their own explicit contract.
+
+### 2026-07-25: Compose trade replies from authoritative results
+
+**Status:** Accepted
+
+**Context:** Even an evidence-gated candidate can be accompanied by
+model-authored narration that falsely claims acceptance, a transfer, an item,
+or a balance. The player-facing reply therefore needs the same authority
+boundary as the state transition.
+
+**Decision:** Accept only the closed model flavor vocabulary (`warm`,
+`neutral`, `attentive`, and `wary`) for non-economic atmosphere, with invalid or
+missing values falling back to `neutral`. Render all other player-visible text
+in one deterministic composer from candidate validation and the evaluated
+offer/result. Store the rendered reply in history.
+
+**Alternatives considered:** Permit bounded model prose or use a second LLM
+grounding check. Both retain an unverifiable claim channel and add unnecessary
+complexity at the conversation boundary.
+
+**Consequences:** A model cannot claim a completed trade or any state change.
+The fixed reply vocabulary must expand explicitly with future transaction
+shapes, while current traces remain reproducible from evaluated offers.

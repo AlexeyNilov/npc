@@ -40,8 +40,10 @@ This helps ensure requirements are:
   trader for the lifetime of that process.
 - **When** the developer sends a natural-language message, **the system shall**
   give the local LLM the current authoritative trader and player state plus the
-  relevant in-session conversation history, and use its output only for
-  narration or an untrusted structured extraction.
+  relevant in-session conversation history, and use its output only for one
+  closed atmospheric flavor (`warm`, `neutral`, `attentive`, or `wary`) or an
+  untrusted structured extraction. Unknown, malformed, or omitted flavor shall
+  fall back to `neutral`.
 - **When** an LLM extraction proposes `sell_to_trader`, one `healing_herb`, and
   a positive decimal-integer `unit_price_gold`, **the system shall** evaluate
   it through the deterministic trader decision engine only if exact,
@@ -50,8 +52,14 @@ This helps ensure requirements are:
   `healing herb`, and `for <positive decimal digits> gold`.
 - **When** an LLM extraction is malformed, unsupported, or lacks matching
   player-message evidence for every transaction field, **the system shall**
-  leave authoritative state unchanged, return narration without a trade
-  decision, and retain the conversational turn for subsequent context.
+  leave authoritative state unchanged, state that no supported trade was
+  completed without asserting a transfer or acceptance, and retain the
+  conversational turn for subsequent context.
+- **When** no extraction is present, **the system shall** render only the fixed
+  atmospheric clause for the selected flavor.
+- **When** an evidence-validated trade is refused or accepted, **the system
+  shall** render its player-visible refusal reason or exact one `healing herb`
+  purchase and positive gold price only from the evaluated offer and result.
 - **When** an evidence-validated trade is accepted or refused, **the system
   shall** show its untrusted extraction, deterministic reason, and
   before-and-after trader and player states in the terminal so the decision

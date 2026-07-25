@@ -59,9 +59,11 @@ python -m npc.trader_playtest
 ```
 
 The one supported transaction is an explicit sale, for example: `I sell you a
-healing herb for 4 gold.` The local LLM supplies narration and an untrusted
-structured extraction; deterministic validation checks the message evidence
-before the trader's decision engine can evaluate the offer.
+healing herb for 4 gold.` The local LLM supplies one fixed atmospheric flavor
+and an untrusted structured extraction; deterministic validation checks the
+message evidence before the trader's decision engine can evaluate the offer.
+The playtest renders every player-visible trade outcome from the validated
+offer and deterministic result, rather than model-authored prose.
 
 ## Project documentation
 

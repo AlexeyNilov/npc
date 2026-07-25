@@ -13,7 +13,7 @@ INITIAL_PLAYER_STATE = PlayerState(healing_herbs=1, gold=0)
 
 SYSTEM_PROMPT = """You are a trader in a small playtest. Reply with JSON only:
 {
-  "narration": "brief response",
+  "flavor": "warm",
   "candidate": {
     "action": "sell_to_trader",
     "item": "healing_herb",
@@ -28,6 +28,9 @@ SYSTEM_PROMPT = """You are a trader in a small playtest. Reply with JSON only:
     }
   }
 }
+Flavor must be exactly one of warm, neutral, attentive, or wary. It supplies
+only atmosphere and cannot describe an item, price, balance, transfer,
+acceptance, refusal, promise, or completed action.
 Set candidate to null unless the player explicitly offers to sell exactly one
 healing herb for a positive decimal-integer gold price. Evidence values must be
 exact excerpts from the player message. Direction must include I before sell or
@@ -39,6 +42,12 @@ The candidate is only a proposal; do not claim that a trade was accepted or refu
 _DIRECTION = re.compile(r"I\b.*\b(?:sell|offer)\b.*\b(?:you|the\s+trader)\b", re.IGNORECASE)
 _PRICE = re.compile(r"[1-9][0-9]*")
 _ADDITIONAL_ITEM = re.compile(r"\b(?:and|,)\s+(?:one|1|a)\s+[a-z]+", re.IGNORECASE)
+_FLAVOR_TEXT = {
+    "warm": "A warm, patient expression.",
+    "neutral": "The trader is quiet.",
+    "attentive": "The trader listens closely.",
+    "wary": "The trader remains guarded.",
+}
 
 
 @dataclass(frozen=True)
@@ -59,7 +68,7 @@ class ConversationContext:
 
 @dataclass(frozen=True)
 class ModelReply:
-    narration: str
+    flavor: str
     candidate: object | None
 
 
@@ -83,10 +92,25 @@ class LocalTraderModel:
         try:
             data = json.loads(response)
         except json.JSONDecodeError:
-            return ModelReply(response, None)
-        if not isinstance(data, dict) or not isinstance(data.get("narration"), str):
-            return ModelReply(response, None)
-        return ModelReply(data["narration"], data.get("candidate"))
+            return ModelReply("neutral", None)
+        if not isinstance(data, dict):
+            return ModelReply("neutral", None)
+        flavor = data.get("flavor")
+        if not isinstance(flavor, str) or flavor not in _FLAVOR_TEXT:
+            flavor = "neutral"
+        return ModelReply(flavor, data.get("candidate"))
+
+
+def compose_reply(flavor: str, candidate: object | None, offer: Offer | None, decision_reason: str | None) -> str:
+    atmosphere = _FLAVOR_TEXT.get(flavor, _FLAVOR_TEXT["neutral"])
+    if offer is None:
+        return atmosphere if candidate is None else f"{atmosphere} No supported trade was completed."
+    if decision_reason == "accepted":
+        return f"{atmosphere} The trader bought one healing herb for {offer.unit_price_gold} gold."
+    return (
+        f"{atmosphere} The trader refused your offer to sell one healing herb for "
+        f"{offer.unit_price_gold} gold: {decision_reason}."
+    )
 
 
 def offer_from_candidate(candidate: object, player_message: str) -> Offer | None:
@@ -159,9 +183,9 @@ class TraderSession:
             player_message=player_message,
         )
         reply = await model.reply(context)
-        output = [f"Trader: {reply.narration}"]
         offer = offer_from_candidate(reply.candidate, player_message)
         decision_reason = None
+        output: list[str] = []
         if offer is not None:
             trader_before = self.trader_state
             player_before = self.player_state
@@ -183,7 +207,9 @@ class TraderSession:
                     sort_keys=True,
                 )
             )
-        self.history.append(ConversationTurn(player_message, reply.narration, reply.candidate, decision_reason))
+        rendered_reply = compose_reply(reply.flavor, reply.candidate, offer, decision_reason)
+        output.insert(0, f"Trader: {rendered_reply}")
+        self.history.append(ConversationTurn(player_message, rendered_reply, reply.candidate, decision_reason))
         return output
 
 

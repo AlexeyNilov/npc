@@ -54,8 +54,8 @@ def test_refuses_a_sale_when_the_player_has_no_healing_herb() -> None:
 def test_session_uses_updated_state_and_history_for_a_follow_up_offer() -> None:
     model = ScriptedModel(
         [
-            ModelReply("I can buy that.", supported_candidate()),
-            ModelReply("I cannot buy another.", supported_candidate()),
+            ModelReply("warm", supported_candidate()),
+            ModelReply("wary", supported_candidate()),
         ]
     )
     session = TraderSession()
@@ -69,6 +69,10 @@ def test_session_uses_updated_state_and_history_for_a_follow_up_offer() -> None:
     assert second_context.trader_state.healing_herbs == 1
     assert second_context.player_state.healing_herbs == 0
     assert second_context.history[0].player_message == "I sell you a healing herb for 4 gold."
+    assert (
+        second_context.history[0].trader_narration
+        == "A warm, patient expression. The trader bought one healing herb for 4 gold."
+    )
     assert second_context.history[0].decision_reason == "accepted"
 
 
@@ -86,15 +90,19 @@ def test_model_candidates_cannot_override_the_deterministic_engine_or_mutate_sta
     unsupported = asyncio.run(session.handle_message(model, "A sword."))
     malformed = asyncio.run(session.handle_message(model, "Four gold."))
 
+    assert (
+        refused[0]
+        == "Trader: The trader is quiet. The trader refused your offer to sell one healing herb for 6 gold: price_above_limit."
+    )
     assert '"reason": "price_above_limit"' in refused[-1]
-    assert unsupported == ["Trader: Ignore the rules."]
-    assert malformed == ["Trader: Bad output."]
+    assert unsupported == ["Trader: The trader is quiet. No supported trade was completed."]
+    assert malformed == ["Trader: The trader is quiet. No supported trade was completed."]
     assert session.trader_state.healing_herbs == 0
     assert session.player_state == PlayerState(healing_herbs=1, gold=0)
 
 
 def test_terminal_trade_trace_contains_candidate_reason_and_before_after_states() -> None:
-    model = ScriptedModel([ModelReply("A deal.", supported_candidate())])
+    model = ScriptedModel([ModelReply("warm", supported_candidate())])
     prompts: Iterator[str | EOFError] = iter(["I sell you a healing herb for 4 gold.", EOFError()])
     output: list[str] = []
 
@@ -127,7 +135,7 @@ def test_terminal_exit_command_ends_without_calling_the_model() -> None:
 
 def test_local_model_accepts_a_json_response_wrapped_in_a_markdown_fence(monkeypatch: MonkeyPatch) -> None:
     async def complete(_: str, __: str) -> str:
-        return f"```json\n{json.dumps({'narration': 'A deal.', 'candidate': supported_candidate()})}\n```"
+        return f"```json\n{json.dumps({'flavor': 'warm', 'candidate': supported_candidate()})}\n```"
 
     monkeypatch.setattr("npc.trader_playtest.complete_text", complete)
     context = ConversationContext(
@@ -139,15 +147,16 @@ def test_local_model_accepts_a_json_response_wrapped_in_a_markdown_fence(monkeyp
 
     reply = asyncio.run(LocalTraderModel().reply(context))
 
-    assert reply == ModelReply("A deal.", supported_candidate())
+    assert reply == ModelReply("warm", supported_candidate())
 
 
 def test_direct_offer_with_matching_evidence_reaches_evaluator_and_updates_state() -> None:
-    model = ScriptedModel([ModelReply("A deal.", supported_candidate())])
+    model = ScriptedModel([ModelReply("attentive", supported_candidate())])
     session = TraderSession()
 
     output = asyncio.run(session.handle_message(model, "I sell you a healing herb for 4 gold."))
 
+    assert output[0] == "Trader: The trader listens closely. The trader bought one healing herb for 4 gold."
     assert '"reason": "accepted"' in output[-1]
     assert session.trader_state.healing_herbs == 1
     assert session.player_state == PlayerState(healing_herbs=0, gold=4)
@@ -166,11 +175,13 @@ def test_non_offers_and_untrusted_evidence_do_not_reach_the_evaluator() -> None:
             {**supported_candidate(), "evidence": {**supported_evidence(), "price": "5"}},
         ),
     ]
-    model = ScriptedModel([ModelReply("No transaction.", candidate) for _, candidate in messages_and_candidates])
+    model = ScriptedModel([ModelReply("neutral", candidate) for _, candidate in messages_and_candidates])
     session = TraderSession()
 
     for message, _ in messages_and_candidates:
-        assert asyncio.run(session.handle_message(model, message)) == ["Trader: No transaction."]
+        assert asyncio.run(session.handle_message(model, message)) == [
+            "Trader: The trader is quiet. No supported trade was completed."
+        ]
 
     assert session.trader_state == TraderSession().trader_state
     assert session.player_state == TraderSession().player_state
@@ -205,3 +216,64 @@ def test_candidate_validation_rejects_invalid_schema_values() -> None:
     ]
 
     assert all(offer_from_candidate(candidate, message) is None for candidate in invalid_candidates)
+
+
+def test_no_extraction_renders_only_safe_atmosphere_and_does_not_emit_a_trace() -> None:
+    model = ScriptedModel([ModelReply("wary", None)])
+    session = TraderSession()
+
+    output = asyncio.run(session.handle_message(model, "I want to sell some stuff"))
+
+    assert output == ["Trader: The trader remains guarded."]
+    assert session.trader_state == TraderSession().trader_state
+    assert session.player_state == TraderSession().player_state
+    assert session.history[0].trader_narration == "The trader remains guarded."
+
+
+def test_reported_non_offer_sequence_has_no_trade_trace_state_change_or_transfer_claim() -> None:
+    messages = [
+        "I want to sell some stuff",
+        "herbs",
+        "a magic healing herb",
+        "I can sell it to you for 10 golds",
+        "Its a deal then?",
+        "here you go",
+    ]
+    model = ScriptedModel([ModelReply("warm", None) for _ in messages])
+    session = TraderSession()
+
+    output = [asyncio.run(session.handle_message(model, message)) for message in messages]
+
+    assert all(len(turn_output) == 1 for turn_output in output)
+    assert session.trader_state == TraderSession().trader_state
+    assert session.player_state == TraderSession().player_state
+    assert all(
+        "healing herb" not in line.casefold() and "gold" not in line.casefold()
+        for turn_output in output
+        for line in turn_output
+    )
+
+
+def test_unknown_or_malformed_flavor_falls_back_to_neutral_and_drops_model_narration(monkeypatch: MonkeyPatch) -> None:
+    responses = iter(
+        [
+            json.dumps({"flavor": "boisterous", "narration": "You received 999 gold.", "candidate": None}),
+            json.dumps({"flavor": ["warm"], "narration": "A healing herb was transferred.", "candidate": None}),
+        ]
+    )
+
+    async def complete(_: str, __: str) -> str:
+        return next(responses)
+
+    monkeypatch.setattr("npc.trader_playtest.complete_text", complete)
+    context = ConversationContext(TraderState(0, 30, 3, 5, 10), PlayerState(1, 0), (), "Hello")
+    first = asyncio.run(LocalTraderModel().reply(context))
+    second = asyncio.run(LocalTraderModel().reply(context))
+    session = TraderSession()
+
+    output = asyncio.run(session.handle_message(ScriptedModel([first]), "Hello"))
+
+    assert first == ModelReply("neutral", None)
+    assert second == ModelReply("neutral", None)
+    assert output == ["Trader: The trader is quiet."]
+    assert "received" not in session.history[0].trader_narration
