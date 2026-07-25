@@ -101,79 +101,139 @@ class LocalTraderModel:
         return ModelReply(flavor, data.get("candidate"))
 
 
+@dataclass(frozen=True)
+class AuthorityOutcome:
+    rendered_reply: str
+    decision_reason: str | None
+    trace_payload: dict[str, object] | None
+
+
+class AuthorityCapability(Protocol):
+    def resolve(self, reply: ModelReply, player_message: str, session: "TraderSession") -> AuthorityOutcome: ...
+
+
+class HealingHerbPurchaseCapability:
+    def resolve(self, reply: ModelReply, player_message: str, session: "TraderSession") -> AuthorityOutcome:
+        offer = self.offer_from_candidate(reply.candidate, player_message)
+        if offer is None:
+            return AuthorityOutcome(self.render(reply.flavor, reply.candidate, None, None), None, None)
+
+        trader_before = session.trader_state
+        player_before = session.player_state
+        result = evaluate_offer(trader_before, player_before, offer)
+        session.trader_state = result.trader_state
+        session.player_state = result.player_state
+        return AuthorityOutcome(
+            self.render(reply.flavor, reply.candidate, offer, result.reason),
+            result.reason,
+            {
+                "candidate": reply.candidate,
+                "reason": result.reason,
+                "trader_before": asdict(trader_before),
+                "trader_after": asdict(result.trader_state),
+                "player_before": asdict(player_before),
+                "player_after": asdict(result.player_state),
+            },
+        )
+
+    @staticmethod
+    def render(flavor: str, candidate: object | None, offer: Offer | None, decision_reason: str | None) -> str:
+        atmosphere = _FLAVOR_TEXT.get(flavor, _FLAVOR_TEXT["neutral"])
+        if offer is None:
+            return atmosphere if candidate is None else f"{atmosphere} No supported trade was completed."
+        if decision_reason == "accepted":
+            return f"{atmosphere} The trader bought one healing herb for {offer.unit_price_gold} gold."
+        return (
+            f"{atmosphere} The trader refused your offer to sell one healing herb for "
+            f"{offer.unit_price_gold} gold: {decision_reason}."
+        )
+
+    @staticmethod
+    def offer_from_candidate(candidate: object, player_message: str) -> Offer | None:
+        if not isinstance(candidate, dict):
+            return None
+        action = candidate.get("action")
+        item = candidate.get("item")
+        quantity = candidate.get("quantity")
+        price = candidate.get("unit_price_gold")
+        evidence = candidate.get("evidence")
+        if (
+            action != "sell_to_trader"
+            or item != "healing_herb"
+            or quantity != 1
+            or isinstance(quantity, bool)
+            or not isinstance(price, int)
+            or isinstance(price, bool)
+            or not isinstance(evidence, dict)
+        ):
+            return None
+        direction = evidence.get("direction")
+        evidence_quantity = evidence.get("quantity")
+        evidence_item = evidence.get("item")
+        evidence_price = evidence.get("price")
+        currency = evidence.get("currency")
+        if (
+            not isinstance(direction, str)
+            or not isinstance(evidence_quantity, str)
+            or not isinstance(evidence_item, str)
+            or not isinstance(evidence_price, str)
+            or not isinstance(currency, str)
+        ):
+            return None
+        if (
+            _DIRECTION.fullmatch(direction) is None
+            or evidence_quantity.casefold() not in {"one", "1", "a"}
+            or evidence_item.casefold() != "healing herb"
+            or _PRICE.fullmatch(evidence_price) is None
+            or int(evidence_price) != price
+            or currency.casefold() != "gold"
+        ):
+            return None
+        direction_end = player_message.casefold().find(direction.casefold())
+        if direction_end < 0:
+            return None
+        direction_end += len(direction)
+        quantity_item = f"{evidence_quantity} {evidence_item}"
+        quantity_end = player_message.casefold().find(quantity_item.casefold(), direction_end)
+        if quantity_end < 0:
+            return None
+        quantity_end += len(quantity_item)
+        price_currency = f"for {evidence_price} {currency}"
+        price_start = player_message.casefold().find(price_currency.casefold(), quantity_end)
+        if price_start < 0 or _ADDITIONAL_ITEM.search(player_message[quantity_end:price_start]) is not None:
+            return None
+        return Offer(name="healing_herb", unit_price_gold=price)
+
+
 def compose_reply(flavor: str, candidate: object | None, offer: Offer | None, decision_reason: str | None) -> str:
-    atmosphere = _FLAVOR_TEXT.get(flavor, _FLAVOR_TEXT["neutral"])
-    if offer is None:
-        return atmosphere if candidate is None else f"{atmosphere} No supported trade was completed."
-    if decision_reason == "accepted":
-        return f"{atmosphere} The trader bought one healing herb for {offer.unit_price_gold} gold."
-    return (
-        f"{atmosphere} The trader refused your offer to sell one healing herb for "
-        f"{offer.unit_price_gold} gold: {decision_reason}."
-    )
+    return HealingHerbPurchaseCapability.render(flavor, candidate, offer, decision_reason)
 
 
 def offer_from_candidate(candidate: object, player_message: str) -> Offer | None:
-    if not isinstance(candidate, dict):
-        return None
-    action = candidate.get("action")
-    item = candidate.get("item")
-    quantity = candidate.get("quantity")
-    price = candidate.get("unit_price_gold")
-    evidence = candidate.get("evidence")
-    if (
-        action != "sell_to_trader"
-        or item != "healing_herb"
-        or quantity != 1
-        or isinstance(quantity, bool)
-        or not isinstance(price, int)
-        or isinstance(price, bool)
-        or not isinstance(evidence, dict)
-    ):
-        return None
-    direction = evidence.get("direction")
-    evidence_quantity = evidence.get("quantity")
-    evidence_item = evidence.get("item")
-    evidence_price = evidence.get("price")
-    currency = evidence.get("currency")
-    if (
-        not isinstance(direction, str)
-        or not isinstance(evidence_quantity, str)
-        or not isinstance(evidence_item, str)
-        or not isinstance(evidence_price, str)
-        or not isinstance(currency, str)
-    ):
-        return None
-    if (
-        _DIRECTION.fullmatch(direction) is None
-        or evidence_quantity.casefold() not in {"one", "1", "a"}
-        or evidence_item.casefold() != "healing herb"
-        or _PRICE.fullmatch(evidence_price) is None
-        or int(evidence_price) != price
-        or currency.casefold() != "gold"
-    ):
-        return None
-    direction_end = player_message.casefold().find(direction.casefold())
-    if direction_end < 0:
-        return None
-    direction_end += len(direction)
-    quantity_item = f"{evidence_quantity} {evidence_item}"
-    quantity_end = player_message.casefold().find(quantity_item.casefold(), direction_end)
-    if quantity_end < 0:
-        return None
-    quantity_end += len(quantity_item)
-    price_currency = f"for {evidence_price} {currency}"
-    price_start = player_message.casefold().find(price_currency.casefold(), quantity_end)
-    if price_start < 0 or _ADDITIONAL_ITEM.search(player_message[quantity_end:price_start]) is not None:
-        return None
-    return Offer(name="healing_herb", unit_price_gold=price)
+    return HealingHerbPurchaseCapability.offer_from_candidate(candidate, player_message)
+
+
+class AuthorityFlow:
+    def __init__(self, capability: AuthorityCapability) -> None:
+        self.capability = capability
+
+    def handle(self, reply: ModelReply, player_message: str, session: "TraderSession") -> list[str]:
+        outcome = self.capability.resolve(reply, player_message, session)
+        output = [f"Trader: {outcome.rendered_reply}"]
+        if outcome.trace_payload is not None:
+            output.append("TRADE_TRACE " + json.dumps(outcome.trace_payload, sort_keys=True))
+        session.history.append(
+            ConversationTurn(player_message, outcome.rendered_reply, reply.candidate, outcome.decision_reason)
+        )
+        return output
 
 
 class TraderSession:
-    def __init__(self) -> None:
+    def __init__(self, authority_flow: AuthorityFlow | None = None) -> None:
         self.trader_state = INITIAL_TRADER_STATE
         self.player_state = INITIAL_PLAYER_STATE
         self.history: list[ConversationTurn] = []
+        self.authority_flow = authority_flow or AuthorityFlow(HealingHerbPurchaseCapability())
 
     async def handle_message(self, model: TraderModel, player_message: str) -> list[str]:
         context = ConversationContext(
@@ -183,34 +243,7 @@ class TraderSession:
             player_message=player_message,
         )
         reply = await model.reply(context)
-        offer = offer_from_candidate(reply.candidate, player_message)
-        decision_reason = None
-        output: list[str] = []
-        if offer is not None:
-            trader_before = self.trader_state
-            player_before = self.player_state
-            result = evaluate_offer(trader_before, player_before, offer)
-            self.trader_state = result.trader_state
-            self.player_state = result.player_state
-            decision_reason = result.reason
-            output.append(
-                "TRADE_TRACE "
-                + json.dumps(
-                    {
-                        "candidate": reply.candidate,
-                        "reason": result.reason,
-                        "trader_before": asdict(trader_before),
-                        "trader_after": asdict(result.trader_state),
-                        "player_before": asdict(player_before),
-                        "player_after": asdict(result.player_state),
-                    },
-                    sort_keys=True,
-                )
-            )
-        rendered_reply = compose_reply(reply.flavor, reply.candidate, offer, decision_reason)
-        output.insert(0, f"Trader: {rendered_reply}")
-        self.history.append(ConversationTurn(player_message, rendered_reply, reply.candidate, decision_reason))
-        return output
+        return self.authority_flow.handle(reply, player_message, self)
 
 
 async def chat(

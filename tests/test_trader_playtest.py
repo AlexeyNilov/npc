@@ -6,7 +6,16 @@ from typing import cast
 from pytest import MonkeyPatch
 
 from npc.trader_experiment import Offer, PlayerState, TraderState, evaluate_offer
-from npc.trader_playtest import ConversationContext, LocalTraderModel, ModelReply, TraderSession, chat, offer_from_candidate
+from npc.trader_playtest import (
+    AuthorityFlow,
+    ConversationContext,
+    HealingHerbPurchaseCapability,
+    LocalTraderModel,
+    ModelReply,
+    TraderSession,
+    chat,
+    offer_from_candidate,
+)
 
 
 def supported_candidate(price: int = 4) -> dict[str, object]:
@@ -37,6 +46,15 @@ class ScriptedModel:
     async def reply(self, context: ConversationContext) -> ModelReply:
         self.contexts.append(context)
         return self.replies.pop(0)
+
+
+class TrackingHealingHerbPurchaseCapability(HealingHerbPurchaseCapability):
+    def __init__(self) -> None:
+        self.resolved_candidates: list[object | None] = []
+
+    def resolve(self, reply: ModelReply, player_message: str, session: TraderSession):
+        self.resolved_candidates.append(reply.candidate)
+        return super().resolve(reply, player_message, session)
 
 
 def test_refuses_a_sale_when_the_player_has_no_healing_herb() -> None:
@@ -160,6 +178,39 @@ def test_direct_offer_with_matching_evidence_reaches_evaluator_and_updates_state
     assert '"reason": "accepted"' in output[-1]
     assert session.trader_state.healing_herbs == 1
     assert session.player_state == PlayerState(healing_herbs=0, gold=4)
+
+
+def test_authority_flow_dispatches_trade_validation_outcome_rendering_and_trace() -> None:
+    capability = TrackingHealingHerbPurchaseCapability()
+    session = TraderSession(authority_flow=AuthorityFlow(capability))
+    model = ScriptedModel([ModelReply("attentive", supported_candidate())])
+
+    output = asyncio.run(session.handle_message(model, "I sell you a healing herb for 4 gold."))
+
+    assert capability.resolved_candidates == [supported_candidate()]
+    assert output[0] == "Trader: The trader listens closely. The trader bought one healing herb for 4 gold."
+    trace = json.loads(output[1].removeprefix("TRADE_TRACE "))
+    assert trace == {
+        "candidate": supported_candidate(),
+        "reason": "accepted",
+        "trader_before": {
+            "healing_herbs": 0,
+            "gold": 30,
+            "target_healing_herbs": 3,
+            "max_unit_price_gold": 5,
+            "gold_reserve": 10,
+        },
+        "trader_after": {
+            "healing_herbs": 1,
+            "gold": 26,
+            "target_healing_herbs": 3,
+            "max_unit_price_gold": 5,
+            "gold_reserve": 10,
+        },
+        "player_before": {"healing_herbs": 1, "gold": 0},
+        "player_after": {"healing_herbs": 0, "gold": 4},
+    }
+    assert session.history[0].decision_reason == "accepted"
 
 
 def test_non_offers_and_untrusted_evidence_do_not_reach_the_evaluator() -> None:
