@@ -19,6 +19,25 @@ their canonical owners, prepare executable tasks, and integrate verified results
 - Apply the lifecycle, delegation, and simplifier triggers in the
   [agent workflow](../agent-workflow.md).
 
+## Planning a roadmap outcome with the user
+
+When asked to plan an outcome in the roadmap:
+
+- Treat the named outcome and its linked evidence as the initial scope; do not
+  silently expand it.
+- Ask only the material questions needed to make a lean, executable plan.
+  Ask one simple question at a time, wait for its answer, and use it to narrow
+  the next question.
+- Do not prepare tasks or present a committed implementation plan until the
+  material ambiguity is resolved. State assumptions explicitly when a safe,
+  reversible assumption is sufficient to continue.
+- Prefer the smallest experiment, interface, and verification that can test
+  the outcome's hypothesis and pass criterion. Call out a simpler option when
+  one exists.
+- Once enough is known, summarize the agreed scope, assumptions, excluded
+  work, verification, and the smallest next tasks. Route any durable facts to
+  their canonical owners before marking work Ready.
+
 ## Integration
 
 Inspect the actual diff and verification rather than trusting the handoff. Resolve
