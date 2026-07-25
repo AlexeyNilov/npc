@@ -4,7 +4,8 @@
 
 **Date:** 2026-07-25
 
-**Roadmap outcome:** [Establish the affect-to-action boundary](../roadmap.md#1-establish-the-affect-to-action-boundary)
+**Roadmap outcome:** Historical scope superseded by binary threat detection;
+see the [current roadmap](../roadmap.md).
 
 ## Decision unlocked
 
@@ -104,4 +105,4 @@ Complete at Review.
 - **Decision or unresolved question created:** Decide whether the observed
   ambiguous-label mismatch warrants a revised affect contract or a small next
   experiment, without adding state or authority to compensate.
-- **Canonical follow-up:** [Roadmap outcome 1](../roadmap.md#1-establish-the-affect-to-action-boundary).
+- **Canonical follow-up:** Superseded by the binary threat-detection delivery.

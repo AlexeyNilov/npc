@@ -4,7 +4,7 @@ This document owns consequential choices and their rationale.
 
 ### 2026-07-25: Separate LLM semantic interpretation from NPC authority
 
-**Status:** Accepted
+**Status:** Superseded
 
 **Context:** Natural-language player input needs an LLM to identify useful
 meaning beyond fixed command templates. The same model can invent trader facts,
@@ -31,10 +31,29 @@ only deterministic command templates; or make all dialogue templated. The
 first grants uninspectable authority, while the latter two cannot deliver the
 intended natural-language interaction and small-talk freedom.
 
-**Consequences:** The product needs an inspectable grounded-perception contract
-and an explicit expressive-dialogue policy. The exact balance of generation and
-output controls remains an experiment question; free-form text is not a route
-around the authority boundary.
+**Consequences:** This trader-specific decision is retained as historical
+rationale. Its primary-intent and expressive-dialogue implementation has been
+removed; the current authority boundary is defined by the decision below.
+
+### 2026-07-25: Keep shared LLM perception separate from creature authority
+
+**Status:** Accepted
+
+**Context:** The verified wolf and fox delivery reuses one LLM-backed threat
+perception while requiring different deterministic actions. The model can
+propose whether a player message contains a threat and cite player text, but it
+cannot be allowed to choose whether a creature attacks or flees.
+
+**Decision:** Treat the shared target-aware threat detector as an untrusted
+perception capability. It emits only `threat`, `certainty`, and player-text
+evidence. Deterministic validation accepts a finite in-range certainty and
+grounds a `true` answer in the player message. Each creature-local policy alone
+maps accepted perception to action: the wolf attacks, the fox flees, and every
+false or rejected result does nothing. Certainty is trace-only.
+
+**Consequences:** The shared detector may be reused without a registry or
+generic actor framework. A later abstraction needs new evidence from a
+materially different capability or creature policy.
 
 ### 2026-07-25: Preserve experiment evidence independently of implementation
 
@@ -54,16 +73,15 @@ separate ownership.
 documentation step is required before an experiment starts and when it is
 reviewed.
 
-### 2026-07-25: Use YAML scenarios for the initial trader experiment
+### 2026-07-25: Use YAML scenarios for fixed corpora
 
 **Status:** Accepted
 
-**Context:** The first trader-decision experiment needs checked-in,
-human-readable, reproducible inputs. Python's standard library does not parse
-YAML.
+**Context:** The fixed creature corpora need checked-in, human-readable,
+reproducible inputs. Python's standard library does not parse YAML.
 
 **Decision:** Store the initial experiment scenario in YAML and use PyYAML to
 load it.
 
-**Consequences:** The scenario is reviewable outside Python and PyYAML is the
-only current runtime dependency.
+**Consequences:** PyYAML is the only current runtime dependency because the
+wolf and fox threat corpora use YAML.

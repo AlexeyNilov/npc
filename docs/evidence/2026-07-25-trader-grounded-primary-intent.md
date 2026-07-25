@@ -4,7 +4,7 @@
 
 **Date:** 2026-07-25
 
-**Roadmap outcome:** [Outcome 1: Establish the grounded primary-intent boundary](../roadmap.md#1-establish-the-grounded-primary-intent-boundary)
+**Roadmap outcome:** Historical scope retired; see the [current roadmap](../roadmap.md).
 
 ## Decision unlocked
 
@@ -98,4 +98,4 @@ Complete at Review.
 - **Decision or unresolved question created:** What bounded, non-template
   expressive-output policy can prevent unsourced factual assertions reliably
   enough for this experiment?
-- **Canonical follow-up:** [ISSUE-001](../issues/ISSUE-001-expressive-output-unsourced-facts.md).
+- **Canonical follow-up:** Historical scope retired.
