@@ -32,3 +32,27 @@ This helps ensure requirements are:
   unchanged.
 - **When** the system accepts an offer, **the system shall** conserve the total
   healing herbs and gold across the trader and player.
+
+### Stateful conversational trader playtest
+
+- **When** a developer runs `python -m npc.trader_playtest` with a configured
+  local LLM, **the system shall** provide a terminal conversation with one
+  trader for the lifetime of that process.
+- **When** the developer sends a natural-language message, **the system shall**
+  give the local LLM the current authoritative trader and player state plus the
+  relevant in-session conversation history, and use its output only to narrate
+  or propose a supported trade.
+- **When** the LLM proposes a supported sale of one healing herb by the player
+  for an integer gold price, **the system shall** validate that proposal and
+  evaluate it through the deterministic trader decision engine; only that
+  engine may accept or refuse the trade and update authoritative state.
+- **When** the LLM output is malformed or does not describe a supported trade,
+  **the system shall** leave authoritative state unchanged and return a
+  conversational response without recording a trade decision.
+- **When** a trade is accepted or refused, **the system shall** show its
+  structured proposal, deterministic reason, and before-and-after trader and
+  player states in the terminal so the decision path can be reproduced.
+- **When** a later message in the same session depends on an earlier exchange
+  or trade, **the system shall** use the updated authoritative state and
+  in-session history; state and history shall be discarded when the process
+  exits.

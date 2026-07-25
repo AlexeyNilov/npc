@@ -55,7 +55,7 @@ format becomes a small, reviewable external input boundary.
 
 ### 2026-07-25: Keep core actor decisions deterministic
 
-**Status:** Proposed
+**Status:** Accepted
 
 **Context:** The project needs agent behaviour that can be tested and
 reproduced while still supporting natural-language interaction and rich
@@ -72,3 +72,26 @@ testability.
 **Consequences:** The internal design must be discovered and validated through
 experiments. LLM output cannot by itself determine an actor's authoritative
 state changes or final choices.
+
+### 2026-07-25: Use a local-LLM terminal session for the first trader playtest
+
+**Status:** Accepted
+
+**Context:** The first conversational playtest must exercise natural-language
+interaction with the configured local LLM, while remaining the smallest
+observable experiment. The developer confirmed that a terminal interface and
+state lasting only for the current program session are sufficient.
+
+**Decision:** Provide one terminal command backed by the configured local LLM.
+Keep one trader/player state and conversation history in memory for the
+process. Require the LLM to return a constrained machine-readable candidate
+trade alongside its narration; validate that candidate before passing it to the
+deterministic decision engine.
+
+**Alternatives considered:** A browser interface, persistence across launches,
+or an LLM that directly changes state. They exceed the smallest playtest or
+would break the deterministic authority boundary.
+
+**Consequences:** Live play requires the local LLM to be reachable. Automated
+tests must replace the LLM boundary with deterministic responses, and malformed
+model output becomes a normal no-state-change path.
