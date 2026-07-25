@@ -41,3 +41,22 @@ only accepted threat: wolf maps true to `attack`, fox maps true to `flee`, and
 false or invalid perception maps to `do_nothing` for both. Certainty is traced
 but has no policy threshold or branch. The delivery has no creature state,
 dialogue, world model, registry, or shared actor framework.
+
+## Two-perception wolf sensemaking
+
+`npc.experiments.food_offer_detection` is a separate binary sensor for whether
+a player message explicitly offers food to the wolf. Its candidate and
+validation contract mirrors the threat sensor with `food_offer`, `certainty`,
+and `evidence`: true evidence must be a non-empty verbatim substring of the
+player message, false evidence must be null, and malformed or invalid
+candidates fail closed.
+
+`npc.experiments.wolf_sensemaking` invokes the established threat sensor and
+the separate food-offer sensor exactly once each for a turn. Its trace retains
+each sensor's raw candidate, parsed candidate, and validation result
+independently. Only accepted booleans enter the explicit policy: accepted
+threat selects `attack`; otherwise accepted food offer selects `approach`;
+otherwise it selects `do_nothing`. The `threat_over_food_offer` priority is
+fixed and certainty remains trace-only. `python -m npc.experiments.wolf_sensemaking`
+loads `scenarios/wolf_sensemaking.yaml`; this bounded wrapper adds no state,
+dialogue, world model, registry, or general actor/perception abstraction.

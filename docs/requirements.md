@@ -22,3 +22,23 @@ This document owns observable system behavior.
 - **When** two otherwise identical valid candidates report different certainty
   values, **the system shall** return the same creature-specific action;
   certainty is recorded but shall not grant authority or affect the action.
+
+### Deterministic wolf sensemaking from two grounded perceptions
+
+- **When** a developer runs the checked-in wolf sensemaking corpus, **the
+  system shall** print one machine-readable trace per player message containing
+  both independent raw and parsed perception candidates, their validation
+  results, expected threat/food-offer/action values, the fixed
+  `threat_over_food_offer` priority, and the deterministic action.
+- **When** an evidence-grounded threat is accepted, **the system shall** choose
+  `attack`; otherwise, when an evidence-grounded explicit food offer is
+  accepted, **the system shall** choose `approach`; otherwise, **the system
+  shall** choose `do_nothing`.
+- **When** either candidate is malformed, has non-finite or out-of-range
+  certainty, has empty true evidence, or cites evidence absent from the player
+  message, **the system shall** reject that perception and it shall not cause
+  its associated action. A rejected threat shall not suppress an accepted food
+  offer.
+- **When** both perceptions are accepted, **the system shall** choose `attack`
+  and trace `threat_over_food_offer`. Changing only valid certainty values
+  shall not change the action.

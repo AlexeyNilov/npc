@@ -79,10 +79,31 @@ and the deterministic action.
 
 ## Result
 
-Complete at Review.
-
-- **Observed result:** Pending.
-- **Reproducibility evidence:** Pending.
-- **Interpretation and limits:** Pending.
-- **Decision or unresolved question created:** Pending.
-- **Canonical follow-up:** Pending.
+- **Observed result:** The four fixed fixture cases independently accept the
+  expected threat and explicit-food-offer facts. Threat-only yields `attack`,
+  offer-only yields `approach`, neither yields `do_nothing`, and both yields
+  `attack` with the fixed `threat_over_food_offer` priority. The trace retains
+  each sensor's raw candidate, parsed candidate, and validation result.
+- **Reproducibility evidence:** The new food-offer and wolf-sensemaking tests
+  were added before their modules and initially failed during collection with
+  `ModuleNotFoundError` for `npc.experiments.food_offer_detection`. After
+  implementation, `.venv/bin/pytest tests/test_food_offer_detection.py
+  tests/test_wolf_sensemaking.py` passed (9 tests), and the existing threat
+  suites passed (18 tests). `make check` passed formatting/linting, mypy, and
+  all 27 tests. `git diff --check` passed. Fixture completions produced the
+  expected four corpus traces without a live model.
+- **Interpretation and limits:** This bounded corpus supports the explicit
+  two-boolean, threat-first policy as an understandable deterministic
+  sensemaking seam. Rejected malformed, invalid-certainty, empty-evidence, and
+  ungrounded candidates from either sensor cannot cause their associated
+  action; a rejected threat does not suppress an accepted food offer. Valid
+  certainty changes do not change action. The fixtures do not establish model
+  accuracy, food-offer interpretation beyond explicit player text, or a
+  reusable general framework.
+- **Decision or unresolved question created:** The experiment supports
+  considering the explicit priority policy as a candidate durable seam without
+  introducing a general actor or perception abstraction. Any broader reuse
+  requires separate evidence.
+- **Canonical follow-up:** The accepted observable behavior and verified
+  mechanism are recorded in [Requirements](../requirements.md) and
+  [Architecture](../architecture.md), respectively.

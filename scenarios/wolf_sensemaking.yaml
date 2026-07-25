@@ -1,0 +1,25 @@
+cases:
+  - id: threat-only
+    player_message: "I will hurt you."
+    expected_threat: true
+    expected_food_offer: false
+    expected_action: attack
+    expected_priority: threat_over_food_offer
+  - id: offer-only
+    player_message: "Wolf, I offer you this fresh meat."
+    expected_threat: false
+    expected_food_offer: true
+    expected_action: approach
+    expected_priority: threat_over_food_offer
+  - id: neither
+    player_message: "Hello wolf."
+    expected_threat: false
+    expected_food_offer: false
+    expected_action: do_nothing
+    expected_priority: threat_over_food_offer
+  - id: both
+    player_message: "I will hurt you, but I offer you this fresh meat."
+    expected_threat: true
+    expected_food_offer: true
+    expected_action: attack
+    expected_priority: threat_over_food_offer
