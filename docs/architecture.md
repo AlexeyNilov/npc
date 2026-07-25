@@ -2,6 +2,26 @@
 
 This document owns the current verified system design.
 
+## Binary perception pattern
+
+LLM-backed perception is modeled as a sequence of small, independent binary
+questions. Each question asks one action-relevant fact about one player message
+and a named creature, rather than asking the model to choose an NPC action or
+produce a broad interpretation.
+
+For the current threat-detection capability, the question is whether the
+message contains a credible hostile threat toward the named creature. The model
+returns a boolean answer, a certainty value, and player-text evidence. A `true`
+answer is usable only when deterministic validation accepts its exact evidence;
+`false`, ambiguity, malformed output, ungrounded evidence, and invalid
+certainty all fail closed. Certainty is trace-only and does not change action.
+
+The question and validation capability are reusable. Each creature retains an
+explicit deterministic policy that maps an accepted answer to its own action:
+the wolf attacks, the fox flees, and all other results do nothing. Future
+perceptions should follow this pattern unless a documented decision and evidence
+justify a different contract.
+
 ## Shared target-aware threat detection
 
 `npc.experiments.threat_detection` builds the one target-aware threat prompt,
