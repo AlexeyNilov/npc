@@ -40,7 +40,6 @@ Use red, green, refactor. Test behavior, not implementation.
 - Use dependency injection to keep business logic easy to test.
 - Omit obvious docstrings; use Google-style docstrings only for complex business logic.
 - Update only the documentation artifact that owns the changed information.
-- Bump the semantic version in the project manifest (`pyproject.toml`) after functional application changes.
 
 ## Surgical changes
 

@@ -15,6 +15,12 @@ class TraderState:
 
 
 @dataclass(frozen=True)
+class PlayerState:
+    healing_herbs: int
+    gold: int
+
+
+@dataclass(frozen=True)
 class Offer:
     name: str
     unit_price_gold: int
@@ -24,61 +30,69 @@ class Offer:
 class DecisionResult:
     accepted: bool
     reason: str
-    state: TraderState
+    trader_state: TraderState
+    player_state: PlayerState
 
 
-def evaluate_offer(state: TraderState, offer: Offer) -> DecisionResult:
-    if offer.unit_price_gold > state.max_unit_price_gold:
-        return DecisionResult(accepted=False, reason="price_above_limit", state=state)
+@dataclass(frozen=True)
+class TradeProposal:
+    offer: Offer
+    trader_state: TraderState
+    player_state: PlayerState
 
-    remaining_gold = state.gold - offer.unit_price_gold
-    if state.healing_herbs >= state.target_healing_herbs:
-        return DecisionResult(accepted=False, reason="stock_target_met", state=state)
-    if remaining_gold < state.gold_reserve:
-        return DecisionResult(accepted=False, reason="reserve_would_be_breached", state=state)
+
+def evaluate_offer(trader_state: TraderState, player_state: PlayerState, offer: Offer) -> DecisionResult:
+    if offer.unit_price_gold > trader_state.max_unit_price_gold:
+        return DecisionResult(False, "price_above_limit", trader_state, player_state)
+
+    remaining_gold = trader_state.gold - offer.unit_price_gold
+    if trader_state.healing_herbs >= trader_state.target_healing_herbs:
+        return DecisionResult(False, "stock_target_met", trader_state, player_state)
+    if remaining_gold < trader_state.gold_reserve:
+        return DecisionResult(False, "reserve_would_be_breached", trader_state, player_state)
 
     return DecisionResult(
         accepted=True,
         reason="accepted",
-        state=TraderState(
-            healing_herbs=state.healing_herbs + 1,
+        trader_state=TraderState(
+            healing_herbs=trader_state.healing_herbs + 1,
             gold=remaining_gold,
-            target_healing_herbs=state.target_healing_herbs,
-            max_unit_price_gold=state.max_unit_price_gold,
-            gold_reserve=state.gold_reserve,
+            target_healing_herbs=trader_state.target_healing_herbs,
+            max_unit_price_gold=trader_state.max_unit_price_gold,
+            gold_reserve=trader_state.gold_reserve,
         ),
+        player_state=PlayerState(healing_herbs=player_state.healing_herbs - 1, gold=player_state.gold + offer.unit_price_gold),
     )
 
 
-def load_scenario(path: Path) -> tuple[TraderState, list[Offer]]:
+def load_scenario(path: Path) -> list[TradeProposal]:
     data = cast(dict[str, object], yaml.safe_load(path.read_text()))
-    initial_state = cast(dict[str, int], data["initial_state"])
     proposals = cast(list[dict[str, object]], data["proposals"])
-    return (
-        TraderState(**initial_state),
-        [
-            Offer(
+    return [
+        TradeProposal(
+            offer=Offer(
                 name=cast(str, proposal["name"]),
                 unit_price_gold=cast(int, proposal["unit_price_gold"]),
-            )
-            for proposal in proposals
-        ],
-    )
+            ),
+            trader_state=TraderState(**cast(dict[str, int], proposal["trader_state"])),
+            player_state=PlayerState(**cast(dict[str, int], proposal["player_state"])),
+        )
+        for proposal in proposals
+    ]
 
 
-def format_state(state: TraderState) -> str:
+def format_state(state: TraderState | PlayerState) -> str:
     return f"healing_herbs={state.healing_herbs}, gold={state.gold}"
 
 
 def main() -> None:
     scenario_path = Path(__file__).parents[2] / "scenarios" / "trader_decision.yaml"
-    initial_state, offers = load_scenario(scenario_path)
-    for offer in offers:
-        result = evaluate_offer(initial_state, offer)
+    for proposal in load_scenario(scenario_path):
+        result = evaluate_offer(proposal.trader_state, proposal.player_state, proposal.offer)
         decision = "accepted" if result.accepted else "refused"
         print(
-            f"{offer.name}: price={offer.unit_price_gold} {decision} ({result.reason}); "
-            f"resulting state: {format_state(result.state)}"
+            f"{proposal.offer.name}: price={proposal.offer.unit_price_gold} {decision} ({result.reason}); "
+            f"trader: {format_state(result.trader_state)}; player: {format_state(result.player_state)}"
         )
 
 
