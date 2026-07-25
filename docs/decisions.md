@@ -142,3 +142,32 @@ complexity at the conversation boundary.
 **Consequences:** A model cannot claim a completed trade or any state change.
 The fixed reply vocabulary must expand explicitly with future transaction
 shapes, while current traces remain reproducible from evaluated offers.
+
+### 2026-07-25: Test a narrow deterministic actor-loop boundary
+
+**Status:** Accepted
+
+**Context:** The trader playtest has a shared authority flow, but it has not
+yet shown that the project vision's reality-to-feedback actor loop can be
+reused outside one trader action. Roadmap Outcome 1 requires two action
+contracts through one inspectable loop while preserving deterministic
+authority.
+
+**Decision:** Test a candidate durable `ActorLoop` boundary that owns only
+deterministic sequencing and a record of reality, perception, sensemaking,
+intent, action, outcome, and feedback. Scenario-owned contracts retain
+validation, domain policy, state transitions, and rendering. The first two
+contracts are the healing-herb purchase and the supported trader-identity
+response.
+
+**Alternatives considered:** Retain trader-only trace scaffolding, build a
+general actor/world framework, or let the LLM select authoritative intents or
+actions. Trader-only scaffolding cannot test reuse; the general framework is
+unsupported by two scenarios; LLM authority conflicts with deterministic
+decision-making.
+
+**Consequences:** The candidate boundary must pass both scenarios without
+trader-specific branches in shared orchestration before it is promoted as a
+reusable direction. It remains subject to rejection if the second contract
+needs different orchestration or if its records cannot reproduce authoritative
+outcomes.
