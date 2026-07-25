@@ -55,28 +55,6 @@ yet supplied by the user.
 
 ## Ordered future outcomes
 
-### 5. Make player-facing trade outcomes state-grounded
-
-**Outcome:** after a proposed trade is evaluated, the player receives one
-response that accurately states the authoritative acceptance/refusal outcome
-and any material state fact it mentions. Unsupported actions are described as
-unsupported or unresolved; they are never narrated as completed.
-
-**Hypothesis:** deriving player-facing outcome statements from the authoritative
-decision and state will make the trader's behaviour understandable and
-trustworthy in play.
-
-**Smallest test:** replay accepted and refused offers, ask for the trader's gold
-after each, and make an unsupported demand for state-changing action. Compare
-each response with its decision trace and state snapshot.
-
-**Support signal / pass criterion:** every claimed trade outcome matches the
-trace; every claimed gold amount matches current state; and no unsupported
-action is claimed to have changed state. One contradiction fails the test.
-
-**Constraint:** an LLM may word a response, but it must not assert a state
-change or final trade outcome beyond the authoritative result supplied to it.
-
 ### 6. Evaluate LangExtract for grounded trade extraction
 
 **Outcome:** obtain reproducible evidence on whether
