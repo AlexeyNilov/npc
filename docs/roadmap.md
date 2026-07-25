@@ -1,128 +1,88 @@
 # Roadmap
 
 This document owns incomplete future outcomes. It orders evidence-bearing
-outcomes, not coding activities or a list of possible abstractions.
+outcomes, not coding activities or speculative engine abstractions.
 
 ## Product frame
 
-**Target user:** the project's developer, learning whether a deterministic
-actor model can turn natural-language player input into grounded NPC behavior
-without losing expressive conversation.
+**Target user:** the project's developer, learning how a deterministic actor
+can use an LLM as a narrow perception sensor without granting it authority over
+the actor's actions.
 
-**Problem:** a language model is the practical semantic interpreter for varied
-player input, but it must not invent trader facts, commitments, state changes,
-or durable history. The current offer evaluator has no language-facing
-perception boundary and no room for safe, free small talk.
+**Problem:** the trader experiment combines language interpretation,
+authoritative facts, commitments, and free expressive dialogue. That is too
+much uncertainty for the current learning step. The project needs a smaller
+language-facing actor whose behavior can be inspected without a world model or
+generated dialogue.
 
-**Evidence milestone:** a developer can send one player message to a trader;
-the system discovers one primary intent and routes it either through a grounded
-authoritative path or an expressive, side-effect-free path.
+**Evidence milestone:** a developer can give a territorial wolf one player
+message and inspect an LLM-proposed affect perception, its exact text evidence,
+validation result, and the wolf's deterministic action.
 
-**Constraints:** start with one player and one primary intent per turn. The one
-supported authoritative intent is a player offer to sell one healing herb for a
-stated gold price. General world simulation, multiple simultaneous intents,
-additional authoritative actions, and durable memory from expressive dialogue
-are out of scope.
+**Confirmed scope:** the first creature is a territorial wolf. It does not
+understand speech or converse. It senses emotional tone only and has exactly
+two authoritative actions: `attack` and `do_nothing`.
+
+**Constraints:** no trader facts, transactions, world simulation, free-form NPC
+replies, multi-intent handling, persistent memory, or additional creature
+actions. The LLM proposes a sensor reading; it does not select an action or
+alter state.
 
 ## Ordered future outcomes
 
-### 1. Establish the grounded primary-intent boundary
+### 1. Establish the affect-to-action boundary
 
-**Hypothesis:** an LLM can propose one useful primary intent from player text
-while deterministic grounding can prevent unsupported interpretations from
-becoming trader facts, commitments, state changes, or durable memory.
+**Hypothesis:** an LLM can act as a bounded affect sensor for a player message:
+it proposes `hostile`, `non_hostile`, or `unclear` plus exact supporting text.
+Deterministic validation and wolf policy can then make the creature's action
+inspectable and replayable from that accepted perception.
 
-**Outcome:** a developer can send one player message and inspect its candidate
-intent, text evidence, route, validation result, and authoritative outcome if
-one exists. The message has one of three safe results: a grounded trade offer,
-an expressive turn, or an unresolved turn with no state change.
+**Outcome:** a developer can run a fixed corpus and inspect, for every message:
+the raw model candidate, affect label, player-text evidence, validation result,
+and either `attack` or `do_nothing`.
 
-**Smallest test:** use the planned
-[grounded-primary-intent experiment record](evidence/2026-07-25-trader-grounded-primary-intent.md).
-Its fixed corpus includes valid trade-offer paraphrases, ordinary small talk,
-mentions that are not offers, invented trader facts, and messages with more
-than one meaningful intent. Keep the perception contract bounded to this
-primary-intent experiment; do not build a general natural-language framework.
+**Smallest test:** define a checked-in corpus containing hostile, calm or
+friendly, fearful, and ambiguous player messages. The LLM returns one candidate
+affect label and exact evidence. Deterministic code rejects malformed or
+ungrounded candidates. The wolf attacks only after an accepted `hostile`
+perception; it does nothing for accepted `non_hostile` or `unclear` perceptions
+and for every rejected candidate.
 
-**Support criterion:** a valid trade offer is grounded in exact player text and
-authoritative trader/player context before the deterministic evaluator can act.
-Small talk and unsupported or multi-intent messages change no authoritative
-state or durable memory. Expressive replies may be free-form, but cannot assert
-canonical trader facts, a commitment, or a completed action.
+**Support criterion:** the corpus records the expected affect/action pairs;
+each accepted sensor reading cites exact player text; malformed or ungrounded
+readings cannot cause an attack; and the same accepted perception always yields
+the same wolf action.
 
-**Rejection criterion:** the model can cause an unsupported authoritative
-interpretation, the system must turn all dialogue into templates to remain safe,
-or a mixed message is silently treated as though the system understood only one
-part. Record the result; do not expand the model's authority to compensate.
+**Rejection criterion:** an LLM candidate can cause an action without valid
+text evidence, the action depends on invented world or trader facts, or the
+experiment needs language understanding beyond affect to explain its result.
+Record the result and do not add authority, conversation, or world machinery to
+compensate.
 
-**Decision unlocked:** how to broaden the supported authoritative intent set or
-expressive freedom without weakening grounding.
+**Decision unlocked:** whether the next experiment should deepen affect
+perception, add a small relevant creature state, or change the perception model.
 
-### 2. Demonstrate stateful trader choices across primary-intent turns
+### 2. Select the next pressure on the creature model
 
-**Precondition:** Outcome 1 has support evidence and a completed experiment
-record.
+**Precondition:** Outcome 1 has a completed experiment record, including a
+negative or inconclusive result where applicable.
 
-**Hypothesis:** the grounded primary-intent boundary can serve a short
-conversation in which authoritative trader state and relevant completed actions
-affect a later deterministic choice, while expressive turns remain
-non-authoritative.
+**Outcome:** choose one smallest question that follows from observed evidence:
+whether a later reaction should use retained creature state, whether a new
+affect category is useful, or whether the current sensor contract should be
+revised.
 
-**Outcome:** a developer can run a repeatable sequence of single-intent player
-turns: expressive small talk, an accepted offer, and a later offer whose result
-reflects the trader's updated state or goals.
+**Smallest test:** state the observed limitation, one falsifiable hypothesis,
+and a stop rule in a new experiment record. Do not add features simply because
+the territorial wolf implementation exists.
 
-**Smallest test:** retain only authoritative state and completed outcomes needed
-for the later decision. Do not promote free-form small-talk content into memory
-or require the model to summarize the conversation as fact.
-
-**Support criterion:** the same validated primary intents reproduce the same
-authoritative transitions; the later trade decision can be explained from
-trader state and goals; expressive turns neither alter state nor introduce
-facts that the trader later treats as true.
-
-**Rejection criterion:** relevant history cannot be represented without letting
-the model create canonical facts, or the required behavior depends on multiple
-intents in a single message. Keep the evidence and defer that expansion.
-
-**Decision unlocked:** whether to add factual queries, another transaction
-shape, or multi-intent handling as the next bounded capability.
-
-### 3. Add multi-intent input deliberately
-
-**Precondition:** Outcome 2 has support evidence and the product has chosen the
-next authoritative capability to combine with expressive conversation.
-
-**Outcome:** determine whether one message containing an authoritative intent
-and expressive content can be split into separately grounded and free-form
-paths without silently discarding meaning.
-
-**Smallest test:** use a small corpus of mixed messages. Require an inspectable
-intent list, text evidence for each authoritative component, and a clear
-unresolved path for ambiguity.
-
-**Pass criterion:** authoritative components remain grounded; expressive
-components retain useful freedom; no supported component is silently ignored;
-and ambiguity produces no state change.
-
-### 4. Extend the trader's authoritative capability deliberately
-
-**Precondition:** prior outcomes identify a specific player-facing capability
-whose value cannot be achieved by the existing sell-offer contract.
-
-**Outcome:** add one bounded authoritative capability, such as a factual query
-or a second transaction contract, while preserving the grounded perception
-boundary and expressive dialogue policy.
-
-**Smallest test:** define the authoritative facts, player-text evidence, and
-state transition or deterministic reply that the new capability requires.
-
-**Pass criterion:** the capability expands useful interaction without granting
-the model a new path to invent facts, commitments, or state transitions.
+**Pass criterion:** the next experiment addresses a documented limitation of
+the affect-to-action result and retains the same deterministic authority
+boundary unless new evidence justifies a change.
 
 ## Recommended next outcome
 
-Start with **Outcome 1**. The planned experiment record gives it a falsifiable,
-bounded definition; prepare implementation work only from that record. Do not
-add multi-intent interpretation, new authoritative actions, or model-authored
-durable memory before the grounded primary-intent boundary is reviewed.
+Start with **Outcome 1**. Prepare its experiment record before implementation.
+Do not revive the trader conversation, introduce expressive output, or add a
+general actor/world framework while testing this narrow perception-to-action
+contract.
