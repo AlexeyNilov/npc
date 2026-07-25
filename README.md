@@ -40,7 +40,8 @@ D&D/RPG-style trader. It should make choices from its state and goals, retain
 relevant history, and refuse deals that do not serve its interests.
 
 The central learning hypothesis is that small, deterministic decision scenarios
-can reveal which model elements survive a second, contrasting actor decision.
+can reveal which model elements survive a second, contrasting decision. Both
+decisions may belong to the same actor.
 Player conversation is a later test of that model, not the current foundation.
 
 ## Project documentation

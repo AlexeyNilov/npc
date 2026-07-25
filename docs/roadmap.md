@@ -8,10 +8,10 @@ This document owns incomplete future outcomes.
 model can evolve beyond one decision scenario.
 
 **Problem:** one trader decision is easy to hard-code. The project has no
-evidence about which parts of it can survive a contrasting actor decision.
+evidence about which parts of it can survive a contrasting decision.
 
-**Desired outcome:** a developer can compare two small, deterministic actor
-decisions and identify the smallest model elements that survive both.
+**Desired outcome:** a developer can compare two small, deterministic decisions
+and identify the smallest model elements that survive both.
 
 **Constraints:** use explicit, deterministic inputs first; do not add a chat or
 language-model boundary to this experiment.
@@ -20,8 +20,8 @@ language-model boundary to this experiment.
 
 ### 1. Choose the paired decision experiment
 
-**Outcome:** select two small actor decisions that create meaningful change
-pressure without assuming a general framework.
+**Outcome:** select two small decisions that create meaningful change pressure
+without assuming a general framework. They may belong to the same actor.
 
 **Smallest test:** define a first and second decision whose actor goals,
 available actions, relevant state, outcomes, or feedback differ in at least two

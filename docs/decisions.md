@@ -26,9 +26,9 @@ trader path could evolve. A single successful scenario is insufficient evidence
 for a reusable model.
 
 **Decision:** Before adding another runtime boundary, choose two contrasting
-actor decisions and use the second as a change test for the first. Inputs and
-authoritative decisions remain explicit and deterministic. Retain only the
-model elements that both decisions use.
+decisions and use the second as a change test for the first. They may belong to
+the same actor. Inputs and authoritative decisions remain explicit and
+deterministic. Retain only the model elements that both decisions use.
 
 **Consequences:** Conversational and language-model work is deferred. The next
 architectural decision is based on observed change pressure rather than a
