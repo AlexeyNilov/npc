@@ -18,6 +18,10 @@ completed actions.
   `A warm, patient expression.`
 - The player-visible response therefore did not distinguish two basic social
   questions or provide the trader's identity.
+- In the follow-up playtest, `What is your name?` returned `The trader's name
+  is Mara.` with no trade trace, while a greeting still returned the closed
+  atmospheric reply `A warm, patient expression.` The supported identity path
+  therefore works, but greeting remains non-responsive beyond atmosphere.
 
 ## Impact
 
@@ -37,10 +41,15 @@ responses meaningfully distinct in a repeatable player-facing playtest?
   records the verified shared authority flow.
 - **Decision:** Pending; a player-facing trust model is consequential only when
   an approach is selected.
-- **Roadmap:** [Outcome 6: Re-run the bounded trader playtest](../roadmap.md#6-re-run-the-bounded-trader-playtest)
-  is the next learning outcome.
+- **Roadmap:** [Outcome 2: Re-run the bounded trader playtest](../roadmap.md#2-re-run-the-bounded-trader-playtest)
+  follows the actor-loop model experiment and remains the social-dialogue
+  learning outcome.
 - **Task:** None.
 
 ## Resolution
 
-Pending.
+Partially addressed: the exact supported name question now has an
+authoritative, state-preserving response. The issue remains open because the
+reported greeting is still indistinguishable from any other no-extraction turn
+with the same flavor, and the complete bounded playtest in the roadmap has not
+yet been evidenced.

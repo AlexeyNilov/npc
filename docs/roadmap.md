@@ -4,141 +4,75 @@ This document owns incomplete future outcomes.
 
 ## Product frame
 
-**Target user:** the project's developer, initially playing with a D&D/RPG-style
+**Target user:** the project's developer, initially playing with a D&D/RPG
 trader through a simple chat interface.
 
-**Problem:** there is not yet evidence that a simulated actor can make
-autonomous, repeatable economic and social choices that stay engaging in a
-conversation. The first trader slices now exist, but the observed playtest
-shows two risks: unconstrained chat can invent or misrepresent a trade, while
-the safety repair has made ordinary social conversation repetitive. The current
-trader-specific contract also does not yet demonstrate a reusable NPC model.
+**Problem:** the current playtest has a safe, deterministic authority boundary,
+but it does not yet demonstrate a reusable actor model or engaging,
+state-grounded social interaction.
 
-**Desired outcome:** a developer can run repeatable play sessions with one
-trader whose inventory, funds, goals, relevant history, and choices affect the
-conversation and a proposed deal. The trader may decline a deal for reasons
-consistent with its interests.
+**Desired outcome:** a developer can run repeatable sessions with an autonomous
+actor whose state, goals, relevant history, and choices visibly affect its
+conversation and actions.
 
-**Constraints already evidenced:** core actor decisions must remain
-deterministic; LLMs may assist with extraction, narration, or proposals but
-must not authoritatively change actor state or choose the final action.
-
-## Evidence and assumptions
-
-**Evidence**
-
-- The README names a self-directed D&D/RPG trader as the first demonstration
-  and hands-on play/observation as the initial engagement evaluation.
-- A sample program can stream a conversation with a configured local LLM.
-- The proposed determinism decision sets the boundary for authoritative actor
-  decisions.
-- The reported trader playtest contains a valid, traced purchase that leaves
-  the trader with 26 gold, followed by narration that it has 30 gold.
-- In that playtest, a question about buying caused a herb sale without the
-  player offering the herb or a price; later narration claimed trades succeeded
-  although the traces recorded `player_has_no_healing_herb`.
-- An unsupported demand to surrender gold was narrated as fulfilled without a
-  corresponding authoritative state change.
-- The repaired playtest renders ordinary social messages through four fixed
-  atmospheric clauses; a greeting and a name question each produced the same
-  reply.
-- The current transaction contract, validation, state model, and rendering are
-  all specific to buying one healing herb for gold from a trader.
-
-**Assumptions to test**
-
-- The smallest meaningful demonstration is one trader and one player rather
-  than a general multi-actor simulation.
-- Visible consequences of state and past interaction will make the trader feel
-  more autonomous than a prompt-only chat character.
-- A small, deterministic economic decision model can create useful learning
-  only if the conversational boundary cannot invent or misrepresent its state
-  transitions.
-- A small reusable authority boundary can support more than one actor
-  capability without requiring its core behavior to be rewritten for each one.
-
-The ordering below is a recommendation based on these assumptions. It is not a
-commitment to dates, scope beyond the listed slices, or product priorities not
-yet supplied by the user.
+**Constraints:** authoritative decisions and state changes remain deterministic;
+LLMs may assist but cannot authoritatively change state or choose the final
+action.
 
 ## Ordered future outcomes
 
-### 6. Re-run the bounded trader playtest
+### 1. Test a minimal reusable actor-loop model
 
-**Outcome:** the developer can conduct a small, repeatable chat playtest where
-the trader responds distinctly and correctly to basic social questions, while
-its trade behaviour and visible state remain consistent across an accepted
-offer, a follow-up refusal, and an unsupported demand.
+**Outcome:** make reality, perception, sensemaking, intent, action, outcome,
+and feedback explicit in a small model that is independent of terminal chat
+and one trader's actions.
 
-**Hypothesis:** the reusable boundary and a bounded set of state-grounded
-social capabilities will make the trader's autonomy observable without relying
-on hidden traces to correct the player-facing dialogue.
+**Smallest test:** run two bounded scenarios with different action contracts
+through the same loop and retain an inspectable record from perception through
+feedback.
 
-**Smallest test:** run and repeat a scripted session containing a greeting, a
-name or fact question, an accepted offer, a follow-up refusal, and an
-unsupported demand. Retain decision traces as diagnostic evidence, but assess
-the player-visible dialogue independently.
+**Pass criterion:** both authoritative state transitions are reproducible, and
+adding the second scenario does not require trader-specific branches in the
+shared loop.
 
-**Support signal / pass criterion:** the basic social questions receive
-meaningfully distinct, authoritative responses; no player-visible claim
-conflicts with state or the trace; no unsolicited trade occurs; and the two
-runs produce the same authoritative state transitions. A trace is not a
-substitute for a correct player-facing response.
+### 2. Re-run the bounded trader playtest
 
-### 7. Decide whether to deepen the actor loop or broaden the model
+**Outcome:** conduct a repeatable chat session where the trader gives distinct,
+correct responses to basic social questions while its trade and visible state
+remain consistent.
 
-**Outcome:** use the playtest evidence to make an explicit next product choice:
-improve the trader's perception, sensemaking, intent, action, outcome, and
-feedback loop; repeat the trader experiment with a changed hypothesis; or
-explore a second actor scale.
+**Smallest test:** run and repeat a scripted greeting, name or fact question,
+accepted offer, follow-up refusal, and unsupported demand.
 
-**Hypothesis:** play evidence will reveal the smallest missing capability that
-limits perceived autonomy or reproducibility.
+**Pass criterion:** social responses are meaningfully distinct; no
+player-visible claim conflicts with state or trace; no unsolicited trade occurs;
+and both runs have the same authoritative state transitions.
 
-**Smallest test:** review recorded play sessions and decision traces against the
-outcomes above; list each observed limitation, the evidence for it, and one
-minimal experiment that could address it.
+### 3. Select the next actor experiment from play evidence
 
-**Support signal / pass criterion:** a next experiment can be selected from
-observed evidence with a falsifiable success signal. If no limitation is
-observable, repeat or strengthen the playtest rather than expanding scope.
+**Outcome:** decide whether to deepen the actor loop, repeat the trader
+experiment with a changed hypothesis, or explore a second actor scale.
 
-### 8. Evaluate LangExtract for grounded trade extraction
+**Smallest test:** review the recorded play sessions against Outcomes 1 and 2,
+then state the observed limitation and one minimal experiment.
 
-**Outcome:** obtain reproducible evidence on whether
-[LangExtract](https://github.com/google/langextract) can improve varied
-natural-language trade extraction while preserving the authoritative
-conversation contract. This is an evaluation milestone, not a commitment to
-add LangExtract to the runtime.
+**Pass criterion:** the next experiment has evidence, a falsifiable success
+signal, and no scope expansion justified only by prior effort.
 
-**Hypothesis:** LangExtract's schema-guided extraction and source character
-intervals can increase recognition of explicitly supported offers without
-increasing inferred transactions, compared with the current untrusted
-extraction plus deterministic validator.
+### 4. Evaluate LangExtract for grounded trade extraction
 
-**Smallest test:** build a fixed, checked-in corpus containing the supported
-offer shape with varied filler, the existing non-offer cases, and the reported
-playtest sequence. Run both extractors against it using the configured local
-model path where possible. For every LangExtract result, verify its spans map
-to the original message, then pass only its normalized candidate through the
-same deterministic validator; record recognition, rejection reason, and
-latency.
+**Outcome:** determine whether LangExtract improves varied trade extraction
+without weakening the authority boundary.
 
-**Support signal / pass criterion:** LangExtract recognizes at least the
-baseline's valid supported offers, produces no validator-accepted transaction
-for a non-offer, and every field used by an accepted candidate has a valid
-source span. If it cannot operate through the configured local model boundary,
-or increases false positives, retain the existing extractor and record the
-evidence.
+**Smallest test:** compare it with the current extractor on a fixed corpus;
+pass only normalized candidates through the existing deterministic validator.
 
-**Scope guard:** do not replace the deterministic validator, change the
-economic evaluator, or add LangExtract to the live playtest during this
-milestone. Do not use cloud credentials merely to complete the comparison.
+**Pass criterion:** it recognizes at least the baseline's valid offers,
+introduces no accepted non-offer, and supports every accepted field with a
+valid source span. Otherwise retain the current extractor.
 
 ## Recommended next outcome
 
-Start with **Outcome 6: re-run the bounded trader playtest**. The completed
-authority-boundary test established a shared flow for a bounded purchase and
-identity interaction. The next experiment should assess whether those
-authoritative responses make the trader's autonomy visible in player-facing
-conversation.
+Start with **Outcome 1**. Do not extend trader-specific dialogue until the
+actor-loop experiment either demonstrates a reusable boundary or establishes
+that a narrower trader-only learning goal is the deliberate choice.
