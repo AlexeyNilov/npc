@@ -30,7 +30,7 @@ alter state.
 
 ## Ordered future outcomes
 
-### Select the next pressure on the creature model
+### Test a binary threat-perception gate
 
 **Precondition:** the affect-to-action experiment has a completed record,
 including its ambiguous-label limitation.
@@ -79,8 +79,7 @@ authority, dialogue, world machinery, memory, or additional creature actions.
 
 ## Recommended next outcome
 
-Select the next pressure on the creature model. Start from the documented
-ambiguous-label limitation and prepare its experiment record before
-implementation. Do not revive the trader conversation, introduce expressive
-output, or add a general actor/world framework while testing this narrow
-perception-to-action contract.
+Test the binary threat-perception gate. Start from the documented ambiguous-label
+limitation and prepare its experiment record before implementation. Do not
+revive the trader conversation, introduce expressive output, or add a general
+actor/world framework while testing this narrow perception-to-action contract.
