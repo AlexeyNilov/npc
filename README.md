@@ -52,6 +52,20 @@ decisions may belong to the same actor.
 Player conversation, persistent state, and broader actor capabilities are later
 tests of that model, not the current foundation.
 
+## Run an interactive fox turn loop
+
+After installing the project, run:
+
+```bash
+python sample/fox_chat.py
+```
+
+Each input is an independent player turn. The existing deterministic fox
+pipeline selects and executes `flee` or `do_nothing`; the configured LLM then
+renders only that completed outcome. The loop carries only authoritative
+distance into the next turn. It does not roleplay the fox or retain dialogue
+history. Type `/exit` to quit.
+
 ## Project documentation
 
 - [Requirements](docs/requirements.md)

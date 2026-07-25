@@ -81,6 +81,15 @@ distance, feedback, or perception. The module's YAML fixtures and narrator are
 disposable scaffolding, not a general renderer, dialogue, state, or event
 framework.
 
+## Interactive fox turns
+
+`sample/fox_chat.py` is a terminal loop modeled on the local sample chat,
+but it does not stream or roleplay a response. For each player input it calls
+the existing `run_turn`, then `render_completed_turn`, prints the resulting
+non-authoritative narration, and carries only the canonical feedback distance
+to the next iteration. The loop has no conversation history, fox persona, or
+path from narration back to the next action.
+
 ## Two-perception wolf sensemaking
 
 `npc.experiments.food_offer_detection` is a separate binary sensor for whether
