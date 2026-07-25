@@ -9,9 +9,6 @@ outcomes, not coding activities or a list of possible abstractions.
 actor model can turn natural-language player input into grounded NPC behavior
 without losing expressive conversation.
 
-**Relevant evidence:** [the deterministic trader offer evaluator record](evidence/2026-07-25-trader-offer-evaluator.md)
-owns the observed result and limits of the current scenario.
-
 **Problem:** a language model is the practical semantic interpreter for varied
 player input, but it must not invent trader facts, commitments, state changes,
 or durable history. The current offer evaluator has no language-facing

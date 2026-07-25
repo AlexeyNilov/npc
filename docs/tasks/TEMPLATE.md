@@ -4,9 +4,9 @@
 
 **Owner:** Unassigned
 
-**Role guide:** [Explorer](../agent_roles/explorer.md) | [Implementer](../agent_roles/implementer.md)
+**Delivery role:** [Explorer](../agent_roles/explorer.md) | [Implementer](../agent_roles/implementer.md) | [Simplifier](../agent_roles/simplifier.md)
 
-**Agent profile:** `explorer` | `implementer`
+**Agent profile:** `explorer` | `implementer` | `simplifier`
 
 **Base commit:** commit hash
 

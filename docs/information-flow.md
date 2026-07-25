@@ -12,15 +12,15 @@ flowchart TB
   subgraph Control[Control plane — outside the implementation loop]
     PM[Product Manager]
     Roadmap[Roadmap\nfuture outcomes]
-    Planner[Planner]
+    TechLead[Technical Lead]
     Packet[Ready task packet]
     Registry[Task registry\nopen packets]
 
     PM --> Roadmap
-    Roadmap --> Planner
+    Roadmap --> TechLead
     User --> PM
-    User --> Planner
-    Planner --> Packet
+    User --> TechLead
+    TechLead --> Packet
     Packet --> Registry
   end
 
@@ -40,7 +40,7 @@ flowchart TB
     Simplifier --> Handoff
   end
 
-  Handoff --> Planner
+  Handoff --> TechLead
 
   subgraph Owners[Canonical durable-information owners]
     Vision[README\nvision and use]
@@ -52,12 +52,12 @@ flowchart TB
     History[Git history\naccepted completed changes]
   end
 
-  Planner --> Requirements
-  Planner --> Architecture
-  Planner --> Decisions
-  Planner --> Evidence
-  Planner --> Issues
-  Planner --> History
+  TechLead --> Requirements
+  TechLead --> Architecture
+  TechLead --> Decisions
+  TechLead --> Evidence
+  TechLead --> Issues
+  TechLead --> History
   PM --> Vision
   PM --> Roadmap
   Evidence --> PM
@@ -78,12 +78,13 @@ flowchart TB
 
 ## Reading the map
 
-- The Product Manager and Planner are control-plane actors. They set direction,
-  prepare a bounded packet, and accept its result; they are not delivery roles.
+- The Product Manager and Technical Lead are control-plane actors. They set
+  direction, prepare a bounded packet, and accept its result; they are not
+  delivery roles.
 - Explorer, Implementer, and Simplifier operate only after a packet enters the
-  implementation loop. Each returns evidence to the Planner rather than making
-  unaccepted product or authority choices.
-- The Planner routes accepted findings to one canonical owner. A finding may
+  implementation loop. Each returns evidence to the Technical Lead rather than
+  making unaccepted product or authority choices.
+- The Technical Lead routes accepted findings to one canonical owner. A finding may
   link to related records, but it is recorded in only one owner.
 - `AGENTS.md` applies the owner rule only when a durable fact is recorded. It
   does not require a workflow for ordinary discussion, review, or read-only

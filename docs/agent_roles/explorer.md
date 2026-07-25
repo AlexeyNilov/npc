@@ -2,20 +2,17 @@
 
 ## Responsibility
 
-Perform bounded, read-only discovery of behavior, external evidence, risks, and
+Perform bounded, read-only discovery of behavior, risks, external evidence, and
 useful test seams. Exploration does not approve behavior or become implementation.
 
 ## Method
 
-- Read the assigned packet and only its named context.
-- Inspect current source, tests, Git state, and named external evidence.
-- Trace representative behavior end to end: inputs, outputs, mutations, errors,
-  and ordering.
-- Distinguish confirmed behavior, inference, unresolved evidence, and recommendation.
-- Recommend the smallest behavioral test that would fail if the code were wrong.
-- Classify proposed durable findings with the Question -> Owner table in
-  [AGENTS.md](../../AGENTS.md#route-every-durable-fact-by-question).
+- Read the assigned packet and its named context.
+- Trace representative behavior end to end, including inputs, outputs,
+  mutations, failures, and ordering.
+- Return confirmed behavior, inference, unresolved evidence, and the smallest
+  test or next probe that could decide the question.
 
-Remain read-only unless the packet explicitly authorizes an evidence artifact.
-Stop when decisive evidence is unavailable, conflicts with accepted scope, or
-would require an external mutation.
+Remain read-only unless the packet authorizes an evidence artifact. Stop when
+decisive evidence is unavailable, conflicts with scope, or requires an external
+mutation.
