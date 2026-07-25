@@ -1,0 +1,17 @@
+cases:
+  - id: hostile-threat
+    player_message: "Get out of my way, or I will hurt you."
+    expected_affect: hostile
+    expected_action: attack
+  - id: calm-greeting
+    player_message: "Hello there. I mean no harm."
+    expected_affect: non_hostile
+    expected_action: do_nothing
+  - id: fearful-plea
+    player_message: "Please do not hurt me; I am scared."
+    expected_affect: non_hostile
+    expected_action: do_nothing
+  - id: ambiguous-statement
+    player_message: "I am not sure what to do."
+    expected_affect: unclear
+    expected_action: do_nothing

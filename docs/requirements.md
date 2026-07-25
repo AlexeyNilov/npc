@@ -38,3 +38,17 @@ This document owns observable system behavior.
   no authoritative state or durable-memory change and display only a generated
   reply that is one non-assertive question with no detected trader or world
   fact, commitment, or completed action.
+
+### Wolf affect-to-action experiment
+
+- **When** a developer runs the checked-in wolf corpus, **the system shall**
+  print one machine-readable trace per independent player message containing
+  the expected affect/action pair, raw model candidate, parsed candidate,
+  validation result, and deterministic action.
+- **When** an affect candidate contains exactly a supported affect label and
+  non-empty evidence that is verbatim player text, **the system shall** accept
+  it and map only `hostile` to `attack`; accepted `non_hostile` and `unclear`
+  candidates shall map to `do_nothing`.
+- **When** a candidate is malformed, has unsupported affect, has empty
+  evidence, or cites text absent from the player message, **the system shall**
+  reject it and return `do_nothing`.

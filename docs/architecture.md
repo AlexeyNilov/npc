@@ -32,3 +32,16 @@ non-assertive question and blocks detected trader or world facts, commitments,
 or completed actions before rendering a fallback. The CLI prints a JSON trace
 per turn. This is a bounded experiment, not a general natural-language
 framework.
+
+## Wolf affect-to-action experiment
+
+`python -m npc.experiments.wolf_affect` loads independent cases from
+`scenarios/wolf_affect.yaml`. Each case supplies a player message and expected
+affect/action pair. The configured completion adapter proposes JSON with only
+an affect label and exact player-text evidence. The experiment-local parser
+requires the exact key set; deterministic validation accepts only `hostile`,
+`non_hostile`, or `unclear` with non-empty evidence occurring verbatim in the
+player message. The pure wolf policy maps an accepted `hostile` perception to
+`attack` and every other input to `do_nothing`. The command prints a JSON trace
+for each case. It creates no creature state, dialogue, world model, or shared
+actor framework.
