@@ -46,27 +46,6 @@ yet supplied by the user.
 
 ## Ordered future outcomes
 
-### 2. Demonstrate an economically self-interested trade loop
-
-**Outcome:** the trader can accept or refuse a narrow, documented class of trade
-proposals based on its funds, inventory, and stated goals, with each outcome
-updating the relevant state.
-
-**Hypothesis:** a small economic loop makes the trader's autonomy observable to
-the developer.
-
-**Smallest test:** conduct paired play scenarios that differ in one trader
-interest—for example, scarce versus surplus stock, or a deal that does versus
-does not advance its goal—and compare the decisions and state transitions.
-
-**Support signal / pass criterion:** the trader accepts and refuses in ways
-consistent with its declared rules and state, and accepted deals conserve the
-specified goods and funds. A decision that contradicts the rules/state, or an
-invalid transition, rejects the hypothesis until explained or corrected.
-
-**Scope guard:** do not add general simulation, multiple actors, or open-ended
-economies in this outcome.
-
 ### 3. Run a stateful conversational trader playtest
 
 **Outcome:** a developer can meet the trader in a simple chat interface, discuss
