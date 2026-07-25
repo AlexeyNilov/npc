@@ -35,6 +35,24 @@ Use a lightweight Architecture Decision Record (ADR) style:
 
 ## Actual decisions
 
+### 2026-07-25: Use YAML scenarios for the initial trader experiment
+
+**Status:** Accepted
+
+**Context:** The first trader-decision experiment needs a checked-in,
+human-readable, reproducible definition of its initial state and proposals.
+Python's standard library does not parse YAML.
+
+**Decision:** Store the initial experiment scenario in YAML and add PyYAML as
+the runtime parser.
+
+**Alternatives considered:** Hard-code the scenario in Python, or add a custom
+restricted YAML parser. Hard-coding obscures the explicit experiment inputs;
+a custom parser adds needless behavior to own and test.
+
+**Consequences:** The application gains one runtime dependency and its scenario
+format becomes a small, reviewable external input boundary.
+
 ### 2026-07-25: Keep core actor decisions deterministic
 
 **Status:** Proposed
