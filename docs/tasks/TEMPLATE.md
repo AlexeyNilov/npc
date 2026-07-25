@@ -24,6 +24,17 @@
 
 State one observable result and why it matters.
 
+## Vision alignment
+
+Required only when this task introduces or claims a reusable system boundary.
+
+- **Vision behavior made observable:**
+- **Classification:** `Disposable experiment scaffolding` | `Candidate durable system foundation`
+- **Reuse pressure:** the smallest second scenario or action contract that
+  tests the boundary, or `Not in scope — scaffolding only`.
+- **Boundary rejection signal:** evidence that stops promotion of this boundary
+  as reusable.
+
 ## Canonical context
 
 - Exact requirement and decision IDs.

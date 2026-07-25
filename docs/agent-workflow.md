@@ -67,6 +67,23 @@ Owner table in [AGENTS.md](../AGENTS.md#route-every-durable-fact-by-question).
 The packet names only task-specific ownership impact and canonical references.
 Execution stops if a fact has no owner or would be duplicated across owners.
 
+## Vision-alignment gate
+
+Before Ready, work that introduces or claims a reusable system boundary must
+state:
+
+- the specific vision behavior it is intended to make observable;
+- whether the proposed code is disposable experiment scaffolding or a candidate
+  durable system foundation;
+- the smallest second scenario or action contract that will test any claim of
+  reuse; and
+- a stop condition for evidence that the shared boundary remains
+  scenario-specific.
+
+One successful vertical slice does not establish a reusable abstraction. If a
+second scenario is not in scope, label the result as scaffolding and do not
+promote its structure as the system direction.
+
 ## Simplifier routing
 
 Route a draft packet or implementation diff to the simplifier only when it adds a

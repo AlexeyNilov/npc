@@ -16,6 +16,9 @@ their canonical owners, prepare executable tasks, and integrate verified results
   compact index.
 - Mark work Ready only when scope, references, ownership impact, verification, and
   stop conditions are complete.
+- For work that introduces or claims a reusable system boundary, apply the
+  [vision-alignment gate](../agent-workflow.md#vision-alignment-gate) before
+  marking it Ready. Do not infer reusability from one vertical slice.
 - Apply the lifecycle, delegation, and simplifier triggers in the
   [agent workflow](../agent-workflow.md).
 

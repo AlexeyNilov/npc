@@ -15,6 +15,10 @@ into the smallest valuable next outcomes.
   observable terms. Do not invent priorities or success data.
 - Treat each proposed feature as a hypothesis. Record the assumption, the
   smallest test, and the signal that would support or reject it.
+- For an outcome intended to advance the project vision, state the system
+  behavior it should make observable and the smallest second scenario that
+  would challenge any reuse claim. A single successful vertical slice is
+  evidence for that slice, not for a general model.
 - Prefer the smallest reversible experiment or delivery slice that can create
   useful learning or user value. Do not prescribe an implementation unless it
   is required by a stated constraint.
