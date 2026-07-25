@@ -34,3 +34,23 @@ Use a lightweight Architecture Decision Record (ADR) style:
 ```
 
 ## Actual decisions
+
+### 2026-07-25: Keep core actor decisions deterministic
+
+**Status:** Proposed
+
+**Context:** The project needs agent behaviour that can be tested and
+reproduced while still supporting natural-language interaction and rich
+proposals.
+
+**Decision:** Use LLMs only as supporting tools for information extraction,
+narration, and generation of plans or proposals. The core engine remains the
+authoritative deterministic decision-maker.
+
+**Alternatives considered:** Letting an LLM make substantive actor decisions.
+This is not the preferred direction because it would weaken reproducibility and
+testability.
+
+**Consequences:** The internal design must be discovered and validated through
+experiments. LLM output cannot by itself determine an actor's authoritative
+state changes or final choices.

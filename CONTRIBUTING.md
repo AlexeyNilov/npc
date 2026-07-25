@@ -3,11 +3,11 @@
 ## Purpose
 
 - Contribute focused, maintainable changes that meet the requested need.
-- Never commit credentials, tokens, `.env`, or secret output.
 
 ## Repository rules
 
 - Think before coding and stay strictly within the prompt's scope.
+- Never commit credentials, tokens, `.env`, or secret output.
 
 ## Simplicity first
 
