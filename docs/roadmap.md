@@ -9,8 +9,9 @@ trader through a simple chat interface.
 
 **Problem:** there is not yet evidence that a simulated actor can make
 autonomous, repeatable economic and social choices that stay engaging in a
-conversation. The current repository provides local-LLM chat connectivity, but
-no actor or simulation behaviour.
+conversation. The first trader slices now exist, but the observed playtest
+shows that the chat can invent a trade, describe a refused trade as successful,
+and contradict authoritative state.
 
 **Desired outcome:** a developer can run repeatable play sessions with one
 trader whose inventory, funds, goals, relevant history, and choices affect the
@@ -30,6 +31,13 @@ must not authoritatively change actor state or choose the final action.
 - A sample program can stream a conversation with a configured local LLM.
 - The proposed determinism decision sets the boundary for authoritative actor
   decisions.
+- The reported trader playtest contains a valid, traced purchase that leaves
+  the trader with 26 gold, followed by narration that it has 30 gold.
+- In that playtest, a question about buying caused a herb sale without the
+  player offering the herb or a price; later narration claimed trades succeeded
+  although the traces recorded `player_has_no_healing_herb`.
+- An unsupported demand to surrender gold was narrated as fulfilled without a
+  corresponding authoritative state change.
 
 **Assumptions to test**
 
@@ -37,8 +45,9 @@ must not authoritatively change actor state or choose the final action.
   than a general multi-actor simulation.
 - Visible consequences of state and past interaction will make the trader feel
   more autonomous than a prompt-only chat character.
-- A small, deterministic economic decision model is enough to create useful
-  learning before broader actor modelling is attempted.
+- A small, deterministic economic decision model can create useful learning
+  only if the conversational boundary cannot invent or misrepresent its state
+  transitions.
 
 The ordering below is a recommendation based on these assumptions. It is not a
 commitment to dates, scope beyond the listed slices, or product priorities not
@@ -46,7 +55,80 @@ yet supplied by the user.
 
 ## Ordered future outcomes
 
-### 4. Decide whether to deepen the actor loop or broaden the model
+### 4. Establish an authoritative conversation contract
+
+**Outcome:** an LLM may extract a schema-aligned candidate from a player
+message, but only a deterministic validator can recognize one supported,
+explicit trade proposal. Each material field—offer direction, `healing herb`,
+quantity one, decimal price, and `gold`—must include verbatim evidence from the
+player message. Only the validated proposal can reach the deterministic
+evaluator. An omitted, zero, or negative price is rejected.
+
+**Hypothesis:** separating LLM-assisted extraction from deterministic,
+evidence-backed recognition will prevent the interface from inventing economic
+commitments while retaining varied natural-language interaction.
+
+**Smallest test:** use a fixed set of messages: a direct offer with one herb and
+a positive integer price; a question about buying; a price without an offer; an
+agreement after a prior refusal; and zero or negative prices. Record the
+extracted candidate, validation result, and state before and after each
+message. Include an extractor candidate whose evidence does not occur in the
+message.
+
+**Support signal / pass criterion:** only a direct offer whose extractor
+evidence proves every required field reaches the evaluator. Every other message
+leaves authoritative state unchanged. Given the same player message and
+extractor response, validation produces the same recognized intent. Any
+inferred item, price, direction, quantity, currency, or transaction rejects the
+hypothesis.
+
+**Scope guard:** do not broaden the supported economy or add new player actions
+to solve this boundary problem. The LLM is not authoritative merely because it
+returns structured output.
+
+### 5. Make player-facing trade outcomes state-grounded
+
+**Outcome:** after a proposed trade is evaluated, the player receives one
+response that accurately states the authoritative acceptance/refusal outcome
+and any material state fact it mentions. Unsupported actions are described as
+unsupported or unresolved; they are never narrated as completed.
+
+**Hypothesis:** deriving player-facing outcome statements from the authoritative
+decision and state will make the trader's behaviour understandable and
+trustworthy in play.
+
+**Smallest test:** replay accepted and refused offers, ask for the trader's gold
+after each, and make an unsupported demand for state-changing action. Compare
+each response with its decision trace and state snapshot.
+
+**Support signal / pass criterion:** every claimed trade outcome matches the
+trace; every claimed gold amount matches current state; and no unsupported
+action is claimed to have changed state. One contradiction fails the test.
+
+**Constraint:** an LLM may word a response, but it must not assert a state
+change or final trade outcome beyond the authoritative result supplied to it.
+
+### 6. Re-run the bounded trader playtest
+
+**Outcome:** the developer can conduct a small, repeatable chat playtest where
+the trader's trade behaviour and visible state remain consistent across
+non-trade conversation, an accepted offer, a follow-up refusal, and an
+unsupported demand.
+
+**Hypothesis:** the repaired conversation contract and grounded outcome layer
+will make the trader's autonomy observable without relying on hidden traces to
+correct the player-facing dialogue.
+
+**Smallest test:** run a scripted four-part session covering the cases above,
+then repeat the same session. Retain decision traces as diagnostic evidence,
+but assess the player-visible dialogue independently.
+
+**Support signal / pass criterion:** no player-visible claim conflicts with
+authoritative state or the trace, no unsolicited trade occurs, and the two runs
+produce the same authoritative state transitions. A trace is not a substitute
+for a correct player-facing response.
+
+### 7. Decide whether to deepen the actor loop or broaden the model
 
 **Outcome:** use the playtest evidence to make an explicit next product choice:
 improve the trader's perception, sensemaking, intent, action, outcome, and
@@ -63,3 +145,12 @@ minimal experiment that could address it.
 **Support signal / pass criterion:** a next experiment can be selected from
 observed evidence with a falsifiable success signal. If no limitation is
 observable, repeat or strengthen the playtest rather than expanding scope.
+
+## Recommended next outcome
+
+Start with **Outcome 4: establish an authoritative conversation contract**.
+The playtest already shows unauthorized state changes, so state-grounded
+narration alone would make incorrect transactions more believable rather than
+preventing them. The critical assumption is that explicit intent recognition
+can contain the transaction boundary; its success signal is that only the
+single supported offer shape changes authoritative state.
