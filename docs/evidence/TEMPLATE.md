@@ -4,7 +4,10 @@
 
 **Date:** YYYY-MM-DD
 
-**Roadmap outcome:** exact heading and link
+**Roadmap outcome:** While the outcome is open, give its exact roadmap heading
+and link. Once it is complete, replace that reference with `Completed; see the
+current roadmap.` The roadmap owns only incomplete future outcomes, so do not
+retain a link to a removed heading.
 
 ## Decision unlocked
 

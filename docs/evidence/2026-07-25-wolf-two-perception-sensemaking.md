@@ -1,10 +1,10 @@
 # Experiment: deterministic wolf sensemaking from two grounded perceptions
 
-**Status:** Planned
+**Status:** Complete
 
 **Date:** 2026-07-25
 
-**Roadmap outcome:** [Test deterministic sensemaking from two grounded wolf perceptions](../roadmap.md#test-deterministic-sensemaking-from-two-grounded-wolf-perceptions)
+**Roadmap outcome:** Completed; see the [current roadmap](../roadmap.md).
 
 ## Decision unlocked
 

@@ -4,7 +4,7 @@
 
 **Date:** 2026-07-25
 
-**Roadmap outcome:** [Reuse threat detection for a fleeing fox](../roadmap.md#reuse-threat-detection-for-a-fleeing-fox)
+**Roadmap outcome:** Completed; see the [current roadmap](../roadmap.md).
 
 ## Decision unlocked
 

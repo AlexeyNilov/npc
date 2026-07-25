@@ -4,7 +4,7 @@
 
 **Date:** 2026-07-25
 
-**Roadmap outcome:** [Test a binary threat-perception gate](../roadmap.md#test-a-binary-threat-perception-gate)
+**Roadmap outcome:** Completed; see the [current roadmap](../roadmap.md).
 
 ## Decision unlocked
 

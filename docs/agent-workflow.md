@@ -51,7 +51,8 @@ priority signal, not a Ready task.
 3. **In progress:** one owner is executing the task.
 4. **Review:** execution and task-local verification are complete.
 5. **Blocked:** a named design or external condition prevents progress.
-6. **Done:** findings are resolved and the Technical Lead accepted the result.
+6. **Done:** findings are resolved, the Technical Lead has reconciled the
+   durable records, and accepted the result.
 
 Only the Technical Lead marks Ready or Done. A delivery role may move Ready work
 to In progress, then Review or Blocked. The [task registry](tasks/STATUS.md) contains
@@ -82,3 +83,16 @@ Return:
 
 Raw logs remain outside durable documents. The Technical Lead inspects the actual
 diff, resolves findings, runs final checks, and integrates only accepted work.
+
+### Completion reconciliation
+
+Before marking an experiment or delivery Done, the Technical Lead confirms:
+
+- its evidence record has its final status and result;
+- accepted behavior and verified mechanism are routed to Requirements and
+  Architecture, while unresolved problems are routed to an issue record;
+- the completed outcome is removed from the incomplete-only roadmap, and its
+  evidence record no longer links to that removed heading;
+- modified Markdown links are checked, with any pre-existing repository-wide
+  link failures recorded as issues rather than ignored; and
+- the final diff passes the repository's required verification.
