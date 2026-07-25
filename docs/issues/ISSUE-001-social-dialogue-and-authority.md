@@ -26,21 +26,19 @@ in the project vision, even when its authoritative economic behavior is safe.
 
 ## Open question
 
-Can a reusable authority flow support bounded social and economic capabilities
-without weakening the guarantee that only authoritative state and decisions
-produce player-facing economic claims?
+Will the established reusable authority flow make the trader's bounded social
+responses meaningfully distinct in a repeatable player-facing playtest?
 
 ## Routing
 
 - **Requirements:** [Stateful conversational trader playtest](../requirements.md#stateful-conversational-trader-playtest)
   defines the currently accepted observable behavior.
-- **Architecture:** Pending; record the verified shared authority flow if the
-  reusable-boundary experiment establishes one.
+- **Architecture:** [Conversational trader playtest](../architecture.md#conversational-trader-playtest)
+  records the verified shared authority flow.
 - **Decision:** Pending; a player-facing trust model is consequential only when
   an approach is selected.
-- **Roadmap:** [Outcome 6: Test a reusable authoritative-action boundary](../roadmap.md#6-test-a-reusable-authoritative-action-boundary)
-  is the next learning outcome; [Outcome 8](../roadmap.md#8-re-run-the-bounded-trader-playtest)
-  supplies the follow-up validation.
+- **Roadmap:** [Outcome 6: Re-run the bounded trader playtest](../roadmap.md#6-re-run-the-bounded-trader-playtest)
+  is the next learning outcome.
 - **Task:** None.
 
 ## Resolution

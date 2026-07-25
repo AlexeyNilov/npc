@@ -63,35 +63,7 @@ yet supplied by the user.
 
 ## Ordered future outcomes
 
-### 6. Test a reusable authoritative-action boundary
-
-**Outcome:** obtain evidence that the actor interaction model can support two
-materially different, bounded capabilities without changing its common
-authority flow. One capability may be the existing trader purchase; the other
-must be a non-economic, state-grounded interaction such as identifying the
-actor or answering a question about an authoritative fact.
-
-**Hypothesis:** the reusable part of an NPC system is the authority flow—not a
-universal trade grammar or a set of trader templates. A generic flow can accept
-an untrusted interpretation, validate evidence against a capability contract,
-produce an authoritative result, and render an outcome for both capabilities.
-
-**Smallest test:** define the two capability contracts and run a fixed corpus
-of supported and unsupported messages for each. Confirm that each contract
-owns its own facts, evidence rules, and possible outcomes, while both use the
-same authority flow and traces.
-
-**Support signal / pass criterion:** both capabilities preserve their stated
-authority and state rules; an unsupported message changes no state; and adding
-the second capability does not require changing the common authority flow or
-the first capability's contract. If it does, identify the coupling rather than
-generalizing further.
-
-**Scope guard:** this is not a commitment to a universal NPC DSL, a multi-actor
-world, or open-ended dialogue. Do not add more capabilities until the result
-shows which concepts are genuinely shared.
-
-### 7. Re-run the bounded trader playtest
+### 6. Re-run the bounded trader playtest
 
 **Outcome:** the developer can conduct a small, repeatable chat playtest where
 the trader responds distinctly and correctly to basic social questions, while
@@ -113,7 +85,7 @@ conflicts with state or the trace; no unsolicited trade occurs; and the two
 runs produce the same authoritative state transitions. A trace is not a
 substitute for a correct player-facing response.
 
-### 8. Decide whether to deepen the actor loop or broaden the model
+### 7. Decide whether to deepen the actor loop or broaden the model
 
 **Outcome:** use the playtest evidence to make an explicit next product choice:
 improve the trader's perception, sensemaking, intent, action, outcome, and
@@ -131,7 +103,7 @@ minimal experiment that could address it.
 observed evidence with a falsifiable success signal. If no limitation is
 observable, repeat or strengthen the playtest rather than expanding scope.
 
-### 9. Evaluate LangExtract for grounded trade extraction
+### 8. Evaluate LangExtract for grounded trade extraction
 
 **Outcome:** obtain reproducible evidence on whether
 [LangExtract](https://github.com/google/langextract) can improve varied
@@ -165,9 +137,8 @@ milestone. Do not use cloud credentials merely to complete the comparison.
 
 ## Recommended next outcome
 
-Start with **Outcome 6: test a reusable authoritative-action boundary**. The
-current safety mechanisms have proven valuable, but their trader-specific form
-is not evidence for a generic NPC engine. The critical assumption is that two
-bounded capabilities can share one authority flow while retaining separate
-contracts; the success signal is that adding the second capability does not
-change the flow or weaken either capability's safety guarantees.
+Start with **Outcome 6: re-run the bounded trader playtest**. The completed
+authority-boundary test established a shared flow for a bounded purchase and
+identity interaction. The next experiment should assess whether those
+authoritative responses make the trader's autonomy visible in player-facing
+conversation.

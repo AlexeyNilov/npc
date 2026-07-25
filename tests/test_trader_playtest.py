@@ -37,6 +37,10 @@ def supported_evidence() -> dict[str, str]:
     return cast(dict[str, str], supported_candidate()["evidence"])
 
 
+def identity_candidate(evidence: object = "what is your name") -> dict[str, object]:
+    return {"action": "identify_trader", "evidence": evidence}
+
+
 class ScriptedModel:
     def __init__(self, replies: list[ModelReply]) -> None:
         self.replies = replies
@@ -210,6 +214,109 @@ def test_authority_flow_dispatches_trade_validation_outcome_rendering_and_trace(
         "player_after": {"healing_herbs": 0, "gold": 4},
     }
     assert session.history[0].decision_reason == "accepted"
+
+
+def test_authority_capabilities_run_the_fixed_corpus_repeatably() -> None:
+    cases = [
+        (
+            "I sell you a healing herb for 4 gold.",
+            ModelReply("warm", supported_candidate()),
+            "A warm, patient expression. The trader bought one healing herb for 4 gold.",
+            "accepted",
+            True,
+            False,
+        ),
+        (
+            "Will you sell me a healing herb for 4 gold?",
+            ModelReply("neutral", supported_candidate()),
+            "The trader is quiet. No supported trade was completed.",
+            None,
+            False,
+            True,
+        ),
+        (
+            "What is your name?",
+            ModelReply("wary", identity_candidate()),
+            "The trader's name is Mara.",
+            None,
+            False,
+            True,
+        ),
+        (
+            "Tell me your name.",
+            ModelReply("neutral", identity_candidate("tell me your name")),
+            "The trader is quiet. No supported trade was completed.",
+            None,
+            False,
+            True,
+        ),
+        (
+            "What is your name?",
+            ModelReply("neutral", {"action": "identify_trader"}),
+            "The trader is quiet. No supported trade was completed.",
+            None,
+            False,
+            True,
+        ),
+    ]
+
+    def run_corpus() -> tuple[list[tuple[list[str], TraderState, PlayerState, str | None]], TraderSession]:
+        session = TraderSession()
+        results = []
+        for message, reply, rendered_reply, decision_reason, emits_trace, state_unchanged in cases:
+            trader_before = session.trader_state
+            player_before = session.player_state
+            output = asyncio.run(session.handle_message(ScriptedModel([reply]), message))
+            turn = session.history[-1]
+            assert output[0] == f"Trader: {rendered_reply}"
+            assert turn.player_message == message
+            assert turn.trader_narration == rendered_reply
+            assert turn.decision_reason == decision_reason
+            assert any(line.startswith("TRADE_TRACE ") for line in output) is emits_trace
+            if message == "I sell you a healing herb for 4 gold.":
+                assert json.loads(output[1].removeprefix("TRADE_TRACE ")) == {
+                    "candidate": supported_candidate(),
+                    "reason": "accepted",
+                    "trader_before": {
+                        "healing_herbs": 0,
+                        "gold": 30,
+                        "target_healing_herbs": 3,
+                        "max_unit_price_gold": 5,
+                        "gold_reserve": 10,
+                    },
+                    "trader_after": {
+                        "healing_herbs": 1,
+                        "gold": 26,
+                        "target_healing_herbs": 3,
+                        "max_unit_price_gold": 5,
+                        "gold_reserve": 10,
+                    },
+                    "player_before": {"healing_herbs": 1, "gold": 0},
+                    "player_after": {"healing_herbs": 0, "gold": 4},
+                }
+            if state_unchanged:
+                assert session.trader_state == trader_before
+                assert session.player_state == player_before
+            results.append((output, session.trader_state, session.player_state, turn.decision_reason))
+        return results, session
+
+    first, first_session = run_corpus()
+    second, second_session = run_corpus()
+
+    assert first == second
+    assert first_session.trader_state == second_session.trader_state
+    assert first_session.player_state == second_session.player_state
+
+
+def test_identity_evidence_accepts_player_case_and_terminal_punctuation_variations() -> None:
+    session = TraderSession()
+    model = ScriptedModel([ModelReply("neutral", identity_candidate())])
+
+    output = asyncio.run(session.handle_message(model, " WHAT IS YOUR NAME!!! "))
+
+    assert output == ["Trader: The trader's name is Mara."]
+    assert session.trader_state == TraderSession().trader_state
+    assert session.player_state == TraderSession().player_state
 
 
 def test_non_offers_and_untrusted_evidence_do_not_reach_the_evaluator() -> None:

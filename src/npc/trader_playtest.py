@@ -31,13 +31,15 @@ SYSTEM_PROMPT = """You are a trader in a small playtest. Reply with JSON only:
 Flavor must be exactly one of warm, neutral, attentive, or wary. It supplies
 only atmosphere and cannot describe an item, price, balance, transfer,
 acceptance, refusal, promise, or completed action.
-Set candidate to null unless the player explicitly offers to sell exactly one
-healing herb for a positive decimal-integer gold price. Evidence values must be
-exact excerpts from the player message. Direction must include I before sell or
-offer and then you or the trader. Quantity and item must be the contiguous
-phrase one, 1, or a followed by healing herb. Price and currency must be the
-contiguous phrase for <positive decimal digits> gold.
-The candidate is only a proposal; do not claim that a trade was accepted or refused."""
+For a request whose complete player message is what is your name, candidate may
+instead be {"action": "identify_trader", "evidence": "what is your name"}.
+Otherwise, set candidate to null unless the player explicitly offers to sell
+exactly one healing herb for a positive decimal-integer gold price. Trade
+evidence values must be exact excerpts from the player message. Direction must
+include I before sell or offer and then you or the trader. Quantity and item
+must be the contiguous phrase one, 1, or a followed by healing herb. Price and
+currency must be the contiguous phrase for <positive decimal digits> gold. The
+candidate is only a proposal; do not claim that a trade was accepted or refused."""
 
 _DIRECTION = re.compile(r"I\b.*\b(?:sell|offer)\b.*\b(?:you|the\s+trader)\b", re.IGNORECASE)
 _PRICE = re.compile(r"[1-9][0-9]*")
@@ -205,6 +207,45 @@ class HealingHerbPurchaseCapability:
         return Offer(name="healing_herb", unit_price_gold=price)
 
 
+class TraderIdentityCapability:
+    _NAME = "Mara"
+    _ACTION = "identify_trader"
+    _SUPPORTED_MESSAGE = "what is your name"
+
+    def resolve(self, reply: ModelReply, player_message: str, session: "TraderSession") -> AuthorityOutcome:
+        if self._is_supported(reply.candidate, player_message):
+            return AuthorityOutcome(f"The trader's name is {self._NAME}.", None, None)
+        return AuthorityOutcome(HealingHerbPurchaseCapability.render(reply.flavor, reply.candidate, None, None), None, None)
+
+    @classmethod
+    def _is_supported(cls, candidate: object, player_message: str) -> bool:
+        if not isinstance(candidate, dict):
+            return False
+        evidence = candidate.get("evidence")
+        return (
+            set(candidate) == {"action", "evidence"}
+            and candidate.get("action") == cls._ACTION
+            and isinstance(evidence, str)
+            and evidence == cls._normalized_player_message(player_message)
+            and evidence == cls._SUPPORTED_MESSAGE
+        )
+
+    @staticmethod
+    def _normalized_player_message(player_message: str) -> str:
+        return player_message.casefold().strip().rstrip(".?!").strip()
+
+
+class TraderCapabilityDispatch:
+    def __init__(self) -> None:
+        self.identity = TraderIdentityCapability()
+        self.purchase = HealingHerbPurchaseCapability()
+
+    def resolve(self, reply: ModelReply, player_message: str, session: "TraderSession") -> AuthorityOutcome:
+        if isinstance(reply.candidate, dict) and reply.candidate.get("action") == "identify_trader":
+            return self.identity.resolve(reply, player_message, session)
+        return self.purchase.resolve(reply, player_message, session)
+
+
 class AuthorityFlow:
     def __init__(self, capability: AuthorityCapability) -> None:
         self.capability = capability
@@ -225,7 +266,7 @@ class TraderSession:
         self.trader_state = INITIAL_TRADER_STATE
         self.player_state = INITIAL_PLAYER_STATE
         self.history: list[ConversationTurn] = []
-        self.authority_flow = authority_flow or AuthorityFlow(HealingHerbPurchaseCapability())
+        self.authority_flow = authority_flow or AuthorityFlow(TraderCapabilityDispatch())
 
     async def handle_message(self, model: TraderModel, player_message: str) -> list[str]:
         context = ConversationContext(

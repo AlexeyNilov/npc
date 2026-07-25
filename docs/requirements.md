@@ -50,6 +50,16 @@ This helps ensure requirements are:
   ordered player-message evidence proves `I` before `sell` or `offer`, `you` or
   `the trader` after that action, `one`, `1`, or `a` immediately followed by
   `healing herb`, and `for <positive decimal digits> gold`.
+- **When** an untrusted candidate proposes `identify_trader`, **the system
+  shall** return `The trader's name is Mara.` only when its string evidence is
+  exactly the complete normalized player message `what is your name` (player
+  message case and terminal punctuation may vary).
+- **When** the identity candidate is malformed or its action or evidence does
+  not meet that rule, including when the player merely mentions a name, **the
+  system shall** make no identity claim, change no authoritative state, and
+  emit no trade trace.
+- **When** the system returns the supported identity reply, **the system
+  shall** change neither trader nor player state and emit no trade trace.
 - **When** an LLM extraction is malformed, unsupported, or lacks matching
   player-message evidence for every transaction field, **the system shall**
   leave authoritative state unchanged, state that no supported trade was
