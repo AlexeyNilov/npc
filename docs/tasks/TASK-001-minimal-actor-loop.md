@@ -1,8 +1,8 @@
 # TASK-001: Demonstrate a minimal deterministic actor loop
 
-**Status:** Ready
+**Status:** Done
 
-**Owner:** Unassigned
+**Owner:** task_001_actor_loop
 
 **Role guide:** [Implementer](../agent_roles/implementer.md)
 
@@ -124,10 +124,24 @@ to the accepted authority decisions.
 
 ## Handoff
 
-**Status and outcome:** Pending
+**Status and outcome:** Done — both the state-changing purchase and
+state-preserving identity contracts run through one terminal-independent,
+seven-stage deterministic loop with reproducible authoritative records.
 
-**Changed files and ownership impact:** Pending
+**Changed files and ownership impact:** `src/npc/actor_loop.py` establishes
+the narrow loop; `src/npc/trader_playtest.py` adapts both contracts; tests
+cover the experiment and playtest regression. [Requirements](../requirements.md)
+now owns the new observable behavior and [Architecture](../architecture.md)
+owns the verified current design.
 
-**Verification:** Pending
+**Verification:** Initial focused behavioral test failed before loop logic with
+missing `TraderSession.last_actor_record`. After implementation and simplifier
+correction: `.venv/bin/pytest tests/test_actor_loop.py tests/test_trader_playtest.py`
+passed (17 tests); `make check` passed (26 tests); final `git diff --check`
+passed.
 
-**Assumptions, risks, and next action:** Pending
+**Assumptions, risks, and next action:** Identical validated input means the
+same normalized candidate; closed model flavor remains non-authoritative. The
+boundary is a candidate durable foundation, not proof of a universal actor
+model. Next action is Roadmap Outcome 2 only after deciding to run the bounded
+trader playtest.

@@ -5,6 +5,7 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from typing import Protocol
 
+from npc.actor_loop import ActorLoop, ActorLoopRecord, ActorLoopResult
 from npc.infrastructure.language_model import complete_text
 from npc.trader_experiment import Offer, PlayerState, TraderState, evaluate_offer
 
@@ -108,41 +109,98 @@ class AuthorityOutcome:
     rendered_reply: str
     decision_reason: str | None
     trace_payload: dict[str, object] | None
+    trader_state: TraderState
+    player_state: PlayerState
+
+
+@dataclass(frozen=True)
+class TraderReality:
+    trader_state: TraderState
+    player_state: PlayerState
+    player_message: str
+
+
+@dataclass(frozen=True)
+class UnsupportedPerception:
+    flavor: str
+    has_candidate: bool
+
+
+@dataclass(frozen=True)
+class TradePerception:
+    flavor: str
+    candidate: object
+    offer: Offer
+
+
+@dataclass(frozen=True)
+class IdentityPerception:
+    flavor: str
+
+
+TraderPerception = UnsupportedPerception | TradePerception | IdentityPerception
+
+
+def _has_candidate(perception: TraderPerception) -> bool:
+    return not isinstance(perception, UnsupportedPerception) or perception.has_candidate
+
+
+@dataclass(frozen=True)
+class TraderIntent:
+    name: str = "resolve_validated_perception"
+
+
+@dataclass(frozen=True)
+class AuthorityAction:
+    perception: TraderPerception
+
+
+class TraderStateContext(Protocol):
+    @property
+    def trader_state(self) -> TraderState: ...
+
+    @property
+    def player_state(self) -> PlayerState: ...
 
 
 class AuthorityCapability(Protocol):
-    def resolve(self, reply: ModelReply, player_message: str, session: "TraderSession") -> AuthorityOutcome: ...
+    def resolve(self, perception: TraderPerception, session: TraderStateContext) -> AuthorityOutcome: ...
 
 
 class HealingHerbPurchaseCapability:
-    def resolve(self, reply: ModelReply, player_message: str, session: "TraderSession") -> AuthorityOutcome:
-        offer = self.offer_from_candidate(reply.candidate, player_message)
-        if offer is None:
-            return AuthorityOutcome(self.render(reply.flavor, reply.candidate, None, None), None, None)
+    def resolve(self, perception: TraderPerception, session: TraderStateContext) -> AuthorityOutcome:
+        if not isinstance(perception, TradePerception):
+            return AuthorityOutcome(
+                self.render(perception.flavor, _has_candidate(perception), None, None),
+                None,
+                None,
+                session.trader_state,
+                session.player_state,
+            )
 
         trader_before = session.trader_state
         player_before = session.player_state
-        result = evaluate_offer(trader_before, player_before, offer)
-        session.trader_state = result.trader_state
-        session.player_state = result.player_state
+        result = evaluate_offer(trader_before, player_before, perception.offer)
         return AuthorityOutcome(
-            self.render(reply.flavor, reply.candidate, offer, result.reason),
+            self.render(perception.flavor, True, perception.offer, result.reason),
             result.reason,
             {
-                "candidate": reply.candidate,
+                "candidate": perception.candidate,
                 "reason": result.reason,
                 "trader_before": asdict(trader_before),
                 "trader_after": asdict(result.trader_state),
                 "player_before": asdict(player_before),
                 "player_after": asdict(result.player_state),
             },
+            result.trader_state,
+            result.player_state,
         )
 
     @staticmethod
-    def render(flavor: str, candidate: object | None, offer: Offer | None, decision_reason: str | None) -> str:
+    def render(flavor: str, has_candidate: bool, offer: Offer | None, decision_reason: str | None) -> str:
         atmosphere = _FLAVOR_TEXT.get(flavor, _FLAVOR_TEXT["neutral"])
         if offer is None:
-            return atmosphere if candidate is None else f"{atmosphere} No supported trade was completed."
+            return atmosphere if not has_candidate else f"{atmosphere} No supported trade was completed."
         if decision_reason == "accepted":
             return f"{atmosphere} The trader bought one healing herb for {offer.unit_price_gold} gold."
         return (
@@ -212,10 +270,18 @@ class TraderIdentityCapability:
     _ACTION = "identify_trader"
     _SUPPORTED_MESSAGE = "what is your name"
 
-    def resolve(self, reply: ModelReply, player_message: str, session: "TraderSession") -> AuthorityOutcome:
-        if self._is_supported(reply.candidate, player_message):
-            return AuthorityOutcome(f"The trader's name is {self._NAME}.", None, None)
-        return AuthorityOutcome(HealingHerbPurchaseCapability.render(reply.flavor, reply.candidate, None, None), None, None)
+    def resolve(self, perception: TraderPerception, session: TraderStateContext) -> AuthorityOutcome:
+        if isinstance(perception, IdentityPerception):
+            return AuthorityOutcome(
+                f"The trader's name is {self._NAME}.", None, None, session.trader_state, session.player_state
+            )
+        return AuthorityOutcome(
+            HealingHerbPurchaseCapability.render(perception.flavor, _has_candidate(perception), None, None),
+            None,
+            None,
+            session.trader_state,
+            session.player_state,
+        )
 
     @classmethod
     def _is_supported(cls, candidate: object, player_message: str) -> bool:
@@ -240,25 +306,51 @@ class TraderCapabilityDispatch:
         self.identity = TraderIdentityCapability()
         self.purchase = HealingHerbPurchaseCapability()
 
-    def resolve(self, reply: ModelReply, player_message: str, session: "TraderSession") -> AuthorityOutcome:
-        if isinstance(reply.candidate, dict) and reply.candidate.get("action") == "identify_trader":
-            return self.identity.resolve(reply, player_message, session)
-        return self.purchase.resolve(reply, player_message, session)
+    def resolve(self, perception: TraderPerception, session: TraderStateContext) -> AuthorityOutcome:
+        if isinstance(perception, IdentityPerception):
+            return self.identity.resolve(perception, session)
+        return self.purchase.resolve(perception, session)
 
 
 class AuthorityFlow:
     def __init__(self, capability: AuthorityCapability) -> None:
         self.capability = capability
 
-    def handle(self, reply: ModelReply, player_message: str, session: "TraderSession") -> list[str]:
-        outcome = self.capability.resolve(reply, player_message, session)
-        output = [f"Trader: {outcome.rendered_reply}"]
-        if outcome.trace_payload is not None:
-            output.append("TRADE_TRACE " + json.dumps(outcome.trace_payload, sort_keys=True))
-        session.history.append(
-            ConversationTurn(player_message, outcome.rendered_reply, reply.candidate, outcome.decision_reason)
-        )
-        return output
+    def perceive(self, reality: object, model_output: object) -> object:
+        assert isinstance(reality, TraderReality)
+        assert isinstance(model_output, ModelReply)
+        flavor = model_output.flavor if model_output.flavor in _FLAVOR_TEXT else "neutral"
+        if TraderIdentityCapability._is_supported(model_output.candidate, reality.player_message):
+            return IdentityPerception(flavor)
+        offer = HealingHerbPurchaseCapability.offer_from_candidate(model_output.candidate, reality.player_message)
+        if offer is not None:
+            return TradePerception(flavor, model_output.candidate, offer)
+        return UnsupportedPerception(flavor, model_output.candidate is not None)
+
+    def sensemake(self, reality: object, perception: object) -> object:
+        return perception
+
+    def intend(self, reality: object, sensemaking: object) -> object:
+        assert isinstance(sensemaking, (UnsupportedPerception, TradePerception, IdentityPerception))
+        return TraderIntent()
+
+    def act(self, reality: object, sensemaking: object, intent: object) -> object:
+        assert isinstance(sensemaking, (UnsupportedPerception, TradePerception, IdentityPerception))
+        assert isinstance(intent, TraderIntent)
+        return AuthorityAction(sensemaking)
+
+    def resolve(self, reality: object, action: object) -> tuple[object, object]:
+        assert isinstance(reality, TraderReality)
+        assert isinstance(action, AuthorityAction)
+        outcome = self.capability.resolve(action.perception, reality)
+        return outcome, TraderReality(outcome.trader_state, outcome.player_state, reality.player_message)
+
+    def feedback(self, reality: object, outcome: object) -> object:
+        assert isinstance(outcome, AuthorityOutcome)
+        return outcome
+
+    def run(self, loop: ActorLoop, reality: TraderReality, reply: ModelReply) -> ActorLoopResult:
+        return loop.run(reality, reply, self)
 
 
 class TraderSession:
@@ -267,6 +359,8 @@ class TraderSession:
         self.player_state = INITIAL_PLAYER_STATE
         self.history: list[ConversationTurn] = []
         self.authority_flow = authority_flow or AuthorityFlow(TraderCapabilityDispatch())
+        self.actor_loop = ActorLoop()
+        self.last_actor_record: ActorLoopRecord | None = None
 
     async def handle_message(self, model: TraderModel, player_message: str) -> list[str]:
         context = ConversationContext(
@@ -276,7 +370,21 @@ class TraderSession:
             player_message=player_message,
         )
         reply = await model.reply(context)
-        return self.authority_flow.handle(reply, player_message, self)
+        result = self.authority_flow.run(
+            self.actor_loop,
+            TraderReality(self.trader_state, self.player_state, player_message),
+            reply,
+        )
+        outcome = result.record.outcome
+        assert isinstance(outcome, AuthorityOutcome)
+        self.trader_state = outcome.trader_state
+        self.player_state = outcome.player_state
+        self.last_actor_record = result.record
+        output = [f"Trader: {outcome.rendered_reply}"]
+        if outcome.trace_payload is not None:
+            output.append("TRADE_TRACE " + json.dumps(outcome.trace_payload, sort_keys=True))
+        self.history.append(ConversationTurn(player_message, outcome.rendered_reply, reply.candidate, outcome.decision_reason))
+        return output
 
 
 async def chat(

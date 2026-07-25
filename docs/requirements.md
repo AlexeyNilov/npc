@@ -78,3 +78,26 @@ This helps ensure requirements are:
   or trade, **the system shall** use the updated authoritative state and
   in-session history; state and history shall be discarded when the process
   exits.
+
+### Deterministic actor-loop experiment
+
+- **When** either the evidence-validated healing-herb purchase or the
+  supported trader-identity response runs, **the system shall** use one
+  terminal-independent deterministic actor loop and retain an inspectable
+  record with reality, perception, sensemaking, intent, action, outcome, and
+  feedback stages.
+- **When** the loop records perception, **the system shall** derive it only
+  from authoritative reality, the player message, and deterministically
+  validated untrusted model output; the model shall not authoritatively select
+  an intent, action, state change, or final choice.
+- **When** the documented initial state receives `I sell you a healing herb for
+  4 gold.` with its evidence-validated offer, **the system shall** record the
+  deterministic accepted decision, transfer one healing herb and four gold,
+  and conserve the combined herb and gold totals.
+- **When** `What is your name?` receives the supported identity candidate,
+  **the system shall** record Mara's state-preserving identity outcome and emit
+  no trade trace.
+- **When** either fixed scenario is re-run from identical reality and
+  validated input, **the system shall** produce identical authoritative intent,
+  outcome, state, and feedback; model flavor is excluded from that authority
+  comparison.

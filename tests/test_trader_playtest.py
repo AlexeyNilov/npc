@@ -13,6 +13,7 @@ from npc.trader_playtest import (
     LocalTraderModel,
     ModelReply,
     TraderSession,
+    TraderStateContext,
     chat,
 )
 
@@ -55,9 +56,10 @@ class TrackingHealingHerbPurchaseCapability(HealingHerbPurchaseCapability):
     def __init__(self) -> None:
         self.resolved_candidates: list[object | None] = []
 
-    def resolve(self, reply: ModelReply, player_message: str, session: TraderSession):
-        self.resolved_candidates.append(reply.candidate)
-        return super().resolve(reply, player_message, session)
+    def resolve(self, perception, session: TraderStateContext):
+        if hasattr(perception, "candidate"):
+            self.resolved_candidates.append(perception.candidate)
+        return super().resolve(perception, session)
 
 
 def test_refuses_a_sale_when_the_player_has_no_healing_herb() -> None:
