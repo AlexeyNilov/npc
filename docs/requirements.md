@@ -53,7 +53,7 @@ This document owns observable system behavior.
 evidence, or cites text absent from the player message, **the system shall**
 reject it and return `do_nothing`.
 
-### Shared target-aware threat-detection experiment
+### Shared target-aware threat detection
 
 - **When** a developer runs either checked-in wolf or fox threat corpus, **the
   system shall** print one machine-readable trace per independent player

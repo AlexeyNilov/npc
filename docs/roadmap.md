@@ -28,7 +28,7 @@ replies, multi-intent handling, persistent memory, or additional creature
 actions. The LLM proposes a sensor reading; it does not select an action or
 alter state.
 
-## Ordered future outcomes
+## Completed outcome
 
 ### Reuse threat detection for a fleeing fox
 
@@ -70,6 +70,8 @@ structure is accepted.
 fixtures, and the two deterministic policy tests. Do not add memory, dialogue,
 world simulation, certainty-based authority, or a general skill registry.
 
-## Recommended next outcome
+## Next decision
 
-Reuse threat detection for a fleeing fox.
+The shared fox delivery is complete. Do not select another delivery or
+experiment until the developer identifies a concrete limitation or decision it
+must address.

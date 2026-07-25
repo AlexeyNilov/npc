@@ -46,7 +46,7 @@ player message. The pure wolf policy maps an accepted `hostile` perception to
 for each case. It creates no creature state, dialogue, world model, or shared
 actor framework.
 
-## Shared target-aware threat-detection experiment
+## Shared target-aware threat detection
 
 `npc.experiments.threat_detection` builds the one target-aware threat prompt,
 makes the configured completion call, and parses and validates the common JSON
@@ -63,5 +63,5 @@ call the shared perception module once per case and print a trace with their
 target and expected threat/action pair. Their explicit local policies consume
 only accepted threat: wolf maps true to `attack`, fox maps true to `flee`, and
 false or invalid perception maps to `do_nothing` for both. Certainty is traced
-but has no policy threshold or branch. The experiment has no creature state,
+but has no policy threshold or branch. The delivery has no creature state,
 dialogue, world model, registry, or shared actor framework.

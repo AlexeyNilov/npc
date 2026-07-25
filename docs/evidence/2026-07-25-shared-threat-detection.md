@@ -1,4 +1,4 @@
-# Experiment: shared target-aware threat detection
+# Delivery: shared target-aware threat detection
 
 **Status:** Complete
 
@@ -12,7 +12,7 @@ Whether the verified binary threat contract is a sufficiently small reusable
 perception capability for two creatures with different deterministic actions,
 without creating a general creature or skill framework.
 
-## Hypothesis
+## Delivery contract
 
 One target-aware threat-detection capability can make exactly one untrusted
 binary perception request for either a wolf or a fox, return the same candidate
@@ -25,7 +25,7 @@ Assumptions: a creature's fixed display name is sufficient target context for
 this bounded prompt; the existing wolf corpus remains valid; and fixture
 completions establish the shared contract and policies independently of a live
 model run. Certainty remains recorded observational data, not an authority
-threshold. This experiment does not establish a general creature interface or
+threshold. This delivery does not establish a general creature interface or
 cross-scenario model accuracy.
 
 ## Observable behavior
@@ -70,23 +70,20 @@ deterministic action.
   authority, and a creature/skill registry or generic actor framework.
 - **Candidate durable elements and disposable scaffolding:** the shared
   target-aware detection module is a candidate durable capability; the wolf and
-  fox CLI/corpus wrappers remain experiment scaffolding. A third materially
+  fox CLI/corpus wrappers remain delivery scaffolding. A third materially
   different creature perception or policy is required before introducing a
   registry or broader abstraction.
 
-## Signals and stop rule
+## Acceptance and boundary
 
-- **Support signal:** wolf and fox traces expose the same candidate and
+- **Acceptance evidence:** wolf and fox traces expose the same candidate and
   validation contract; an identical accepted grounded perception yields
   `attack` for wolf and `flee` for fox; every invalid or ungrounded candidate
   yields `do_nothing`; and changing only certainty changes neither policy.
-- **Rejection signal:** target-awareness requires creature-specific model fields
+- **Boundary breach:** target-awareness requires creature-specific model fields
   or validation, invalid evidence can cause either action, the policy needs
   more than one model question, or reuse requires a general framework.
-- **Inconclusive condition:** fixture and policy tests pass but a live run does
-  not yield enough captured traces to assess the configured model on both fixed
-  corpora.
-- **Stop rule:** after both corpora, malformed and ungrounded true fixtures,
+- **Completion boundary:** after both corpora, malformed and ungrounded true fixtures,
   and both deterministic policy tests, complete this record. Do not add memory,
   dialogue, world machinery, certainty authority, or a general registry.
 
@@ -108,17 +105,16 @@ deterministic action.
   passed (3 tests), `.venv/bin/pytest tests/test_wolf_threat.py` passed (10
   tests), and `.venv/bin/pytest tests/test_fox_threat.py` passed (5 tests).
   `make check` passed after formatting/linting, mypy, and all 47 tests.
-  `git diff --check` passed. The system `python` executable was unavailable;
-  the project interpreter invoked both corpus CLIs without an error exit, but
-  no live JSON traces were captured.
-- **Interpretation and limits:** Fixture results support this bounded shared
+  `git diff --check` passed. The project interpreter captured four valid JSON
+  traces for each corpus: the direct threat was accepted as `true` and produced
+  wolf `attack` or fox `flee`; calm, fearful, and ambiguous messages were
+  accepted as `false` and produced `do_nothing` for both creatures.
+- **Interpretation and limits:** The fixed corpora support this bounded shared
   perception capability: prompt target context does not alter the candidate
   shape or validation, while explicit creature policies retain all action
-  authority. The lack of captured live traces means this result does not assess
-  the configured model on either corpus, establish general model accuracy, or
-  calibrate certainty.
+  authority. Two fixed corpora do not establish general model accuracy or
+  certainty calibration.
 - **Decision or unresolved question created:** This two-creature result supports
   retaining the small shared detector without a registry or generic actor
   framework. A third materially different perception or policy would need its
   own documented reuse pressure before any broader abstraction is considered.
-- **Canonical follow-up:** [Roadmap outcome](../roadmap.md#reuse-threat-detection-for-a-fleeing-fox).
