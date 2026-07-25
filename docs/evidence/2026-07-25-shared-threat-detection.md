@@ -1,6 +1,6 @@
 # Experiment: shared target-aware threat detection
 
-**Status:** Planned
+**Status:** Complete
 
 **Date:** 2026-07-25
 
@@ -92,10 +92,33 @@ deterministic action.
 
 ## Result
 
-Complete at Review.
-
-- **Observed result:** Pending.
-- **Reproducibility evidence:** Pending.
-- **Interpretation and limits:** Pending.
-- **Decision or unresolved question created:** Pending.
+- **Observed result:** The shared detector preserves the exact three-field
+  candidate contract and deterministic validation for both targets. The same
+  grounded `true` fixture maps to wolf `attack` and fox `flee`; accepted
+  `false`, malformed output, ungrounded `true` evidence, non-finite or
+  out-of-range certainty, and arbitrarily large integer certainty all map to
+  `do_nothing` under the applicable policy. Both four-case corpora include a
+  direct threat, calm/friendly, fearful, and ambiguous message. The fox direct
+  threat names the fox in the player text. Changing only valid `true` certainty
+  from `0.01` to `0.99` changes neither creature's action.
+- **Reproducibility evidence:** The new shared/fox behavior tests were added
+  before the extraction and initially failed during collection with
+  `ModuleNotFoundError: No module named 'npc.experiments.threat_detection'`.
+  After implementation, `.venv/bin/pytest tests/test_threat_detection.py`
+  passed (3 tests), `.venv/bin/pytest tests/test_wolf_threat.py` passed (10
+  tests), and `.venv/bin/pytest tests/test_fox_threat.py` passed (5 tests).
+  `make check` passed after formatting/linting, mypy, and all 47 tests.
+  `git diff --check` passed. The system `python` executable was unavailable;
+  the project interpreter invoked both corpus CLIs without an error exit, but
+  no live JSON traces were captured.
+- **Interpretation and limits:** Fixture results support this bounded shared
+  perception capability: prompt target context does not alter the candidate
+  shape or validation, while explicit creature policies retain all action
+  authority. The lack of captured live traces means this result does not assess
+  the configured model on either corpus, establish general model accuracy, or
+  calibrate certainty.
+- **Decision or unresolved question created:** This two-creature result supports
+  retaining the small shared detector without a registry or generic actor
+  framework. A third materially different perception or policy would need its
+  own documented reuse pressure before any broader abstraction is considered.
 - **Canonical follow-up:** [Roadmap outcome](../roadmap.md#reuse-threat-detection-for-a-fleeing-fox).

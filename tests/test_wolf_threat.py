@@ -37,6 +37,20 @@ def test_accepted_grounded_true_candidate_attacks() -> None:
     assert result.action == "attack"
 
 
+def test_wolf_trace_names_its_target_and_wrapper_makes_one_completion_call() -> None:
+    calls = 0
+
+    async def one_response(_: str, __: str) -> str:
+        nonlocal calls
+        calls += 1
+        return candidate(False, 0.5, None)
+
+    result = asyncio.run(run_case("Hello wolf.", one_response))
+
+    assert calls == 1
+    assert result.target == "wolf"
+
+
 def test_accepted_false_candidate_does_nothing() -> None:
     result = asyncio.run(run_case("Hello there.", completion(candidate(False, 0.3, None))))
 

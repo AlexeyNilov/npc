@@ -46,18 +46,22 @@ player message. The pure wolf policy maps an accepted `hostile` perception to
 for each case. It creates no creature state, dialogue, world model, or shared
 actor framework.
 
-## Wolf binary threat-perception experiment
+## Shared target-aware threat-detection experiment
 
-`python -m npc.experiments.wolf_threat` loads independent cases from
-`scenarios/wolf_threat.yaml`. Each case supplies a player message and expected
-binary threat/action pair. The configured completion adapter makes one request
-per case for JSON containing exactly `threat`, `certainty`, and `evidence`.
-The experiment-local parser requires the exact object shape: `threat` is a
-boolean, `certainty` is numeric, and evidence is a string for `true` or `null`
-for `false`. Deterministic validation accepts an in-range finite certainty and,
-for `true`, requires non-empty evidence occurring verbatim in the player
-message. The pure wolf policy maps only an accepted `true` perception to
-`attack`; `false` and every invalid candidate map to `do_nothing`. Certainty is
-included in the trace but has no policy threshold or branch. The command prints
-a JSON trace for each case and creates no creature state, dialogue, world
-model, or shared actor framework.
+`npc.experiments.threat_detection` builds the one target-aware threat prompt,
+makes the configured completion call, and parses and validates the common JSON
+candidate. Its `perceive_threat` result contains only the raw candidate, parsed
+candidate, and validation result; it never selects an action. The exact object
+has `threat`, `certainty`, and `evidence`: threat is boolean, certainty is a
+finite in-range number, and true evidence is a non-empty verbatim substring of
+the player message while false evidence is null.
+
+`python -m npc.experiments.wolf_threat` and
+`python -m npc.experiments.fox_threat` load independent cases from
+`scenarios/wolf_threat.yaml` and `scenarios/fox_threat.yaml` respectively. Both
+call the shared perception module once per case and print a trace with their
+target and expected threat/action pair. Their explicit local policies consume
+only accepted threat: wolf maps true to `attack`, fox maps true to `flee`, and
+false or invalid perception maps to `do_nothing` for both. Certainty is traced
+but has no policy threshold or branch. The experiment has no creature state,
+dialogue, world model, registry, or shared actor framework.

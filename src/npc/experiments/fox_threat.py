@@ -7,11 +7,10 @@ from typing import Any, Literal, cast
 
 import yaml  # type: ignore[import-untyped]
 
-from npc.experiments.threat_detection import CandidateThreat, Completion, build_threat_sensor_prompt, perceive_threat
+from npc.experiments.threat_detection import CandidateThreat, Completion, perceive_threat
 from npc.infrastructure.language_model import complete_text
 
-Action = Literal["attack", "do_nothing"]
-THREAT_SENSOR_PROMPT = build_threat_sensor_prompt("wolf")
+Action = Literal["flee", "do_nothing"]
 
 
 @dataclass(frozen=True)
@@ -28,7 +27,7 @@ class ThreatTrace:
 
 
 def decide_action(accepted_threat: bool) -> Action:
-    return "attack" if accepted_threat else "do_nothing"
+    return "flee" if accepted_threat else "do_nothing"
 
 
 async def run_case(
@@ -36,12 +35,12 @@ async def run_case(
     completion: Completion = complete_text,
     expected: Mapping[str, object] | None = None,
 ) -> ThreatTrace:
-    perception = await perceive_threat(player_message, "wolf", completion)
+    perception = await perceive_threat(player_message, "fox", completion)
     accepted_threat = (
         perception.candidate is not None and perception.candidate.threat and perception.validation_result == "accepted"
     )
     return ThreatTrace(
-        target="wolf",
+        target="fox",
         case_id=cast(str, expected["id"]) if expected else None,
         player_message=player_message,
         expected_threat=cast(bool, expected["expected_threat"]) if expected else None,
@@ -59,7 +58,7 @@ def load_corpus(path: Path) -> list[dict[str, object]]:
 
 
 async def main_async() -> None:
-    corpus_path = Path(__file__).parents[3] / "scenarios" / "wolf_threat.yaml"
+    corpus_path = Path(__file__).parents[3] / "scenarios" / "fox_threat.yaml"
     for case in load_corpus(corpus_path):
         trace = await run_case(cast(str, case["player_message"]), expected=case)
         print(json.dumps(asdict(trace), sort_keys=True))

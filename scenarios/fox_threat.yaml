@@ -1,0 +1,17 @@
+cases:
+  - id: direct-threat
+    player_message: "Fox, get out of my way, or I will hurt you."
+    expected_threat: true
+    expected_action: flee
+  - id: calm-greeting
+    player_message: "Hello, fox. I mean no harm."
+    expected_threat: false
+    expected_action: do_nothing
+  - id: fearful-plea
+    player_message: "Please do not hurt me, fox; I am scared."
+    expected_threat: false
+    expected_action: do_nothing
+  - id: ambiguous-statement
+    player_message: "Fox, I am not sure what to do."
+    expected_threat: false
+    expected_action: do_nothing
