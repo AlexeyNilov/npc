@@ -23,4 +23,4 @@ authority, model-selected state transitions, registry, or actor framework.
 
 ## Ordered future outcomes
 
-No incomplete outcomes are currently recorded.
+Create a fox game + add fox approach logic
