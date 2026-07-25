@@ -45,3 +45,19 @@ player message. The pure wolf policy maps an accepted `hostile` perception to
 `attack` and every other input to `do_nothing`. The command prints a JSON trace
 for each case. It creates no creature state, dialogue, world model, or shared
 actor framework.
+
+## Wolf binary threat-perception experiment
+
+`python -m npc.experiments.wolf_threat` loads independent cases from
+`scenarios/wolf_threat.yaml`. Each case supplies a player message and expected
+binary threat/action pair. The configured completion adapter makes one request
+per case for JSON containing exactly `threat`, `certainty`, and `evidence`.
+The experiment-local parser requires the exact object shape: `threat` is a
+boolean, `certainty` is numeric, and evidence is a string for `true` or `null`
+for `false`. Deterministic validation accepts an in-range finite certainty and,
+for `true`, requires non-empty evidence occurring verbatim in the player
+message. The pure wolf policy maps only an accepted `true` perception to
+`attack`; `false` and every invalid candidate map to `do_nothing`. Certainty is
+included in the trace but has no policy threshold or branch. The command prints
+a JSON trace for each case and creates no creature state, dialogue, world
+model, or shared actor framework.

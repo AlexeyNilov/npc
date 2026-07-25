@@ -1,6 +1,6 @@
 # Experiment: wolf binary threat-perception gate
 
-**Status:** Planned
+**Status:** Complete
 
 **Date:** 2026-07-25
 
@@ -87,10 +87,34 @@ candidate, certainty, evidence, validation result, and deterministic action.
 
 ## Result
 
-Complete at Review.
-
-- **Observed result:** Pending.
-- **Reproducibility evidence:** Pending.
-- **Interpretation and limits:** Pending.
-- **Decision or unresolved question created:** Pending.
+- **Observed result:** The checked-in fixtures support the binary authority
+  boundary: a grounded `true` candidate yields `attack`; an accepted `false`,
+  malformed candidate, empty or ungrounded `true` evidence, and an out-of-range
+  non-finite, or arbitrarily large integer certainty all yield `do_nothing`.
+  The four-case corpus contains direct-threat, calm/friendly, fearful, and
+  ambiguous messages and displays an expected threat/action pair for each case.
+  Changing only valid `true` certainty from `0.01` to `0.99` leaves the action
+  as `attack`.
+- **Reproducibility evidence:** Behavioral tests were written before the module
+  existed and initially failed during collection with `ModuleNotFoundError: No
+  module named 'npc.experiments.wolf_threat'`. After implementation,
+  `.venv/bin/pytest tests/test_wolf_threat.py` passed (9 tests) and
+  `.venv/bin/pytest tests/test_wolf_affect.py` passed (8 tests). `make check`
+  passed: ruff formatting and lint, mypy, and all 38 tests. `git diff --check`
+  passed. The requested `python -m npc.experiments.wolf_threat` could not run
+  because `python` is not installed in this environment. Its project-interpreter
+  equivalent, `.venv/bin/python -m npc.experiments.wolf_threat`, exited
+  successfully but yielded no captured stdout, so it did not provide usable
+  live corpus traces.
+- **Interpretation and limits:** The deterministic fixtures demonstrate that
+  model output cannot select an attack without an accepted `true` and exact
+  player-text evidence, while certainty remains observational data. The live
+  sensor behavior is inconclusive: no captured live traces are available to
+  assess the configured completion adapter against the fixed corpus. Fixture
+  results do not establish general model accuracy.
+- **Decision or unresolved question created:** Run the fixed corpus where the
+  configured completion adapter's JSON traces can be captured before treating
+  the binary perception question as supported beyond deterministic fixtures;
+  then decide whether independent binary perceptions and a separate certainty
+  calibration experiment are warranted.
 - **Canonical follow-up:** [Roadmap outcome](../roadmap.md#test-a-binary-threat-perception-gate).
