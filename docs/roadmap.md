@@ -6,125 +6,126 @@ outcomes, not coding activities or a list of possible abstractions.
 ## Product frame
 
 **Target user:** the project's developer, learning whether a deterministic
-actor model can produce autonomous behavior that survives meaningful change.
+actor model can turn natural-language player input into grounded NPC behavior
+without losing expressive conversation.
 
 **Relevant evidence:** [the deterministic trader offer evaluator record](evidence/2026-07-25-trader-offer-evaluator.md)
 owns the observed result and limits of the current scenario.
 
-**Problem:** the project cannot yet decide whether the vision's actor loop is a
-useful model or merely labels around scenario-specific rules. A paired decision
-test alone cannot answer that question.
+**Problem:** a language model is the practical semantic interpreter for varied
+player input, but it must not invent trader facts, commitments, state changes,
+or durable history. The current offer evaluator has no language-facing
+perception boundary and no room for safe, free small talk.
 
-**Evidence milestone:** a developer can run and inspect a deterministic trader
-simulation in which an explicit goal and perceived world event cause an action
-without a player request; the action's outcome becomes feedback that changes a
-later decision.
+**Evidence milestone:** a developer can send one player message to a trader;
+the system discovers one primary intent and routes it either through a grounded
+authoritative path or an expressive, side-effect-free path.
 
-**Constraints:** use checked-in, deterministic inputs and authoritative state.
-Do not add chat, an LLM boundary, persistence, or a general simulation framework
-until evidence from the milestones below justifies one.
+**Constraints:** start with one player and one primary intent per turn. The one
+supported authoritative intent is a player offer to sell one healing herb for a
+stated gold price. General world simulation, multiple simultaneous intents,
+additional authoritative actions, and durable memory from expressive dialogue
+are out of scope.
 
 ## Ordered future outcomes
 
-### 1. Demonstrate one autonomous goal-feedback loop
+### 1. Establish the grounded primary-intent boundary
 
-**Hypothesis:** an explicit trader goal, authoritative perception, deterministic
-choice, action outcome, and retained feedback can produce a replayable,
-actor-initiated decision that materially affects the trader's next decision.
+**Hypothesis:** an LLM can propose one useful primary intent from player text
+while deterministic grounding can prevent unsupported interpretations from
+becoming trader facts, commitments, state changes, or durable memory.
 
-**Outcome:** a developer can inspect a fixed, multi-step trader timeline. At
-least one action is triggered by an authoritative world event or time step, not
-by a player proposal. Its outcome is retained, and replaying the later decision
-with and without that feedback yields different deterministic choices.
+**Outcome:** a developer can send one player message and inspect its candidate
+intent, text evidence, route, validation result, and authoritative outcome if
+one exists. The message has one of three safe results: a grounded trade offer,
+an expressive turn, or an unresolved turn with no state change.
 
 **Smallest test:** use the planned
-[autonomous-restock experiment record](evidence/2026-07-25-trader-autonomous-restock.md).
-It uses one trader goal and a minimal world event—an inventory shortage that
-causes a restock attempt—then makes the result of that attempt relevant to a
-later restock choice. Keep the precise event and action contract in the record
-rather than prematurely standardizing them in a framework.
+[grounded-primary-intent experiment record](evidence/2026-07-25-trader-grounded-primary-intent.md).
+Its fixed corpus includes valid trade-offer paraphrases, ordinary small talk,
+mentions that are not offers, invented trader facts, and messages with more
+than one meaningful intent. Keep the perception contract bounded to this
+primary-intent experiment; do not build a general natural-language framework.
 
-**Support criterion:** identical checked-in inputs reproduce the full causal
-trace: reality, perception, goal or intent, action, outcome, feedback, and the
-changed later choice. The trace makes clear why the actor acted without a player
-request.
+**Support criterion:** a valid trade offer is grounded in exact player text and
+authoritative trader/player context before the deterministic evaluator can act.
+Small talk and unsupported or multi-intent messages change no authoritative
+state or durable memory. Expressive replies may be free-form, but cannot assert
+canonical trader facts, a commitment, or a completed action.
 
-**Rejection criterion:** the scenario requires hidden or ad hoc state, feedback
-does not affect a later choice, or the only meaningful decision remains a
-player-request evaluator. Record the result; do not add an actor-loop
-abstraction merely to preserve its labels.
+**Rejection criterion:** the model can cause an unsupported authoritative
+interpretation, the system must turn all dialogue into templates to remain safe,
+or a mixed message is silently treated as though the system understood only one
+part. Record the result; do not expand the model's authority to compensate.
 
-**Decision unlocked:** whether there is evidence to apply reuse pressure to a
-small candidate actor model, or whether the project should change the hypothesis
-before building further.
+**Decision unlocked:** how to broaden the supported authoritative intent set or
+expressive freedom without weakening grounding.
 
-### 2. Apply reuse pressure with a contrasting decision contract
+### 2. Demonstrate stateful trader choices across primary-intent turns
 
 **Precondition:** Outcome 1 has support evidence and a completed experiment
 record.
 
-**Hypothesis:** the minimum elements that made the autonomous loop observable—
-authoritative reality, goal-relevant state, perception, choice, outcome, and
-feedback—also serve a contrasting trader decision without trader-action
-branches in any proposed shared boundary.
+**Hypothesis:** the grounded primary-intent boundary can serve a short
+conversation in which authoritative trader state and relevant completed actions
+affect a later deterministic choice, while expressive turns remain
+non-authoritative.
 
-**Outcome:** a developer can compare the autonomous action with a contrasting
-contract, such as responding to a player offer, and identify exactly which
-model elements both use and which belong only to a scenario.
+**Outcome:** a developer can run a repeatable sequence of single-intent player
+turns: expressive small talk, an accepted offer, and a later offer whose result
+reflects the trader's updated state or goals.
 
-**Smallest test:** run the existing offer-evaluation behavior or another bounded
-reactive decision through the candidate model only after Outcome 1. Retain only
-elements that both traces require. Do not require the two scenarios to share a
-policy or domain vocabulary.
+**Smallest test:** retain only authoritative state and completed outcomes needed
+for the later decision. Do not promote free-form small-talk content into memory
+or require the model to summarize the conversation as fact.
 
-**Support criterion:** both traces are deterministic and inspectable; shared
-elements need no trader-action-specific branches; scenario policy and rendering
-remain outside the shared candidate.
+**Support criterion:** the same validated primary intents reproduce the same
+authoritative transitions; the later trade decision can be explained from
+trader state and goals; expressive turns neither alter state nor introduce
+facts that the trader later treats as true.
 
-**Rejection criterion:** reuse requires a general framework, hidden coupling,
-or branches that exist only to make the second case fit. Keep the evidence and
-return to a narrower experiment or explicitly retain two scenario-specific
-flows.
+**Rejection criterion:** relevant history cannot be represented without letting
+the model create canonical facts, or the required behavior depends on multiple
+intents in a single message. Keep the evidence and defer that expansion.
 
-**Decision unlocked:** whether to retain a small, evidence-backed actor-model
-candidate or stop treating the common structure as durable.
+**Decision unlocked:** whether to add factual queries, another transaction
+shape, or multi-intent handling as the next bounded capability.
 
-### 3. Make the model-direction decision
+### 3. Add multi-intent input deliberately
 
-**Precondition:** the first two experiment records are complete, including
-negative or inconclusive results.
+**Precondition:** Outcome 2 has support evidence and the product has chosen the
+next authoritative capability to combine with expressive conversation.
 
-**Outcome:** make one explicit choice: retain the smallest supported actor
-model, run a changed hypothesis, or narrow the project to deterministic
-scenario engines.
+**Outcome:** determine whether one message containing an authoritative intent
+and expressive content can be split into separately grounded and free-form
+paths without silently discarding meaning.
 
-**Smallest test:** compare the two traces and records. Name the observed common
-elements, unsupported assumptions, and the next falsifiable question.
+**Smallest test:** use a small corpus of mixed messages. Require an inspectable
+intent list, text evidence for each authoritative component, and a clear
+unresolved path for ambiguity.
 
-**Pass criterion:** the decision cites experiment evidence, has a stated scope
-and rejection condition, and does not preserve code or expand scope because of
-prior effort.
+**Pass criterion:** authoritative components remain grounded; expressive
+components retain useful freedom; no supported component is silently ignored;
+and ambiguity produces no state change.
 
-### 4. Introduce a player-facing boundary only when it tests the model
+### 4. Extend the trader's authoritative capability deliberately
 
-**Precondition:** Outcome 3 retains a supported actor-model candidate and
-identifies a player-facing question that deterministic traces cannot answer.
+**Precondition:** prior outcomes identify a specific player-facing capability
+whose value cannot be achieved by the existing sell-offer contract.
 
-**Outcome:** determine whether conversation or another interface makes the
-actor's goal-driven, state-grounded choices understandable and engaging without
-becoming an authority path.
+**Outcome:** add one bounded authoritative capability, such as a factual query
+or a second transaction contract, while preserving the grounded perception
+boundary and expressive dialogue policy.
 
-**Smallest test:** define a repeatable playtest whose authoritative actions and
-state transitions use the validated model. Treat language-model output only as
-untrusted input or bounded presentation.
+**Smallest test:** define the authoritative facts, player-text evidence, and
+state transition or deterministic reply that the new capability requires.
 
-**Pass criterion:** the interface makes a specific actor behavior more
-observable to the developer; it neither authors authoritative choices nor hides
-whether the underlying model succeeded.
+**Pass criterion:** the capability expands useful interaction without granting
+the model a new path to invent facts, commitments, or state transitions.
 
 ## Recommended next outcome
 
 Start with **Outcome 1**. The planned experiment record gives it a falsifiable,
 bounded definition; prepare implementation work only from that record. Do not
-code a reusable loop, add a second interface, or revive chat before the first
-autonomous goal-feedback demonstration is reviewed.
+add multi-intent interpretation, new authoritative actions, or model-authored
+durable memory before the grounded primary-intent boundary is reviewed.

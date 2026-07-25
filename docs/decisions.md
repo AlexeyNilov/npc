@@ -2,6 +2,40 @@
 
 This document owns consequential choices and their rationale.
 
+### 2026-07-25: Separate LLM semantic interpretation from NPC authority
+
+**Status:** Accepted
+
+**Context:** Natural-language player input needs an LLM to identify useful
+meaning beyond fixed command templates. The same model can invent trader facts,
+completed actions, commitments, or history that do not exist. The first trader
+also needs genuine small talk rather than wholly templated dialogue.
+
+**Decision:** Treat the LLM as an untrusted semantic sensor. For the first
+milestone it proposes one primary player intent and the supporting player-text
+evidence. Deterministic code routes that intent:
+
+- An **authoritative** intent can affect an NPC decision only after its fields
+  are grounded in the player text and authoritative trader/player context.
+- An **expressive** intent may receive free-form, persona-consistent dialogue,
+  but cannot assert canonical trader facts, commitments, completed actions, or
+  create authoritative state or durable memory.
+- An unsupported, unclear, or multi-intent message causes no authoritative
+  state change. Multi-intent interpretation is deferred.
+
+Player statements are claims, requests, or proposals; they do not establish
+world facts merely because the LLM recognized them.
+
+**Alternatives considered:** Let the LLM select actions or write memory; use
+only deterministic command templates; or make all dialogue templated. The
+first grants uninspectable authority, while the latter two cannot deliver the
+intended natural-language interaction and small-talk freedom.
+
+**Consequences:** The product needs an inspectable grounded-perception contract
+and an explicit expressive-dialogue policy. The exact balance of generation and
+output controls remains an experiment question; free-form text is not a route
+around the authority boundary.
+
 ### 2026-07-25: Preserve experiment evidence independently of implementation
 
 **Status:** Accepted

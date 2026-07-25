@@ -23,10 +23,10 @@ and what must be observable before more code is justified.
   it, record its assumption, observable behavior, smallest test, support
   signal, rejection signal, and the decision to make from either result.
 - For an outcome intended to advance the project vision, identify the minimum
-  vision behavior it must demonstrate. For an actor claim, distinguish a
-  request-response rule from goal pursuit, autonomous initiative, stateful
-  feedback, or a later decision changed by history. Do not label the former an
-  actor-model result.
+  vision behavior it must demonstrate and the behaviors it deliberately does
+  not test. For an actor claim, name whether the evidence concerns grounded
+  perception, goal-driven choice, relevant history, autonomous initiative, or
+  another specific behavior. Do not claim untested behavior.
 - A second scenario tests a reuse claim; it does not by itself establish user
   value or autonomy. State both the pressure it applies and the separate
   behavior the first scenario must demonstrate.

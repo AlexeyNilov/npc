@@ -20,5 +20,5 @@ resolve the hypothesis. The record remains when its code is removed.
   [requirements](../requirements.md).
 
 Use a stable, descriptive filename such as
-`YYYY-MM-DD-trader-autonomous-restock.md`. Do not create a record for ordinary
+`YYYY-MM-DD-trader-grounded-primary-intent.md`. Do not create a record for ordinary
 bug fixes or routine delivery work.
