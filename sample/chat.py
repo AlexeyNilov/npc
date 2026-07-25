@@ -9,8 +9,7 @@ import argparse
 import asyncio
 from collections.abc import Sequence
 
-from local_llm_project_template.infrastructure.language_model import stream_text
-
+from npc.infrastructure.language_model import stream_text
 
 DEFAULT_SYSTEM_PROMPT = "You are a helpful assistant."
 

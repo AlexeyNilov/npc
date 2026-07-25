@@ -3,9 +3,9 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "local_llm_project_template"
+name = "npc"
 version = "0.1.0"
-description = "local_llm_project_template"
+description = "npc"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -25,11 +25,11 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["local_llm_project_template*"]
+include = ["npc*"]
 namespaces = false
 
 [tool.setuptools.package-data]
-local_llm_project_template = ["py.typed"]
+npc = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -45,7 +45,7 @@ select = ["E", "F", "I", "UP"]
 
 [tool.mypy]
 python_version = "3.12"
-files = ["src/local_llm_project_template", "tests"]
+files = ["src/npc", "tests"]
 warn_unused_configs = true
 warn_return_any = true
 warn_unused_ignores = true

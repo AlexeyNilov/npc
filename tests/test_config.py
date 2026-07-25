@@ -2,7 +2,7 @@ import importlib
 
 from pytest import MonkeyPatch
 
-from local_llm_project_template import config
+from npc import config
 
 
 def test_uses_defaults_when_environment_variables_are_unset(monkeypatch: MonkeyPatch) -> None:

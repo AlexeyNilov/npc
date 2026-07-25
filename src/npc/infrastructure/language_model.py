@@ -1,7 +1,7 @@
 from collections.abc import AsyncIterator
 
-from local_llm_project_template.config import LLM_NAME
-from local_llm_project_template.infrastructure.chat_client import chat_client
+from npc.config import LLM_NAME
+from npc.infrastructure.chat_client import chat_client
 
 
 async def stream_text(prompt: str, system_prompt: str) -> AsyncIterator[str]:
