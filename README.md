@@ -57,10 +57,6 @@ Run the checked-in deterministic trader scenario with:
 python -m npc.trader_experiment
 ```
 
-The command independently evaluates two one-herb purchase proposals from the
-same initial trader state and prints each proposal's decision reason and
-resulting state. It makes no network or LLM calls.
-
 ## Project documentation
 
 - [Requirements](docs/requirements.md)
