@@ -40,6 +40,7 @@ Do not preload every document automatically.
 | How do humans/agents build, test, and contribute? | [Contributing](CONTRIBUTING.md) |
 | How must agents behave? | [Agent instructions](AGENTS.md) |
 | How does work move between roles? | [Agent workflow](docs/agent-workflow.md) |
+| How does durable information move between its owners? | [Information flow](docs/information-flow.md) |
 | How does this specific role operate? | [Role guides](docs/agent_roles/) |
 | What is this assignment? | [Task template](docs/tasks/TEMPLATE.md) |
 | Which assignments are currently open? | [Task registry](docs/tasks/STATUS.md) |
