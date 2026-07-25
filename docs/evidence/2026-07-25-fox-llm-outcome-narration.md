@@ -1,10 +1,8 @@
 # Experiment: configured non-authoritative fox outcome narration
 
-**Status:** Inconclusive
+**Status:** Complete
 
 **Date:** 2026-07-25
-
-**Roadmap outcome:** [Invoke an LLM as a non-authoritative fox outcome narrator](../roadmap.md#1-invoke-an-llm-as-a-non-authoritative-fox-outcome-narrator)
 
 ## Decision unlocked
 
@@ -56,19 +54,24 @@ rendered text or fallback, and `non_authoritative: true`.
 
 ## Result
 
-Complete at Review.
-
 - **Observed result:** Fixture coverage accepts free-form `flee` and
   `do_nothing` narration and exercises blank, oversized, and exceptional
-  fallback paths. The configured command was invoked on 2026-07-25 and exited
-  successfully, but this execution environment returned no inspectable trace
-  output; it therefore did not provide the required configured-model evidence.
+  fallback paths. A configured-model run produced accepted action-only-prompt
+  narrations for `flee` (`The fox darts into the shadows, vanishing into the
+  brush.`) and `do_nothing` (`The fox remains still, watching with steady
+  eyes.`). Their canonical action and feedback distances remained `flee`/`15`
+  and `do_nothing`/`10` respectively. The model also supplied noncanonical
+  flavour, which this experiment intentionally permits as presentation only.
 - **Reproducibility evidence:** `.venv/bin/python -m pytest
-  tests/test_fox_outcome_rendering.py`; fixture command:
-  `.venv/bin/python -m npc.experiments.fox_outcome_rendering`.
-- **Interpretation and limits:** Fixture evidence establishes the boundary and
-  fallback behavior only. The missing configured trace means this experiment
-  does not demonstrate a configured-model response or its usability.
-- **Decision or unresolved question created:** Whether actual free-form model
-  narration is useful, and whether it needs factual constraints.
-- **Canonical follow-up:** [Roadmap outcome](../roadmap.md#1-invoke-an-llm-as-a-non-authoritative-fox-outcome-narrator).
+  tests/test_fox_outcome_rendering.py` passed with 5 tests; `make check` passed
+  with 38 tests; `git diff --check` passed. Fixture traces were captured with
+  `.venv/bin/python -m npc.experiments.fox_outcome_rendering`; configured
+  traces were captured with `python -m npc.experiments.fox_outcome_rendering
+  --configured-narrator`.
+- **Interpretation and limits:** The configured run and fixture failure tests
+  support the narrow presentation boundary: narration is visible to the player
+  but cannot change the completed canonical turn. They do not establish that
+  generated narration is factually accurate, suitable for dialogue, or a
+  reusable rendering framework.
+- **Decision or unresolved question created:** Whether later work needs factual
+  constraints on noncanonical flavour remains open.
