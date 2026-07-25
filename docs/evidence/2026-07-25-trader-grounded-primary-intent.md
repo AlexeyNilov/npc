@@ -1,6 +1,6 @@
 # Experiment: grounded primary intent
 
-**Status:** Planned
+**Status:** Inconclusive
 
 **Date:** 2026-07-25
 
@@ -74,8 +74,28 @@ exists. One turn results in exactly one of the following:
 
 Complete at Review.
 
-- **Observed result:** Pending.
-- **Reproducibility evidence:** Pending.
-- **Interpretation and limits:** Pending.
-- **Decision or unresolved question created:** Pending.
-- **Canonical follow-up:** [Roadmap Outcome 2](../roadmap.md#2-demonstrate-stateful-trader-choices-across-primary-intent-turns) if supported; otherwise the roadmap or a decision record.
+- **Observed result:** The five-case corpus routed the valid offer through the
+  deterministic evaluator, which accepted it and transferred one healing herb
+  and four gold. Small talk was expressive with unchanged authoritative state.
+  The non-offer mention, invented trader commitment, and mixed message were
+  unresolved with unchanged authoritative state. The model initially returned
+  JSON in Markdown fences; the experiment parser was corrected to accept one
+  enclosing JSON fence before this recorded run.
+- **Reproducibility evidence:** Run `python -m npc.primary_intent_experiment`
+  with the configured local model and
+  `scenarios/grounded_primary_intent.yaml`; the captured 2026-07-25 trace has
+  one result for each corpus message. Offline validation tests cover fenced
+  JSON, grounded offers, malformed output, ungrounded prices, invented trader
+  commitments, multi-intent candidates, and unsafe expressive replies.
+- **Interpretation and limits:** The run supports the limited authoritative
+  boundary: an LLM-proposed trade did not reach the evaluator without grounded
+  player text, and unsupported or multi-intent messages made no authoritative
+  change. It does not establish the expressive-dialogue policy. The small-talk
+  response asserted that the day was volatile and its momentum promising,
+  neither of which came from authoritative context; the lexical policy check
+  passed that response. No durable state was created, but the experiment cannot
+  yet show that free-form replies avoid unsourced canonical claims.
+- **Decision or unresolved question created:** What bounded, non-template
+  expressive-output policy can prevent unsourced factual assertions reliably
+  enough for this experiment?
+- **Canonical follow-up:** [ISSUE-001](../issues/ISSUE-001-expressive-output-unsourced-facts.md).
