@@ -8,8 +8,8 @@ from typing import Any, Literal, cast
 
 import yaml  # type: ignore[import-untyped]
 
+from npc.experiments.trader import DecisionResult, Offer, PlayerState, TraderState, evaluate_offer
 from npc.infrastructure.language_model import complete_text
-from npc.trader_experiment import DecisionResult, Offer, PlayerState, TraderState, evaluate_offer
 
 Completion = Callable[[str, str], Awaitable[str]]
 Route = Literal["grounded_trade_offer", "expressive", "unresolved"]
@@ -265,7 +265,7 @@ def load_corpus(path: Path) -> list[dict[str, Any]]:
 
 
 async def main_async() -> None:
-    corpus_path = Path(__file__).parents[2] / "scenarios" / "grounded_primary_intent.yaml"
+    corpus_path = Path(__file__).parents[3] / "scenarios" / "grounded_primary_intent.yaml"
     for turn in load_corpus(corpus_path):
         trader_state = TraderState(**cast(dict[str, int], turn["trader_state"]))
         player_state = PlayerState(**cast(dict[str, int], turn["player_state"]))

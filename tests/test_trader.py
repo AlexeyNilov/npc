@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 from subprocess import run
 
-from npc.trader_experiment import (
+from npc.experiments.trader import (
     Offer,
     PlayerState,
     TraderState,
@@ -73,7 +73,7 @@ def test_accepted_trade_conserves_combined_healing_herbs_and_gold() -> None:
 
 def test_cli_prints_each_proposal_decision_reason_and_both_resulting_states() -> None:
     completed = run(
-        [sys.executable, "-m", "npc.trader_experiment"],
+        [sys.executable, "-m", "npc.experiments.trader"],
         cwd=ROOT,
         capture_output=True,
         check=True,

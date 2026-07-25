@@ -11,8 +11,7 @@ import json
 from collections.abc import Sequence
 from dataclasses import asdict
 
-from npc.infrastructure.language_model import complete_text, stream_text
-from npc.primary_intent_experiment import (
+from npc.experiments.primary_intent import (
     EXPRESSIVE_SYSTEM_PROMPT,
     PERCEPTION_SYSTEM_PROMPT,
     check_expressive_reply,
@@ -20,7 +19,8 @@ from npc.primary_intent_experiment import (
     parse_supported_sell_offer,
     validate_candidate,
 )
-from npc.trader_experiment import PlayerState, TraderState, evaluate_offer
+from npc.experiments.trader import PlayerState, TraderState, evaluate_offer
+from npc.infrastructure.language_model import complete_text, stream_text
 
 
 async def stream_reply(player_message: str) -> tuple[str, str]:

@@ -2,8 +2,8 @@ import asyncio
 import json
 from collections.abc import Awaitable, Callable
 
-from npc.primary_intent_experiment import run_turn
-from npc.trader_experiment import PlayerState, TraderState
+from npc.experiments.primary_intent import run_turn
+from npc.experiments.trader import PlayerState, TraderState
 
 
 def candidate(**overrides: object) -> str:

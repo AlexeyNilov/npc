@@ -81,7 +81,7 @@ Complete at Review.
   unresolved with unchanged authoritative state. The model initially returned
   JSON in Markdown fences; the experiment parser was corrected to accept one
   enclosing JSON fence before this recorded run.
-- **Reproducibility evidence:** Run `python -m npc.primary_intent_experiment`
+- **Reproducibility evidence:** Run `python -m npc.experiments.primary_intent`
   with the configured local model and
   `scenarios/grounded_primary_intent.yaml`; the captured 2026-07-25 trace has
   one result for each corpus message. Offline validation tests cover fenced

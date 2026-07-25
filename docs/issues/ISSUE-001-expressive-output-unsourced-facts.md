@@ -14,7 +14,7 @@ allows it.
 
 ## Evidence
 
-- Run `python -m npc.primary_intent_experiment` with the checked-in corpus.
+- Run `python -m npc.experiments.primary_intent` with the checked-in corpus.
 - For `Good afternoon. How is the market treating you?`, the route preserved
   trader and player state but returned: `It's a volatile day, but the momentum
   feels promising. How about you?` The policy check reported `passed`.

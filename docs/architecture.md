@@ -4,7 +4,7 @@ This document owns the current verified system design.
 
 ## Trader decision experiment
 
-`python -m npc.trader_experiment` loads independent proposals from
+`python -m npc.experiments.trader` loads independent proposals from
 `scenarios/trader_decision.yaml`. Each proposal contains explicit trader and
 player state plus an offered price for one healing herb. `evaluate_offer`
 applies the trader's price, stock, and reserve rules and returns the decision
@@ -16,7 +16,7 @@ change in actor goals, actions, or outcomes.
 
 ## Grounded primary-intent experiment
 
-`python -m npc.primary_intent_experiment` loads the fixed corpus from
+`python -m npc.experiments.primary_intent` loads the fixed corpus from
 `scenarios/grounded_primary_intent.yaml`. For each independent turn it calls
 the configured OpenAI-compatible completion adapter in
 `npc.infrastructure.language_model` to propose strict JSON containing one

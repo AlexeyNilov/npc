@@ -85,7 +85,7 @@ def format_state(state: TraderState | PlayerState) -> str:
 
 
 def main() -> None:
-    scenario_path = Path(__file__).parents[2] / "scenarios" / "trader_decision.yaml"
+    scenario_path = Path(__file__).parents[3] / "scenarios" / "trader_decision.yaml"
     for proposal in load_scenario(scenario_path):
         result = evaluate_offer(proposal.trader_state, proposal.player_state, proposal.offer)
         decision = "accepted" if result.accepted else "refused"
