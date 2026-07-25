@@ -49,6 +49,18 @@ The engine should support developers in describing actors. Assisted creation
 from natural language, constrained by schemas, is a possible later direction;
 it is not the project's initial purpose.
 
+## Trader decision experiment
+
+Run the checked-in deterministic trader scenario with:
+
+```text
+python -m npc.trader_experiment
+```
+
+The command independently evaluates two one-herb purchase proposals from the
+same initial trader state and prints each proposal's decision reason and
+resulting state. It makes no network or LLM calls.
+
 ## Project documentation
 
 - [Requirements](docs/requirements.md)

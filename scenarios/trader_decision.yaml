@@ -1,0 +1,11 @@
+initial_state:
+  healing_herbs: 0
+  gold: 30
+  target_healing_herbs: 3
+  max_unit_price_gold: 5
+  gold_reserve: 10
+proposals:
+  - name: four_gold
+    unit_price_gold: 4
+  - name: six_gold
+    unit_price_gold: 6
