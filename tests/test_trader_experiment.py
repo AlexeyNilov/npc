@@ -18,7 +18,7 @@ def test_accepts_an_affordable_offer_and_transfers_one_herb_and_four_gold() -> N
     trader = TraderState(healing_herbs=0, gold=30, target_healing_herbs=3, max_unit_price_gold=5, gold_reserve=10)
     player = PlayerState(healing_herbs=1, gold=0)
 
-    result = evaluate_offer(trader, player, Offer(name="four_gold", unit_price_gold=4))
+    result = evaluate_offer(trader, player, Offer(unit_price_gold=4))
 
     assert result.accepted is True
     assert result.reason == "accepted"
@@ -32,7 +32,7 @@ def test_refuses_an_offer_above_the_price_limit_without_either_state_changing() 
     trader = TraderState(healing_herbs=0, gold=30, target_healing_herbs=3, max_unit_price_gold=5, gold_reserve=10)
     player = PlayerState(healing_herbs=1, gold=0)
 
-    result = evaluate_offer(trader, player, Offer(name="six_gold", unit_price_gold=6))
+    result = evaluate_offer(trader, player, Offer(unit_price_gold=6))
 
     assert result.accepted is False
     assert result.reason == "price_above_limit"
@@ -43,7 +43,7 @@ def test_refuses_an_offer_above_the_price_limit_without_either_state_changing() 
 def test_evaluating_the_same_inputs_repeatedly_is_deterministic() -> None:
     trader = TraderState(healing_herbs=0, gold=30, target_healing_herbs=3, max_unit_price_gold=5, gold_reserve=10)
     player = PlayerState(healing_herbs=1, gold=0)
-    offer = Offer(name="four_gold", unit_price_gold=4)
+    offer = Offer(unit_price_gold=4)
 
     assert evaluate_offer(trader, player, offer) == evaluate_offer(trader, player, offer)
 
@@ -58,17 +58,14 @@ def test_checked_in_scenario_cases_start_from_the_same_initial_state() -> None:
         healing_herbs=0, gold=30, target_healing_herbs=3, max_unit_price_gold=5, gold_reserve=10
     )
     assert proposals[0].player_state == PlayerState(healing_herbs=1, gold=0)
-    assert {proposal.offer.name: proposal.offer.unit_price_gold for proposal in proposals} == {
-        "four_gold": 4,
-        "six_gold": 6,
-    }
+    assert [proposal.offer.unit_price_gold for proposal in proposals] == [4, 6]
 
 
 def test_accepted_trade_conserves_combined_healing_herbs_and_gold() -> None:
     trader = TraderState(healing_herbs=0, gold=30, target_healing_herbs=3, max_unit_price_gold=5, gold_reserve=10)
     player = PlayerState(healing_herbs=1, gold=0)
 
-    result = evaluate_offer(trader, player, Offer(name="four_gold", unit_price_gold=4))
+    result = evaluate_offer(trader, player, Offer(unit_price_gold=4))
 
     assert result.trader_state.healing_herbs + result.player_state.healing_herbs == trader.healing_herbs + player.healing_herbs
     assert result.trader_state.gold + result.player_state.gold == trader.gold + player.gold
@@ -83,9 +80,9 @@ def test_cli_prints_each_proposal_decision_reason_and_both_resulting_states() ->
         text=True,
     )
 
-    assert "four_gold: price=4 accepted (accepted)" in completed.stdout
+    assert "healing herb: price=4 accepted (accepted)" in completed.stdout
     assert "trader: healing_herbs=1, gold=26" in completed.stdout
     assert "player: healing_herbs=0, gold=4" in completed.stdout
-    assert "six_gold: price=6 refused (price_above_limit)" in completed.stdout
+    assert "healing herb: price=6 refused (price_above_limit)" in completed.stdout
     assert "trader: healing_herbs=0, gold=30" in completed.stdout
     assert "player: healing_herbs=1, gold=0" in completed.stdout

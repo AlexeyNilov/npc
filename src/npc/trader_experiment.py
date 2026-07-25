@@ -22,7 +22,6 @@ class PlayerState:
 
 @dataclass(frozen=True)
 class Offer:
-    name: str
     unit_price_gold: int
 
 
@@ -73,10 +72,7 @@ def load_scenario(path: Path) -> list[TradeProposal]:
     proposals = cast(list[dict[str, object]], data["proposals"])
     return [
         TradeProposal(
-            offer=Offer(
-                name=cast(str, proposal["name"]),
-                unit_price_gold=cast(int, proposal["unit_price_gold"]),
-            ),
+            offer=Offer(unit_price_gold=cast(int, proposal["unit_price_gold"])),
             trader_state=TraderState(**cast(dict[str, int], proposal["trader_state"])),
             player_state=PlayerState(**cast(dict[str, int], proposal["player_state"])),
         )
@@ -94,7 +90,7 @@ def main() -> None:
         result = evaluate_offer(proposal.trader_state, proposal.player_state, proposal.offer)
         decision = "accepted" if result.accepted else "refused"
         print(
-            f"{proposal.offer.name}: price={proposal.offer.unit_price_gold} {decision} ({result.reason}); "
+            f"healing herb: price={proposal.offer.unit_price_gold} {decision} ({result.reason}); "
             f"trader: {format_state(result.trader_state)}; player: {format_state(result.player_state)}"
         )
 

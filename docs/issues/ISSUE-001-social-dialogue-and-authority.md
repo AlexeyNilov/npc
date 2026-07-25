@@ -1,10 +1,10 @@
 # ISSUE-001: Social dialogue is repetitive after authority hardening
 
-**Status:** Routed
+**Status:** Deferred
 
 **Observed:** 2026-07-25
 
-**Scope:** Terminal trader playtest, non-economic conversation turns
+**Scope:** Deferred terminal trader playtest, non-economic conversation turns
 
 ## Problem
 
@@ -22,6 +22,13 @@ completed actions.
   is Mara.` with no trade trace, while a greeting still returned the closed
   atmospheric reply `A warm, patient expression.` The supported identity path
   therefore works, but greeting remains non-responsive beyond atmosphere.
+- After the actor-loop milestone, a live playtest repeated `What is your
+  name?` three times and received `A warm, patient expression. No supported
+  trade was completed.` each time. This rendering proves that the local model
+  supplied a non-null candidate that failed deterministic validation; it did
+  not reach the supported identity response. The capability therefore works
+  with a supplied valid candidate but is not yet repeatable through the live
+  language-model boundary.
 
 ## Impact
 
@@ -35,21 +42,16 @@ responses meaningfully distinct in a repeatable player-facing playtest?
 
 ## Routing
 
-- **Requirements:** [Stateful conversational trader playtest](../requirements.md#stateful-conversational-trader-playtest)
-  defines the currently accepted observable behavior.
-- **Architecture:** [Conversational trader playtest](../architecture.md#conversational-trader-playtest)
-  records the verified shared authority flow.
-- **Decision:** Pending; a player-facing trust model is consequential only when
-  an approach is selected.
-- **Roadmap:** [Outcome 2: Re-run the bounded trader playtest](../roadmap.md#2-re-run-the-bounded-trader-playtest)
-  follows the actor-loop model experiment and remains the social-dialogue
-  learning outcome.
+- **Decision:** [Start evolution testing with paired deterministic decisions](../decisions.md#2026-07-25-start-evolution-testing-with-paired-deterministic-decisions)
+  defers the conversational runtime.
+- **Roadmap:** [Outcome 1: Choose the paired decision experiment](../roadmap.md#1-choose-the-paired-decision-experiment)
+  must identify the next evidence-bearing decision work before conversation is
+  reconsidered.
 - **Task:** None.
 
 ## Resolution
 
-Partially addressed: the exact supported name question now has an
-authoritative, state-preserving response. The issue remains open because the
-reported greeting is still indistinguishable from any other no-extraction turn
-with the same flavor, and the complete bounded playtest in the roadmap has not
-yet been evidenced.
+Deferred, not resolved. The conversational runtime was removed because it did
+not provide useful evidence about whether the decision model can evolve. Reopen
+this issue only after the paired decision experiment identifies a justified
+player-facing boundary.

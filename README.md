@@ -7,13 +7,11 @@ deterministic agentic systems. It is the first subgoal toward a future universal
 simulation engine: a successful engine should provide lessons and foundations
 that can later be carried into that broader effort.
 
-The project explores a general model for **agentic simulated actors**. Although
-the first form is an NPC, the model should be able to describe actors at many
-scales: individuals, groups, organisations, and non-human systems. Passive
-world entities and fixed systems may provide an actor's reality, but they are
-not the primary scope of this project.
+The project explores a general model for **agentic simulated actors**.
+Although the first form is an NPC, the model should eventually describe actors
+at many scales: individuals, groups, organisations, and non-human systems.
 
-An actor continuously participates in this decision loop:
+The intended actor loop is:
 
 ```text
 Reality
@@ -33,37 +31,17 @@ Feedback
 Perception   Sensemaking
 ```
 
+This is the project's target model, not a claim about the current
+implementation. Experiments should reveal which parts of it must become durable
+system structure.
+
 The first audience is the project's developer. The first demonstration is a
-D&D/RPG-style trader whom a player meets through a simple chat interface. The
-trader should be an autonomous economic and social actor: it has inventory and
-funds, pursues its own goals, retains relevant history, adapts to the player,
-and can refuse deals that do not serve its interests.
+D&D/RPG-style trader. It should make choices from its state and goals, retain
+relevant history, and refuse deals that do not serve its interests.
 
-The central learning hypothesis is that an actor built around this loop can be
-realistic and autonomous enough to remain engaging to a human, rather than
-becoming a predictable chat character. Engagement will initially be evaluated
-through hands-on play and observation; its precise criteria are intentionally
-open for discovery.
-
-The engine should support developers in describing actors. Assisted creation
-from natural language, constrained by schemas, is a possible later direction;
-it is not the project's initial purpose.
-
-## Conversational trader playtest
-
-With a local OpenAI-compatible LLM running, start the in-memory terminal
-playtest with:
-
-```text
-python -m npc.trader_playtest
-```
-
-The one supported transaction is an explicit sale, for example: `I sell you a
-healing herb for 4 gold.` The local LLM supplies one fixed atmospheric flavor
-and an untrusted structured extraction; deterministic validation checks the
-message evidence before the trader's decision engine can evaluate the offer.
-The playtest renders every player-visible trade outcome from the validated
-offer and deterministic result, rather than model-authored prose.
+The central learning hypothesis is that small, deterministic decision scenarios
+can reveal which model elements survive a second, contrasting actor decision.
+Player conversation is a later test of that model, not the current foundation.
 
 ## Project documentation
 

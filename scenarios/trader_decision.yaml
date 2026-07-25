@@ -1,6 +1,5 @@
 proposals:
-  - name: four_gold
-    unit_price_gold: 4
+  - unit_price_gold: 4
     trader_state:
       healing_herbs: 0
       gold: 30
@@ -10,8 +9,7 @@ proposals:
     player_state:
       healing_herbs: 1
       gold: 0
-  - name: six_gold
-    unit_price_gold: 6
+  - unit_price_gold: 6
     trader_state:
       healing_herbs: 0
       gold: 30
