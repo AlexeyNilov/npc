@@ -95,3 +95,27 @@ would break the deterministic authority boundary.
 **Consequences:** Live play requires the local LLM to be reachable. Automated
 tests must replace the LLM boundary with deterministic responses, and malformed
 model output becomes a normal no-state-change path.
+
+### 2026-07-25: Gate trade extraction with verbatim player-message evidence
+
+**Status:** Accepted
+
+**Context:** A structured LLM candidate can still invent a sale, item, price,
+or direction that the player did not explicitly offer. The terminal playtest
+supports exactly one transaction shape, so an LLM interpretation alone cannot
+authorize its economic commitment.
+
+**Decision:** Treat the model's candidate as untrusted extraction. Accept it
+only when its fixed schema values and exact, ordered evidence excerpts prove an
+explicit sale by the player of one `healing herb` to the trader for positive
+decimal-digit `gold`; then pass the resulting `Offer` to the deterministic
+evaluator.
+
+**Alternatives considered:** Match one fixed player-message template. That
+would be simpler to validate but would unnecessarily reject varied filler and
+wording around the supported word-level grammar.
+
+**Consequences:** The conversation boundary is deterministic and repeatable
+without claiming the model itself is deterministic. Messages that cannot prove
+the sole offer shape remain narration-only, and future transaction shapes need
+their own explicit contract.

@@ -14,12 +14,16 @@ returns narration plus an untrusted JSON candidate. The transport disables the
 model's optional thinking mode so a concise playtest response does not generate
 an unbounded hidden rationale first.
 
-Only a candidate for one `healing_herb` and an integer `unit_price_gold` becomes
-an `Offer`. `evaluate_offer` remains the authority for acceptance, refusal, and
-the next state; malformed or unsupported candidates produce narration only.
-History retains each valid candidate's deterministic reason alongside its
-narration, so later turns receive the authoritative outcome rather than relying
-on model wording.
-For every valid candidate, the terminal prints a `TRADE_TRACE` JSON record with
-the candidate, engine reason, and pre/post states. State and history are lost
-when the process exits.
+The model response may contain an untrusted extraction for only
+`sell_to_trader`, one `healing_herb`, and a positive integer gold price. Before
+constructing an `Offer`, `offer_from_candidate` requires the extraction's exact
+player-message evidence to prove, in order, the seller/action/recipient,
+quantity and canonical item, and `for <price> gold`. It rejects malformed,
+invented, mismatched, zero, or negative values. `evaluate_offer` remains the
+authority for acceptance, refusal, and the next state; rejected extractions
+produce narration only.
+
+History retains every model reply, but only evidence-validated proposals gain a
+deterministic reason. For each such proposal, the terminal prints a
+`TRADE_TRACE` JSON record with the untrusted extraction, engine reason, and
+pre/post states. State and history are lost when the process exits.
