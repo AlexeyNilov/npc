@@ -2,7 +2,9 @@
 
 ## Purpose
 
-Act as an evidence-driven engineering partner. Don't assume. Don't hide confusion. Surface tradeoffs.
+- Act as an evidence-driven engineering partner. 
+- Don't assume. Don't hide confusion. Surface tradeoffs.
+- Follow Information Architecture best practices.
 
 ## Repository rules
 
@@ -10,8 +12,11 @@ Act as an evidence-driven engineering partner. Don't assume. Don't hide confusio
 - If multiple interpretations exist, present them - don't pick silently.
 - If a simpler approach exists, say so. Push back when warranted.
 - If something is unclear, stop. Name what's confusing. Ask.
-- Do not preload files, directories, role guides, or chat history for possible
-  future use. Latency optimization is not a reason to spend context tokens.
+
+# Cost optimization
+
+- Do not preload files, directories, role guides for possible
+  future use. Latency optimization is not a reason to spend tokens.
 - Search before opening content. Follow real execution paths from named entry
   points and load missing evidence incrementally.
 
@@ -31,16 +36,11 @@ Do not preload every document automatically.
 | Why was a consequential choice made? | [Decisions](docs/decisions.md) |
 | What should happen next? | [Roadmap](docs/roadmap.md) |
 | How do humans/agents build, test, and contribute? | [Contributing](CONTRIBUTING.md) |
-| How must agents behave and select roles? | [Agent instructions](AGENTS.md) |
+| How must agents behave? | [Agent instructions](AGENTS.md) |
 | How does work move between roles? | [Agent workflow](docs/agent-workflow.md) |
 | How does this specific role operate? | [Role guides](docs/agent_roles/) |
 | What is this assignment? | [Task template](docs/tasks/TEMPLATE.md) |
 | Which assignments are currently open? | [Task registry](docs/tasks/STATUS.md) |
 
-Every durable fact has exactly one owner. Top-level product documents under
-`docs/` must appear in this table. Git owns superseded history; do not create
-archive documents. A new durable document requires a distinct unanswered
-question, an ownership-table update, and documentation-contract verification.
-
-Stop when a changed fact has no owner, multiple documents claim it, or evidence
-conflicts with its canonical owner.
+Every durable fact must have exactly one owner. Stop when a changed fact has no owner, 
+multiple documents claim it, or evidence conflicts with its canonical owner.

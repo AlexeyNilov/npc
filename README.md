@@ -1,4 +1,4 @@
-# npc
+# NPC engine
 
 TODO: add vision
 
