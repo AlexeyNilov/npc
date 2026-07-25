@@ -1,6 +1,6 @@
 # TASK-004: Evidence-backed authoritative conversation contract
 
-**Status:** Planned
+**Status:** Ready
 
 **Owner:** Unassigned
 
@@ -60,11 +60,23 @@ completed tasks, or unrelated planning history.
 
 ## Task-specific scope
 
-- Dependency before implementation: define the deterministic vocabulary that
-  makes each quoted evidence span prove offer direction and quantity one. Exact
-  spans alone do not establish semantics; for example, an extractor could
-  falsely label `a` as quantity `1` or `give` as a sale. The packet becomes
-  Ready only after that vocabulary is accepted.
+- Use this accepted, case-insensitive evidence vocabulary. It is a word-level
+  grammar, not one fixed player-message template:
+  - Seller: the first-person token `I` must occur before the action evidence.
+  - Action: `sell` or `offer`.
+  - Recipient: `you` or `the trader`, occurring after the action.
+  - Quantity: `one`, `1`, or `a`, immediately followed by `healing herb`.
+  - Item: the canonical contiguous phrase `healing herb`; `herb` alone is not
+    sufficient.
+  - Price and currency: the contiguous phrase `for <positive decimal digits>
+    gold`, where the digit sequence matches `[1-9][0-9]*` and is the extraction
+    price.
+  The extractor's verbatim evidence must show these terms in their stated order
+  in the player message. This rules out a question such as `Will you sell ...`,
+  a statement about the player's gold, and an inferred sale, while allowing
+  non-template filler around the explicit terms. Do not support `trade`,
+  pronoun resolution, synonyms, spelled-out prices, or additional items in this
+  slice.
 - Define one small, schema-aligned untrusted extraction shape for the existing
   model response. It represents only `sell_to_trader`, `healing_herb`, quantity
   `1`, and `unit_price_gold`, together with exact player-message evidence for
