@@ -1,6 +1,6 @@
 # TASK-002: Add and test an authoritative trader-identity capability
 
-**Status:** Planned
+**Status:** Ready
 
 **Owner:** Unassigned
 
@@ -8,7 +8,7 @@
 
 **Agent profile:** `implementer`
 
-**Base commit:** Accepted TASK-001 commit
+**Base commit:** `d1ea612` (plus the accepted uncommitted simplifier cleanup)
 
 **Depends on:** TASK-001
 

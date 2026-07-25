@@ -14,7 +14,6 @@ from npc.trader_playtest import (
     ModelReply,
     TraderSession,
     chat,
-    offer_from_candidate,
 )
 
 
@@ -252,8 +251,8 @@ def test_candidate_validation_is_repeatable() -> None:
         },
     }
 
-    assert offer_from_candidate(candidate, message) == Offer("healing_herb", 4)
-    assert offer_from_candidate(candidate, message) == Offer("healing_herb", 4)
+    assert HealingHerbPurchaseCapability.offer_from_candidate(candidate, message) == Offer("healing_herb", 4)
+    assert HealingHerbPurchaseCapability.offer_from_candidate(candidate, message) == Offer("healing_herb", 4)
 
 
 def test_candidate_validation_rejects_invalid_schema_values() -> None:
@@ -266,7 +265,9 @@ def test_candidate_validation_rejects_invalid_schema_values() -> None:
         {**supported_candidate(), "evidence": {**supported_evidence(), "price": "04"}},
     ]
 
-    assert all(offer_from_candidate(candidate, message) is None for candidate in invalid_candidates)
+    assert all(
+        HealingHerbPurchaseCapability.offer_from_candidate(candidate, message) is None for candidate in invalid_candidates
+    )
 
 
 def test_no_extraction_renders_only_safe_atmosphere_and_does_not_emit_a_trace() -> None:

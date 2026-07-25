@@ -205,14 +205,6 @@ class HealingHerbPurchaseCapability:
         return Offer(name="healing_herb", unit_price_gold=price)
 
 
-def compose_reply(flavor: str, candidate: object | None, offer: Offer | None, decision_reason: str | None) -> str:
-    return HealingHerbPurchaseCapability.render(flavor, candidate, offer, decision_reason)
-
-
-def offer_from_candidate(candidate: object, player_message: str) -> Offer | None:
-    return HealingHerbPurchaseCapability.offer_from_candidate(candidate, player_message)
-
-
 class AuthorityFlow:
     def __init__(self, capability: AuthorityCapability) -> None:
         self.capability = capability
