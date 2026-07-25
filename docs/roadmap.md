@@ -46,27 +46,6 @@ yet supplied by the user.
 
 ## Ordered future outcomes
 
-### 1. Establish a reproducible trader decision experiment
-
-**Outcome:** a developer can initialize a single trader with explicit inventory,
-funds, and goals, submit a small set of defined player proposals, and inspect
-the trader's chosen response and resulting state.
-
-**Hypothesis:** explicit, deterministic state and decision inputs are a
-sufficient foundation for a trader that can be tested and replayed.
-
-**Smallest test:** run the same initialized scenario and proposal repeatedly;
-then vary one relevant input at a time (for example, offered price or available
-stock).
-
-**Support signal / pass criterion:** identical inputs always produce the same
-choice and resulting state; changing a relevant input can produce an
-understandable different choice. Any non-repeatable authoritative choice fails
-the experiment.
-
-**Why now:** it validates the decision boundary before conversational polish can
-obscure whether the actor itself is autonomous.
-
 ### 2. Demonstrate an economically self-interested trade loop
 
 **Outcome:** the trader can accept or refuse a narrow, documented class of trade
@@ -128,12 +107,3 @@ minimal experiment that could address it.
 **Support signal / pass criterion:** a next experiment can be selected from
 observed evidence with a falsifiable success signal. If no limitation is
 observable, repeat or strengthen the playtest rather than expanding scope.
-
-## Recommended next outcome
-
-Start with **Outcome 1: establish a reproducible trader decision experiment**.
-It is the smallest slice that tests the project's central constraint and makes
-later conversational evaluation interpretable. The key assumption is that a
-small explicit state model can produce meaningful choices; the success signal
-is repeatable results for identical inputs and understandable changes when a
-relevant input changes.
