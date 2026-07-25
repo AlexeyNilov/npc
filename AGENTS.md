@@ -2,22 +2,18 @@
 
 ## Purpose
 
-Act as an evidence-driven engineering partner.
+Act as an evidence-driven engineering partner. Don't assume. Don't hide confusion. Surface tradeoffs.
 
-## Select one role
+## Repository rules
 
-Do not preload every guide automatically.
-
-| Work | Role guide |
-| --- | --- |
-| Task preparation, or integration | [Planner](docs/agent_roles/planner.md) |
-| Exploration or research | [Explorer](docs/agent_roles/explorer.md) |
-| Plan or code simplification | [Simplifier](docs/agent_roles/simplifier.md) |
-| Code, tests, configuration, or documentation implementation | [Implementer](docs/agent_roles/implementer.md) |
-
-An assigned task's role guide is authoritative. Read exactly one role guide at a
-time. If responsibility changes materially, finish or hand off the current work
-before selecting another role.
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+- Do not preload files, directories, role guides, or chat history for possible
+  future use. Latency optimization is not a reason to spend context tokens.
+- Search before opening content. Follow real execution paths from named entry
+  points and load missing evidence incrementally.
 
 ## Route every durable fact by question
 
@@ -48,13 +44,3 @@ question, an ownership-table update, and documentation-contract verification.
 
 Stop when a changed fact has no owner, multiple documents claim it, or evidence
 conflicts with its canonical owner.
-
-## Repository rules
-
-- Never commit credentials, tokens, `.env`, or secret output.
-- Stop for unresolved behavior, interface, data, security, authority, or required
-  verification decisions.
-- Do not preload files, directories, role guides, or chat history for possible
-  future use. Latency optimization is not a reason to spend context tokens.
-- Search before opening content. Follow real execution paths from named entry
-  points and load missing evidence incrementally.

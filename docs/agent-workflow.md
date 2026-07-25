@@ -4,6 +4,21 @@ This document owns task lifecycle, delegation, context boundaries, and handoff.
 Repository-wide behavior and information routing remain in
 [AGENTS.md](../AGENTS.md).
 
+## Select one role
+
+Do not preload every guide automatically.
+
+| Work | Role guide |
+| --- | --- |
+| Task preparation, or integration | [Planner](docs/agent_roles/planner.md) |
+| Exploration or research | [Explorer](docs/agent_roles/explorer.md) |
+| Plan or code simplification | [Simplifier](docs/agent_roles/simplifier.md) |
+| Code, tests, configuration, or documentation implementation | [Implementer](docs/agent_roles/implementer.md) |
+
+An assigned task's role guide is authoritative. Read exactly one role guide at a
+time. If responsibility changes materially, finish or hand off the current work
+before selecting another role.
+
 ## Operating loop
 
 ```text

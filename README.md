@@ -1,6 +1,6 @@
 # npc
 
-TBD
+TODO: add vision
 
 ## Project documentation
 
