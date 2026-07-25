@@ -22,7 +22,9 @@ the configured OpenAI-compatible completion adapter in
 `npc.infrastructure.language_model` to propose strict JSON containing one
 candidate intent and exact player-text evidence. Deterministic validation
 rejects malformed, unsupported, ungrounded, and multi-intent candidates before
-only a grounded healing-herb offer reaches `evaluate_offer`.
+only a full-message deterministic parse of a supported healing-herb offer
+reaches `evaluate_offer`. The parser, rather than model-proposed fields,
+supplies the offer price to the evaluator.
 
 Expressive turns use the same adapter but preserve both authoritative states and
 create no memory. An experiment-local policy check blocks generated text that

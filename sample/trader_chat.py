@@ -17,9 +17,10 @@ from npc.primary_intent_experiment import (
     PERCEPTION_SYSTEM_PROMPT,
     check_expressive_reply,
     parse_candidate,
+    parse_supported_sell_offer,
     validate_candidate,
 )
-from npc.trader_experiment import Offer, PlayerState, TraderState, evaluate_offer
+from npc.trader_experiment import PlayerState, TraderState, evaluate_offer
 
 
 async def stream_reply(player_message: str) -> tuple[str, str]:
@@ -84,7 +85,11 @@ async def chat(trader_state: TraderState, player_state: PlayerState) -> None:
         print(f"Trace: candidate={trace}; validation={validation_result}")
 
         if validation_result == "grounded_sell_offer":
-            result = evaluate_offer(trader_state, player_state, Offer(candidate.unit_price_gold))
+            grounded_offer = parse_supported_sell_offer(player_message)
+            if grounded_offer is None:
+                print("Trader: The trader cannot act on that message.")
+                continue
+            result = evaluate_offer(trader_state, player_state, grounded_offer)
             trader_state, player_state = result.trader_state, result.player_state
             print(f"Trader: The trader {'accepts' if result.accepted else 'refuses'} the offer ({result.reason}).")
             show_state(trader_state, player_state)

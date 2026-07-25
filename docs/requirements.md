@@ -28,8 +28,9 @@ This document owns observable system behavior.
   intent, player-text evidence, route, validation result, and authoritative
   outcome when one exists.
 - **When** a candidate offer to sell one healing herb for a stated gold price
-  has exact player-text evidence and passes the supported offer contract,
-  **the system shall** evaluate it through the deterministic trader policy.
+  has exact player-text evidence and the complete player message passes the
+  supported offer contract, **the system shall** evaluate its deterministically
+  parsed fields through the trader policy.
 - **When** a candidate is malformed, unsupported, ungrounded, unclear, or
   multi-intent, **the system shall** return an unresolved result and leave
   authoritative trader and player state unchanged.

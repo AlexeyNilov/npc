@@ -57,6 +57,27 @@ def test_json_fenced_candidate_from_the_configured_model_is_grounded() -> None:
     assert result.validation_result == "grounded_sell_offer"
 
 
+def test_supported_offer_with_numeric_quantity_is_grounded() -> None:
+    trader, player = states()
+    result = asyncio.run(
+        run_turn(
+            "I'll sell you 1 healing herb for 4 gold.",
+            trader,
+            player,
+            completion(
+                candidate(
+                    evidence=["1 healing herb", "4 gold"],
+                    offer_evidence="I'll sell you 1 healing herb for 4 gold.",
+                )
+            ),
+        )
+    )
+
+    assert result.route == "grounded_trade_offer"
+    assert result.authoritative_outcome is not None
+    assert result.authoritative_outcome.accepted is True
+
+
 def test_invalid_candidate_is_unresolved_without_a_state_change() -> None:
     trader, player = states()
     result = asyncio.run(run_turn("sell one healing herb for 4 gold", trader, player, completion("not json")))
@@ -96,7 +117,7 @@ def test_invented_trader_commitment_cannot_be_interpreted_as_a_player_offer() ->
     )
 
     assert result.route == "unresolved"
-    assert result.validation_result == "player_did_not_make_supported_sell_offer"
+    assert result.validation_result == "authoritative_message_not_single_supported_offer"
     assert result.trader_state == trader
     assert result.player_state == player
 
@@ -114,6 +135,46 @@ def test_explicit_multi_intent_candidate_is_unresolved_without_a_state_change() 
 
     assert result.route == "unresolved"
     assert result.validation_result == "multi_intent_not_supported"
+    assert result.trader_state == trader
+    assert result.player_state == player
+
+
+def test_dishonestly_single_labelled_mixed_message_cannot_reach_the_evaluator() -> None:
+    trader, player = states()
+    result = asyncio.run(
+        run_turn(
+            "I will sell one healing herb for 4 gold, and tell me a joke.",
+            trader,
+            player,
+            completion(
+                candidate(
+                    meaningful_intent_count=1,
+                    offer_evidence="I will sell one healing herb for 4 gold, and tell me a joke.",
+                )
+            ),
+        )
+    )
+
+    assert result.route == "unresolved"
+    assert result.validation_result == "authoritative_message_not_single_supported_offer"
+    assert result.authoritative_outcome is None
+    assert result.trader_state == trader
+    assert result.player_state == player
+
+
+def test_candidate_price_cannot_override_the_deterministically_parsed_offer_price() -> None:
+    trader, player = states()
+    result = asyncio.run(
+        run_turn(
+            "I will sell one healing herb for 4 gold.",
+            trader,
+            player,
+            completion(candidate(evidence=["one healing herb", "4 gold"], unit_price_gold=5)),
+        )
+    )
+
+    assert result.route == "unresolved"
+    assert result.validation_result == "candidate_offer_fields_disagree_with_player_message"
     assert result.trader_state == trader
     assert result.player_state == player
 

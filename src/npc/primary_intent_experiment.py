@@ -42,8 +42,8 @@ UNSAFE_EXPRESSIVE_REPLY = re.compile(
     r"give you|take your|my stock|my inventory|my gold|healing herbs?|price is)\b",
     re.IGNORECASE,
 )
-SELL_OFFER_EVIDENCE = re.compile(
-    r"\b(?:i\s+(?:will|would)|i['’]ll)\s+sell\s+(?:you\s+)?(?:one|1)\s+healing herb\b",
+SUPPORTED_SELL_OFFER = re.compile(
+    r"\s*(?:i\s+will|i['’]ll)\s+sell\s+(?:you\s+)?(?:one|1)\s+healing herb\s+for\s+(?P<price>\d+)\s+gold[.!?]?\s*",
     re.IGNORECASE,
 )
 
@@ -130,6 +130,12 @@ def _is_optional_int(value: object) -> bool:
     return value is None or (isinstance(value, int) and not isinstance(value, bool))
 
 
+def parse_supported_sell_offer(player_message: str) -> Offer | None:
+    """Extract the only authoritative offer from a complete player message."""
+    match = SUPPORTED_SELL_OFFER.fullmatch(player_message)
+    return Offer(unit_price_gold=int(match["price"])) if match else None
+
+
 def validate_candidate(candidate: CandidateIntent, player_message: str) -> str:
     if any(evidence not in player_message for evidence in candidate.evidence):
         return "evidence_not_in_player_message"
@@ -140,8 +146,11 @@ def validate_candidate(candidate: CandidateIntent, player_message: str) -> str:
             return "unsupported_offer_contract"
         if candidate.offer_evidence is None or candidate.offer_evidence not in player_message:
             return "offer_not_grounded_in_player_message"
-        if not SELL_OFFER_EVIDENCE.search(candidate.offer_evidence):
-            return "player_did_not_make_supported_sell_offer"
+        grounded_offer = parse_supported_sell_offer(player_message)
+        if grounded_offer is None:
+            return "authoritative_message_not_single_supported_offer"
+        if candidate.unit_price_gold != grounded_offer.unit_price_gold:
+            return "candidate_offer_fields_disagree_with_player_message"
         if not any("healing herb" in evidence.lower() for evidence in candidate.evidence):
             return "item_not_grounded_in_player_message"
         if not any(re.search(r"\b(one|1)\b", evidence, re.IGNORECASE) for evidence in candidate.evidence):
@@ -173,7 +182,17 @@ async def run_turn(
 
     validation_result = validate_candidate(candidate, player_message)
     if validation_result == "grounded_sell_offer":
-        result = evaluate_offer(trader_state, player_state, Offer(unit_price_gold=cast(int, candidate.unit_price_gold)))
+        grounded_offer = parse_supported_sell_offer(player_message)
+        if grounded_offer is None:
+            return _unresolved(
+                player_message,
+                raw_candidate,
+                candidate,
+                "authoritative_message_not_single_supported_offer",
+                trader_state,
+                player_state,
+            )
+        result = evaluate_offer(trader_state, player_state, grounded_offer)
         return TurnResult(
             player_message,
             raw_candidate,
