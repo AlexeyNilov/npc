@@ -49,13 +49,20 @@ The engine should support developers in describing actors. Assisted creation
 from natural language, constrained by schemas, is a possible later direction;
 it is not the project's initial purpose.
 
-## Trader decision experiment
+## Conversational trader playtest
 
-Run the checked-in deterministic trader scenario with:
+With a local OpenAI-compatible LLM running, start the in-memory terminal
+playtest with:
 
 ```text
-python -m npc.trader_experiment
+python -m npc.trader_playtest
 ```
+
+Set `LLM_BASE_URL`, `LLM_API_KEY`, and `LLM_NAME` when the local service differs
+from the defaults (`http://127.0.0.1:12345/v1`, `key`, and `gemma-4-12b`). Type
+`/exit` or press Ctrl-D to end the session. Each proposed trade prints a
+`TRADE_TRACE` JSON record with the candidate, deterministic reason, and both
+parties' before/after state.
 
 ## Project documentation
 

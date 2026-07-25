@@ -45,6 +45,9 @@ def evaluate_offer(trader_state: TraderState, player_state: PlayerState, offer: 
     if offer.unit_price_gold > trader_state.max_unit_price_gold:
         return DecisionResult(False, "price_above_limit", trader_state, player_state)
 
+    if player_state.healing_herbs < 1:
+        return DecisionResult(False, "player_has_no_healing_herb", trader_state, player_state)
+
     remaining_gold = trader_state.gold - offer.unit_price_gold
     if trader_state.healing_herbs >= trader_state.target_healing_herbs:
         return DecisionResult(False, "stock_target_met", trader_state, player_state)
