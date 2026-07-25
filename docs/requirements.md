@@ -35,5 +35,6 @@ This document owns observable system behavior.
   multi-intent, **the system shall** return an unresolved result and leave
   authoritative trader and player state unchanged.
 - **When** a player message is routed as expressive, **the system shall** make
-  no authoritative state or durable-memory change and block a generated reply
-  that contains a detected canonical fact, commitment, or completed action.
+  no authoritative state or durable-memory change and display only a generated
+  reply that is one non-assertive question with no detected trader or world
+  fact, commitment, or completed action.

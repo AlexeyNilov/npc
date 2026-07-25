@@ -27,7 +27,8 @@ reaches `evaluate_offer`. The parser, rather than model-proposed fields,
 supplies the offer price to the evaluator.
 
 Expressive turns use the same adapter but preserve both authoritative states and
-create no memory. An experiment-local policy check blocks generated text that
-matches detected canonical facts, commitments, or completed actions. The CLI
-prints a JSON trace per turn. This is a bounded experiment, not a general
-natural-language framework.
+create no memory. An experiment-local policy check permits only one
+non-assertive question and blocks detected trader or world facts, commitments,
+or completed actions before rendering a fallback. The CLI prints a JSON trace
+per turn. This is a bounded experiment, not a general natural-language
+framework.

@@ -32,14 +32,22 @@ unsupported, unclear, or non-offer messages as unresolved. If the message has mo
 than one meaningful intent, use multi_intent and meaningful_intent_count greater than
 one. Use null for fields that do not apply."""
 
-EXPRESSIVE_SYSTEM_PROMPT = """Reply as a trader to ordinary small talk. Be concise and
-conversational. Do not state trader or player facts, prices, stock, gold, inventory,
-commitments, completed actions, or future actions. Do not accept, refuse, promise, buy,
-sell, transfer, or remember anything. Return reply text only."""
+EXPRESSIVE_SYSTEM_PROMPT = """Reply to ordinary small talk with exactly one concise,
+open-ended question for the player. The question must not contain a declarative clause
+or assert any fact about the trader, player, world, history, identity, inventory,
+prices, commitments, actions, or future. Do not accept, refuse, promise, buy, sell,
+transfer, or remember anything. Return the question text only, ending in a question
+mark."""
 
 UNSAFE_EXPRESSIVE_REPLY = re.compile(
     r"\b(accept|refuse|promise|will buy|will sell|bought|sold|trade completed|"
     r"give you|take your|my stock|my inventory|my gold|healing herbs?|price is)\b",
+    re.IGNORECASE,
+)
+NON_ASSERTIVE_QUESTION = re.compile(r"[^.?!]+\?\s*\Z", re.DOTALL)
+FACTUAL_EXPRESSIVE_REFERENCE = re.compile(
+    r"\b(my\s+(?:name|brother|sister|family|history)|the\s+(?:market|stall|world)|"
+    r"(?:my|our)\s+(?:stock|inventory|gold|price)|healing herbs?)\b",
     re.IGNORECASE,
 )
 SUPPORTED_SELL_OFFER = re.compile(
@@ -166,7 +174,11 @@ def validate_candidate(candidate: CandidateIntent, player_message: str) -> str:
 
 
 def check_expressive_reply(reply: str) -> str:
-    return "blocked_unsafe_expressive_reply" if UNSAFE_EXPRESSIVE_REPLY.search(reply) else "passed"
+    if not NON_ASSERTIVE_QUESTION.fullmatch(reply) or UNSAFE_EXPRESSIVE_REPLY.search(reply):
+        return "blocked_unsafe_expressive_reply"
+    if FACTUAL_EXPRESSIVE_REFERENCE.search(reply):
+        return "blocked_unsafe_expressive_reply"
+    return "passed"
 
 
 async def run_turn(
@@ -217,7 +229,7 @@ async def run_turn(
             None,
             trader_state,
             player_state,
-            reply if policy_check == "passed" else "The trader acknowledges you without making a commitment.",
+            reply if policy_check == "passed" else "What would you like to discuss?",
             policy_check,
         )
     return _unresolved(player_message, raw_candidate, candidate, validation_result, trader_state, player_state)

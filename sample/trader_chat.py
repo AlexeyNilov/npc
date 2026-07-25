@@ -108,7 +108,7 @@ async def chat(trader_state: TraderState, player_state: PlayerState) -> None:
         if policy_check == "passed":
             print(f"Trader: {reply}")
         else:
-            print("Trader: The trader acknowledges you without making a commitment.")
+            print("Trader: What would you like to discuss?")
         print(f"Trace: route=expressive expressive_policy_check={policy_check}")
         show_state(trader_state, player_state)
 

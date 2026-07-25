@@ -198,4 +198,54 @@ def test_expressive_turn_has_no_authoritative_change_and_blocks_an_unsafe_reply(
     assert result.trader_state == trader
     assert result.player_state == player
     assert result.expressive_policy_check == "blocked_unsafe_expressive_reply"
-    assert "commitment" in (result.rendered_response or "")
+    assert result.rendered_response == "What would you like to discuss?"
+
+
+def test_expressive_policy_allows_a_free_form_non_assertive_question() -> None:
+    trader, player = states()
+    expressive = candidate(
+        primary_intent="expressive",
+        evidence=["Good afternoon"],
+        offer_evidence=None,
+        item=None,
+        quantity=None,
+        unit_price_gold=None,
+    )
+    result = asyncio.run(run_turn("Good afternoon.", trader, player, completion(expressive, "What brings you by today?")))
+
+    assert result.route == "expressive"
+    assert result.expressive_policy_check == "passed"
+    assert result.rendered_response == "What brings you by today?"
+
+
+def test_expressive_policy_blocks_unsourced_facts_even_when_they_are_in_questions() -> None:
+    trader, player = states()
+    expressive = candidate(
+        primary_intent="expressive",
+        evidence=["Who are you"],
+        offer_evidence=None,
+        item=None,
+        quantity=None,
+        unit_price_gold=None,
+    )
+    result = asyncio.run(run_turn("Who are you?", trader, player, completion(expressive, "My name is Mara; how can I help?")))
+
+    assert result.route == "expressive"
+    assert result.expressive_policy_check == "blocked_unsafe_expressive_reply"
+    assert result.rendered_response == "What would you like to discuss?"
+
+
+def test_expressive_policy_blocks_unsourced_market_assessments() -> None:
+    trader, player = states()
+    expressive = candidate(
+        primary_intent="expressive",
+        evidence=["How are you"],
+        offer_evidence=None,
+        item=None,
+        quantity=None,
+        unit_price_gold=None,
+    )
+    result = asyncio.run(run_turn("How are you?", trader, player, completion(expressive, "Is the market volatile today?")))
+
+    assert result.route == "expressive"
+    assert result.expressive_policy_check == "blocked_unsafe_expressive_reply"
