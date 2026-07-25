@@ -35,6 +35,7 @@ Do not preload every document automatically.
 | How does the system work now? | [Architecture](docs/architecture.md) |
 | Why was a consequential choice made? | [Decisions](docs/decisions.md) |
 | What should happen next? | [Roadmap](docs/roadmap.md) |
+| What observed problems remain unresolved? | [Issue records](docs/issues/) |
 | How do humans/agents build, test, and contribute? | [Contributing](CONTRIBUTING.md) |
 | How must agents behave? | [Agent instructions](AGENTS.md) |
 | How does work move between roles? | [Agent workflow](docs/agent-workflow.md) |
