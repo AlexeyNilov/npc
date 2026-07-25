@@ -18,7 +18,6 @@ SELL_OFFER = "sell_one_healing_herb"
 EXPRESSIVE = "expressive"
 UNRESOLVED = "unresolved"
 MULTI_INTENT = "multi_intent"
-ALLOWED_INTENTS = frozenset({SELL_OFFER, EXPRESSIVE, UNRESOLVED, MULTI_INTENT})
 
 PERCEPTION_SYSTEM_PROMPT = """You are an untrusted semantic sensor for one player message.
 Return JSON only, with these exact keys: primary_intent, meaningful_intent_count,
@@ -28,6 +27,8 @@ the exact player-authored sentence fragment that makes a sell offer, or null. Ne
 invent missing facts. Classify a
 player offer to sell exactly one healing herb at an explicitly stated gold price as
 sell_one_healing_herb. Classify ordinary social conversation as expressive. Classify
+an offer to buy one healing herb as buy_one_healing_herb. That intent is not an
+authoritative capability in this experiment. Classify
 unsupported, unclear, or non-offer messages as unresolved. If the message has more
 than one meaningful intent, use multi_intent and meaningful_intent_count greater than
 one. Use null for fields that do not apply."""
@@ -101,7 +102,6 @@ def parse_candidate(raw_candidate: str) -> CandidateIntent | None:
     evidence = payload["evidence"]
     if (
         not isinstance(payload["primary_intent"], str)
-        or payload["primary_intent"] not in ALLOWED_INTENTS
         or not isinstance(payload["meaningful_intent_count"], int)
         or isinstance(payload["meaningful_intent_count"], bool)
         or payload["meaningful_intent_count"] < 1
@@ -170,7 +170,9 @@ def validate_candidate(candidate: CandidateIntent, player_message: str) -> str:
         return "grounded_sell_offer"
     if candidate.primary_intent == EXPRESSIVE:
         return "expressive"
-    return "unsupported_or_unclear_intent"
+    if candidate.primary_intent == UNRESOLVED:
+        return "unsupported_or_unclear_intent"
+    return "unsupported_authoritative_intent"
 
 
 def check_expressive_reply(reply: str) -> str:

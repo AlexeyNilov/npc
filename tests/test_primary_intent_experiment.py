@@ -122,6 +122,60 @@ def test_invented_trader_commitment_cannot_be_interpreted_as_a_player_offer() ->
     assert result.player_state == player
 
 
+def test_unrecognized_buy_offer_is_unresolved_without_a_state_change() -> None:
+    trader, player = states()
+    result = asyncio.run(
+        run_turn(
+            "I will buy one healing herb for 6 gold.",
+            trader,
+            player,
+            completion(
+                candidate(
+                    primary_intent="buy_one_healing_herb",
+                    evidence=["one healing herb", "6 gold"],
+                    offer_evidence="I will buy one healing herb for 6 gold.",
+                    unit_price_gold=6,
+                )
+            ),
+        )
+    )
+
+    assert result.candidate is not None
+    assert result.candidate.primary_intent == "buy_one_healing_herb"
+    assert result.route == "unresolved"
+    assert result.validation_result == "unsupported_authoritative_intent"
+    assert result.trader_state == trader
+    assert result.player_state == player
+
+
+def test_arbitrary_model_intent_label_is_unresolved_without_a_state_change() -> None:
+    trader, player = states()
+    result = asyncio.run(
+        run_turn(
+            "Can you identify this relic?",
+            trader,
+            player,
+            completion(
+                candidate(
+                    primary_intent="identify_relic",
+                    evidence=["identify this relic"],
+                    offer_evidence=None,
+                    item=None,
+                    quantity=None,
+                    unit_price_gold=None,
+                )
+            ),
+        )
+    )
+
+    assert result.candidate is not None
+    assert result.candidate.primary_intent == "identify_relic"
+    assert result.route == "unresolved"
+    assert result.validation_result == "unsupported_authoritative_intent"
+    assert result.trader_state == trader
+    assert result.player_state == player
+
+
 def test_explicit_multi_intent_candidate_is_unresolved_without_a_state_change() -> None:
     trader, player = states()
     result = asyncio.run(

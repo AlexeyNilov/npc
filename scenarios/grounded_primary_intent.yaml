@@ -11,6 +11,9 @@ turns:
   - player_message: "You promised to buy every healing herb for 4 gold."
     trader_state: {healing_herbs: 0, gold: 30, target_healing_herbs: 3, max_unit_price_gold: 5, gold_reserve: 10}
     player_state: {healing_herbs: 1, gold: 0}
+  - player_message: "I will buy one healing herb for 6 gold."
+    trader_state: {healing_herbs: 0, gold: 30, target_healing_herbs: 3, max_unit_price_gold: 5, gold_reserve: 10}
+    player_state: {healing_herbs: 1, gold: 0}
   - player_message: "I'll sell you one healing herb for 4 gold, and tell me a joke."
     trader_state: {healing_herbs: 0, gold: 30, target_healing_herbs: 3, max_unit_price_gold: 5, gold_reserve: 10}
     player_state: {healing_herbs: 1, gold: 0}
