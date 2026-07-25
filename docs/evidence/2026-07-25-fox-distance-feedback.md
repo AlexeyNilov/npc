@@ -1,10 +1,10 @@
 # Experiment: bounded fox distance-feedback loop
 
-**Status:** Planned
+**Status:** Complete
 
 **Date:** 2026-07-25
 
-**Roadmap outcome:** [Demonstrate a bounded fox distance-feedback loop](../roadmap.md#1-demonstrate-a-bounded-fox-distance-feedback-loop).
+**Roadmap outcome:** Completed; see the [current roadmap](../roadmap.md).
 
 ## Decision unlocked
 
@@ -80,10 +80,28 @@ action, resulting distance, and feedback distance.
 
 ## Result
 
-Complete at Review.
-
-- **Observed result:**
-- **Reproducibility evidence:**
-- **Interpretation and limits:**
-- **Decision or unresolved question created:**
-- **Canonical follow-up:**
+- **Observed result:** The direct-threat fixture starts at the audible boundary
+  of `10`, makes one grounded sensor call, selects and executes `flee`, and
+  records `15`. Its repeated player message then starts at `15`, is inaudible,
+  makes no sensor call, retains null candidate-related fields, executes
+  `do_nothing`, and remains at `15`. The audible ungrounded true candidate and
+  initially out-of-range direct threat both leave distance unchanged.
+- **Reproducibility evidence:** Behavioral tests were added before the module
+  and initially failed during collection with `ModuleNotFoundError: No module
+  named 'npc.experiments.fox_distance_feedback'`. After implementation,
+  `.venv/bin/pytest tests/test_fox_distance_feedback.py
+  tests/test_threat_detection.py tests/test_fox_threat.py tests/test_wolf_threat.py`
+  passed with 24 tests. The focused test verifies fixture traces, sensor call
+  counts, the audible boundary, feedback handoff, malformed, invalid-certainty,
+  empty-evidence, and ungrounded candidates. `make check` passed its formatter,
+  linter, mypy, and complete suite (33 tests); `git diff --check` passed.
+- **Interpretation and limits:** The fixed trace distinguishes a hearing-gated
+  skipped sensor call from a rejected perception without asking the model to
+  infer reachability or change distance. It supports this fox-only feedback
+  boundary, not reusable actor, movement, state, or world infrastructure.
+- **Decision or unresolved question created:** The boundary is inspectable with
+  fixed deterministic rules. Whether a contrasting wolf `approach` outcome
+  supplies enough new evidence for a broader outcome model remains unresolved.
+- **Canonical follow-up:** The accepted observable behavior and current
+  mechanism are recorded in [requirements](../requirements.md) and
+  [architecture](../architecture.md), respectively.

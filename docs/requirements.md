@@ -23,6 +23,24 @@ This document owns observable system behavior.
   values, **the system shall** return the same creature-specific action;
   certainty is recorded but shall not grant authority or affect the action.
 
+### Bounded fox distance feedback
+
+- **When** a developer runs the checked-in fox distance-feedback corpus, **the
+  system shall** print one JSON-safe trace per turn containing the player
+  message, starting distance, hearing result, sensor-call status, raw/parsed/
+  validated candidate fields when called, deterministic choice, executed
+  action, resulting distance, and feedback distance.
+- **When** a turn starts at distance `<= 10`, **the system shall** call the
+  existing threat sensor exactly once; only an accepted grounded `threat: true`
+  shall select and execute `flee`, which increases distance by `5`.
+- **When** a turn starts at distance `> 10`, **the system shall** skip the
+  threat sensor, retain null candidate-related fields, execute `do_nothing`,
+  and preserve distance. The resulting distance shall be the next turn's
+  feedback distance.
+- **When** an audible candidate is malformed, has invalid certainty, has empty
+  true evidence, or has true evidence absent from the player message, **the
+  system shall** execute `do_nothing` and preserve distance.
+
 ### Deterministic wolf sensemaking from two grounded perceptions
 
 - **When** a developer runs the checked-in wolf sensemaking corpus, **the

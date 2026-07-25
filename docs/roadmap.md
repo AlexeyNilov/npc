@@ -13,69 +13,15 @@ the actor's actions.
 stateless wolf and fox policies consume independently validated,
 evidence-grounded threat perceptions; the wolf also combines an explicit
 food-offer perception with a fixed threat-first choice to produce `attack`,
-`approach`, or `do_nothing`. It has no state, action execution, in-world
-outcome, feedback, dialogue, certainty authority, registry, or actor framework.
+`approach`, or `do_nothing`. One fixed two-turn fox experiment applies
+authoritative distance to hearing, executes `flee` as a fixed distance increase,
+and feeds that distance into the following turn. It has no dialogue, inferred
+world facts, open-ended memory, certainty authority, model-selected state
+transitions, registry, or actor framework.
 
 ## Ordered future outcomes
 
-### 1. Demonstrate a bounded fox distance-feedback loop
-
-**Why now / evidence:** The verified fox policy deterministically selects `flee`
-from an accepted grounded threat, but its action is only a trace value. Distance
-is the smallest authoritative world fact that makes the message's availability
-to perception, the effect of `flee`, and feedback into the following turn
-concrete. The current experiments explicitly exclude state, action execution,
-outcomes, and feedback.
-
-**Target user and problem:** The project's developer needs an inspectable,
-bounded example in which a world fact constrains perception and is changed by an
-action. Without it, distance is only an idea, and future choices about outcome,
-feedback, and world-state boundaries would lack a concrete reference.
-
-**Delivery boundary:** In a fixed two-turn fox scenario, an authoritative
-player-to-fox distance first determines whether the fox can hear a player
-message. Only an in-range message is sent to the existing threat sensor. An
-accepted threat selects `flee`; execution increases the distance by a fixed,
-inspectable displacement. The recorded resulting distance is feedback for the
-next turn. A repeated threat that is now outside the hearing range causes no
-sensor call and selects `do_nothing`.
-
-**Observable outcome:** A developer can run checked-in two-turn fixtures and
-inspect, for each turn, the player message, starting distance, hearing result,
-whether a threat-sensor call occurred, any untrusted candidate and validation,
-the deterministic intent or choice, executed action, resulting distance, and
-feedback state. The corpus includes an in-range threat followed by the same
-message after fleeing, an in-range invalid or ungrounded threat candidate, and
-an initially out-of-range threat.
-
-**Decision unlocked:** Whether authoritative distance, deterministic
-perception-reachability, and action-produced distance change form a useful
-candidate outcome/feedback boundary before testing a contrasting movement action
-such as the wolf's `approach`.
-
-**Constraints:** Keep the target a fox and reuse only the existing grounded
-threat sensor. Distance, hearing range, and flee displacement are authoritative
-deterministic inputs or rules; the model neither receives authority over them
-nor decides whether a message is heard. Exclude dialogue, inferred world facts,
-open-ended memory, certainty thresholds, model-selected state transitions,
-approach behavior, a registry, and a generic actor loop/framework.
-
-**Acceptance evidence:** Fixtures show that an in-range accepted threat alone
-causes a flee and increases distance; the resulting out-of-range feedback gates
-the repeated threat before it reaches the sensor; and initially out-of-range
-messages likewise cause no sensor call or movement. Malformed, invalid, or
-ungrounded in-range candidates fail closed and leave distance unchanged.
-
-**Stop rule:** Record the fixed two-turn corpus, including valid, out-of-range,
-and failing-perception cases, then stop. Do not add generalized memory,
-conversation, world simulation, approach behavior, or cross-creature reuse in
-this outcome.
-
-**Unresolved questions:** What distance unit, hearing-boundary convention, and
-fixed flee displacement make the corpus most legible? Does the resulting
-boundary deserve a contrasting wolf `approach` scenario before promotion?
-
-### 2. Render a completed fox outcome as a player-facing text message
+### 1. Render a completed fox outcome as a player-facing text message
 
 **Why next / dependency:** The distance-feedback milestone establishes the
 authoritative event that occurred: whether the fox fled and its resulting

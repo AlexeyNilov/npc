@@ -42,6 +42,23 @@ false or invalid perception maps to `do_nothing` for both. Certainty is traced
 but has no policy threshold or branch. The delivery has no creature state,
 dialogue, world model, registry, or shared actor framework.
 
+## Bounded fox distance feedback
+
+`npc.experiments.fox_distance_feedback` is a fox-only experiment wrapper with
+local `TurnTrace`, turn execution, and fixture helpers. Before each turn calls
+`perceive_threat`, its authoritative integer starting distance is checked
+against the fixed hearing range of `10`. An inaudible turn records no sensor
+call and null perception fields; an audible turn calls the shared detector once
+and retains its raw candidate, parsed candidate, and validation result.
+
+The wrapper reuses the existing fox `decide_action` policy: only an accepted
+grounded threat selects `flee`. Execution is local and deterministic: `flee`
+adds the fixed displacement of `5`, while `do_nothing` leaves distance
+unchanged. The resulting distance is recorded as feedback and becomes the next
+turn's starting distance. `python -m npc.experiments.fox_distance_feedback`
+loads only fixture completions from `scenarios/fox_distance_feedback.yaml`; it
+does not introduce a generic actor, movement, state, or world abstraction.
+
 ## Two-perception wolf sensemaking
 
 `npc.experiments.food_offer_detection` is a separate binary sensor for whether

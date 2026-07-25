@@ -35,10 +35,13 @@ This is the project's target model, not a claim about the current
 implementation. Experiments should reveal which parts of it must become durable
 system structure.
 
-The first audience is the project's developer. The current demonstration is a
+The first audience is the project's developer. The current demonstrations use a
 shared, bounded threat-detection capability: a territorial wolf deterministically
-attacks an accepted threat, while a fox deterministically flees one. The LLM
-supplies only an evidence-grounded perception; it never chooses an action.
+attacks an accepted threat, while a fox deterministically flees one. A fixed
+two-turn fox experiment also applies authoritative distance to gate hearing,
+executes `flee` as a fixed distance change, and feeds the resulting distance
+into the next turn. The LLM supplies only an evidence-grounded perception; it
+never chooses an action, determines reachability, or changes distance.
 
 The central learning hypothesis is that small, deterministic decision scenarios
 can reveal which model elements survive a second, contrasting decision. Both
