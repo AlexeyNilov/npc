@@ -101,20 +101,15 @@ candidate, certainty, evidence, validation result, and deterministic action.
   `.venv/bin/pytest tests/test_wolf_threat.py` passed (9 tests) and
   `.venv/bin/pytest tests/test_wolf_affect.py` passed (8 tests). `make check`
   passed: ruff formatting and lint, mypy, and all 38 tests. `git diff --check`
-  passed. The requested `python -m npc.experiments.wolf_threat` could not run
-  because `python` is not installed in this environment. Its project-interpreter
-  equivalent, `.venv/bin/python -m npc.experiments.wolf_threat`, exited
-  successfully but yielded no captured stdout, so it did not provide usable
-  live corpus traces.
-- **Interpretation and limits:** The deterministic fixtures demonstrate that
-  model output cannot select an attack without an accepted `true` and exact
-  player-text evidence, while certainty remains observational data. The live
-  sensor behavior is inconclusive: no captured live traces are available to
-  assess the configured completion adapter against the fixed corpus. Fixture
-  results do not establish general model accuracy.
-- **Decision or unresolved question created:** Run the fixed corpus where the
-  configured completion adapter's JSON traces can be captured before treating
-  the binary perception question as supported beyond deterministic fixtures;
-  then decide whether independent binary perceptions and a separate certainty
-  calibration experiment are warranted.
-- **Canonical follow-up:** [Roadmap outcome](../roadmap.md#test-a-binary-threat-perception-gate).
+  passed. The project interpreter ran the fixed corpus and captured four valid
+  JSON traces: the direct threat was accepted as `true` and attacked; the calm,
+  fearful, and ambiguous messages were accepted as `false` and did nothing.
+- **Interpretation and limits:** The fixed corpus supports the binary question
+  for this narrow threat boundary: model output cannot select an attack without
+  an accepted `true` and exact player-text evidence, while certainty remains
+  observational data. One corpus run does not establish general model accuracy
+  or certainty calibration.
+- **Decision or unresolved question created:** Decide whether observed product
+  behavior warrants a second independent, action-relevant binary perception
+  question or a separate certainty-calibration experiment. Do not select one
+  without a documented limitation or decision it must address.
