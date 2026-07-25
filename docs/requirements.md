@@ -41,6 +41,22 @@ This document owns observable system behavior.
   true evidence, or has true evidence absent from the player message, **the
   system shall** execute `do_nothing` and preserve distance.
 
+### Non-authoritative rendering of completed fox outcomes
+
+- **When** a developer runs the checked-in fox outcome-rendering corpus,
+  **the system shall** print one JSON-safe rendering trace per completed turn
+  containing the unmodified canonical turn, rendering prompt, raw renderer
+  output or null, validation result, rendered text, and an explicit
+  non-authoritative marker.
+- **When** a completed action is `flee` or `do_nothing`, **the system shall**
+  call the renderer exactly once with only that completed action and accept
+  only a JSON object with exactly `action` and `message`, matching the action
+  and its exact approved sentence: `The fox flees.` or `The fox does nothing.`
+- **When** renderer output is malformed, has extra fields, mismatches the
+  completed action or approved message, or is unavailable, **the system
+  shall** return `The fox's response cannot be rendered.` and leave every
+  canonical-turn field, including action and feedback distance, unchanged.
+
 ### Deterministic wolf sensemaking from two grounded perceptions
 
 - **When** a developer runs the checked-in wolf sensemaking corpus, **the

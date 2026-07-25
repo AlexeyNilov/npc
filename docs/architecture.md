@@ -59,6 +59,25 @@ turn's starting distance. `python -m npc.experiments.fox_distance_feedback`
 loads only fixture completions from `scenarios/fox_distance_feedback.yaml`; it
 does not introduce a generic actor, movement, state, or world abstraction.
 
+## Non-authoritative rendering of completed fox outcomes
+
+`npc.experiments.fox_outcome_rendering` is a fox-only presentation wrapper
+around an already completed `fox_distance_feedback.TurnTrace`. It passes its
+one-argument fixture renderer a prompt containing only `executed_action` and
+explicitly states that rendering neither chooses an action nor asserts a world
+fact. The renderer is called once after completion; it cannot receive raw
+player text, perception candidate, certainty, distance, or mutable state.
+
+Its local closed JSON contract requires exactly `action` and `message`. Only a
+matching completed action and its fixed sentence are accepted: `flee` maps to
+`The fox flees.` and `do_nothing` maps to `The fox does nothing.` Malformed,
+extra, mismatched, or exceptional results produce the fixed fallback. A frozen
+`RenderingTrace` retains the unmodified canonical turn, prompt, raw output or
+null, validation result, rendered text, and `non_authoritative=True`; rendered
+text has no path to action, distance, feedback, or perception. The module's
+YAML fixtures and renderer are disposable scaffolding, not a general renderer,
+dialogue, state, or event framework.
+
 ## Two-perception wolf sensemaking
 
 `npc.experiments.food_offer_detection` is a separate binary sensor for whether

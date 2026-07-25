@@ -1,10 +1,10 @@
 # Experiment: non-authoritative rendering of a completed fox outcome
 
-**Status:** Planned
+**Status:** Complete
 
 **Date:** 2026-07-25
 
-**Roadmap outcome:** [Render a completed fox outcome as a player-facing text message](../roadmap.md#1-render-a-completed-fox-outcome-as-a-player-facing-text-message).
+**Roadmap outcome:** Completed; see the [current roadmap](../roadmap.md).
 
 ## Decision unlocked
 
@@ -77,10 +77,30 @@ validation result, and player-facing rendering or deterministic fallback.
 
 ## Result
 
-Complete at Review.
-
-- **Observed result:**
-- **Reproducibility evidence:**
-- **Interpretation and limits:**
-- **Decision or unresolved question created:**
-- **Canonical follow-up:**
+- **Observed result:** Valid fixture rendering accepts `flee` only as `The fox
+  flees.` and `do_nothing` only as `The fox does nothing.` The accepted
+  in-range threat preserves its completed `flee` trace and distance `15`; the
+  in-range and initially out-of-range non-actions preserve `do_nothing` and
+  distances `10` and `11`. Malformed, extra-field, action-mismatched,
+  message-mismatched, and failed renderer outputs return the fixed fallback
+  without changing any canonical-turn field. The rendering test records one
+  renderer call for each requested completed turn; no perception sensor is
+  called by rendering.
+- **Reproducibility evidence:** Behavioral tests were added before the module
+  and initially failed during collection with `ModuleNotFoundError: No module
+  named 'npc.experiments.fox_outcome_rendering'`. After implementation,
+  `.venv/bin/pytest tests/test_fox_outcome_rendering.py` passed with 5 tests.
+  The checked-in fixture traces cover accepted in-range `flee`, in-range and
+  initially out-of-range `do_nothing`, malformed output, and renderer failure.
+  The packet's existing fox distance and threat modules, `make check`, and
+  `git diff --check` are recorded in the implementation handoff.
+- **Interpretation and limits:** The trace demonstrates only a closed,
+  non-authoritative rendering boundary after a completed fox turn. It does not
+  demonstrate reusable presentation, dialogue, flavour generation, world
+  facts, state changes, or an event framework.
+- **Decision or unresolved question created:** Whether this narrowly checked
+  presentation is useful enough to expose to players before adding expressive
+  flavour remains unresolved.
+- **Canonical follow-up:** The accepted observable behavior and verified
+  mechanism are recorded in [requirements](../requirements.md) and
+  [architecture](../architecture.md), respectively.
