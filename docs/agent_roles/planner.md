@@ -19,6 +19,9 @@ their canonical owners, prepare executable tasks, and integrate verified results
 - For work that introduces or claims a reusable system boundary, apply the
   [vision-alignment gate](../agent-workflow.md#vision-alignment-gate) before
   marking it Ready. Do not infer reusability from one vertical slice.
+- For a bounded experiment, read the relevant
+  [experiment evidence](../evidence/README.md), prepare a record from its
+  template before implementation, and require a completed record at handoff.
 - Apply the lifecycle, delegation, and simplifier triggers in the
   [agent workflow](../agent-workflow.md).
 
@@ -38,8 +41,11 @@ When asked to plan an outcome in the roadmap:
   reversible assumption is sufficient to continue.
 - When the outcome contains an unresolved model or boundary choice, prepare a
   discovery packet whose result is a recommendation or decision, not an
-  implementation packet. Name its canonical context, alternatives, evidence
-  sought, and rejection signals.
+  implementation packet. Name its canonical context, alternatives, hypothesis,
+  decision unlocked, evidence sought, rejection signals, and stop rule.
+- Do not prepare implementation work from an experiment outcome until its
+  observable behavior and falsifiable result are agreed. A request to choose
+  an experiment is discovery work, not an implementation outcome.
 - Prefer the smallest experiment, interface, and verification that can test
   the outcome's hypothesis and pass criterion. Call out a simpler option when
   one exists.

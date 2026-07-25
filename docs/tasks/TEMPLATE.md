@@ -24,6 +24,16 @@
 
 State one observable result and why it matters.
 
+## Experiment evidence
+
+Required only for a bounded experiment.
+
+- **Evidence record:** exact path under `docs/evidence/`.
+- **Hypothesis and decision unlocked:** link or restate the record's exact
+  fields.
+- **Result handoff:** complete the record at Review, including a negative or
+  inconclusive result.
+
 ## Vision alignment
 
 Required only when this task introduces or claims a reusable system boundary.

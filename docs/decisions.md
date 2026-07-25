@@ -2,6 +2,24 @@
 
 This document owns consequential choices and their rationale.
 
+### 2026-07-25: Preserve experiment evidence independently of implementation
+
+**Status:** Accepted
+
+**Context:** The project deliberately removes unsuccessful scaffolding, but
+without a durable record its observations are compressed into later decisions
+or lost. That encourages re-running the same work and makes roadmap choices
+look like implementation preferences rather than evidence-led bets.
+
+**Decision:** Keep one concise experiment-evidence record for every bounded
+experiment. The record owns what the experiment demonstrated or refuted;
+requirements, architecture, roadmap, and decisions retain their existing,
+separate ownership.
+
+**Consequences:** Removing code does not remove its learning. A small
+documentation step is required before an experiment starts and when it is
+reviewed.
+
 ### 2026-07-25: Use YAML scenarios for the initial trader experiment
 
 **Status:** Accepted
@@ -15,21 +33,3 @@ load it.
 
 **Consequences:** The scenario is reviewable outside Python and PyYAML is the
 only current runtime dependency.
-
-### 2026-07-25: Start evolution testing with paired deterministic decisions
-
-**Status:** Accepted
-
-**Context:** The conversation, language-model extraction, and formal actor-loop
-experiments produced safe components but did not show that one hard-coded
-trader path could evolve. A single successful scenario is insufficient evidence
-for a reusable model.
-
-**Decision:** Before adding another runtime boundary, choose two contrasting
-decisions and use the second as a change test for the first. They may belong to
-the same actor. Inputs and authoritative decisions remain explicit and
-deterministic. Retain only the model elements that both decisions use.
-
-**Consequences:** Conversational and language-model work is deferred. The next
-architectural decision is based on observed change pressure rather than a
-pre-designed framework.

@@ -84,13 +84,28 @@ One successful vertical slice does not establish a reusable abstraction. If a
 second scenario is not in scope, label the result as scaffolding and do not
 promote its structure as the system direction.
 
+## Experiment-evidence gate
+
+Before Ready, a bounded experiment must have a record based on the
+[experiment-evidence template](evidence/TEMPLATE.md). It states the hypothesis,
+decision unlocked, observable behavior, fixed inputs, support and rejection
+signals, and stop rule. The packet links to the record.
+
+At Review, complete that record with the observed result, reproducibility
+evidence, interpretation, and the decision or unresolved question it creates.
+Record a negative or inconclusive result as carefully as a positive one. Keep
+the record when its implementation is removed; it is the canonical evidence for
+what the experiment demonstrated or refuted.
+
 ## Roadmap handoff gate
 
 A roadmap outcome orders future learning; it does not make work Ready. Before
-preparing a packet from an outcome, the planner assembles the relevant vision,
+preparing a packet from a roadmap outcome, the planner assembles the relevant vision,
 current architecture, requirements, decisions, and observed issues. The packet
 names those canonical sources and resolves material ambiguity, or is explicitly
-a discovery packet with a recommendation or decision as its outcome.
+a discovery packet with a recommendation or decision as its outcome. For an
+experiment, it also names the experiment-evidence record and the decision the
+result must unlock.
 
 ## Simplifier routing
 
