@@ -31,6 +31,7 @@ Do not preload every document automatically.
 | Question | Owner |
 | --- | --- |
 | What is this project, and how do I use it? | [README](README.md) |
+| How do we reach the vision coherently? | [Strategy](docs/strategy.md) |
 | What must the system do? | [Requirements](docs/requirements.md) |
 | How does the system work now? | [Architecture](docs/architecture.md) |
 | Why was a consequential choice made? | [Decisions](docs/decisions.md) |

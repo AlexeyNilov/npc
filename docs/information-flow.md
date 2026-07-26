@@ -10,14 +10,19 @@ flowchart TB
   User[User feedback, requests, and discussion]
 
   subgraph Control[Control plane — outside the implementation loop]
+    Strategist[Product Strategist]
+    Strategy[Strategy\nvision-to-capability path]
     PM[Product Manager]
     Roadmap[Roadmap\nfuture outcomes]
     TechLead[Technical Lead]
     Packet[Ready task packet]
     Registry[Task registry\nopen packets]
 
+    Strategist --> Strategy
+    Strategy --> PM
     PM --> Roadmap
     Roadmap --> TechLead
+    User --> Strategist
     User --> PM
     User --> TechLead
     TechLead --> Packet
@@ -44,6 +49,7 @@ flowchart TB
 
   subgraph Owners[Canonical durable-information owners]
     Vision[README\nvision and use]
+    StrategyOwner[Strategy\ncapability path and constraints]
     Requirements[Requirements\naccepted behavior]
     Architecture[Architecture\ncurrent mechanism]
     Decisions[Decisions\naccepted rationale]
@@ -58,7 +64,11 @@ flowchart TB
   TechLead --> Evidence
   TechLead --> Issues
   TechLead --> History
-  PM --> Vision
+  Strategist --> StrategyOwner
+  Vision --> Strategist
+  Evidence --> Strategist
+  Issues --> Strategist
+  Decisions --> Strategist
   PM --> Roadmap
   Evidence --> PM
   Issues --> PM
@@ -73,14 +83,16 @@ flowchart TB
   Route --> Evidence
   Route --> Issues
   Route --> Vision
+  Route --> StrategyOwner
   Route --> Roadmap
 ```
 
 ## Reading the map
 
-- The Product Manager and Technical Lead are control-plane actors. They set
-  direction, prepare a bounded packet, and accept its result; they are not
-  delivery roles.
+- The Product Strategist, Product Manager, and Technical Lead are control-plane
+  actors. The Strategist maintains the capability path from vision; the Product
+  Manager orders the next outcomes within it; the Technical Lead prepares a
+  bounded packet and accepts its result. None is a delivery role.
 - Explorer, Implementer, and Simplifier operate only after a packet enters the
   implementation loop. Each returns evidence to the Technical Lead rather than
   making unaccepted product or authority choices.

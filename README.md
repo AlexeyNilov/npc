@@ -72,5 +72,6 @@ history. Type `/exit` to quit.
 - [Requirements](docs/requirements.md)
 - [Architecture](docs/architecture.md)
 - [Decisions](docs/decisions.md)
+- [Strategy](docs/strategy.md)
 - [Roadmap](docs/roadmap.md)
 - [Development workflow](CONTRIBUTING.md)

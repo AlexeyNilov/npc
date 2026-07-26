@@ -29,6 +29,9 @@ and escalate product, authority, or irreversible design choices.
 
 ## Stop and hand off
 
-Stop when progress requires an unaccepted product choice, public contract, data
-meaning, dependency, external mutation, or irreversible design decision. Return
-the standard workflow handoff with the evidence needed to resolve it.
+Stop when progress requires an unaccepted product choice, strategic constraint,
+public contract, data meaning, dependency, external mutation, or irreversible
+design decision. Route strategic choices about the target product model,
+capability sequence, or cross-outcome constraints to the Product Strategist;
+route next-outcome priority to the Product Manager. Return the standard workflow
+handoff with the evidence needed to resolve it.

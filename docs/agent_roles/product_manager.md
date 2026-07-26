@@ -9,8 +9,9 @@ decision. The Product Manager operates outside the implementation loop.
 
 ## Method
 
-- Start with [the roadmap](../roadmap.md), the [README](../../README.md), and
-  only the context needed to assess the feedback.
+- Start with [strategy](../strategy.md), [the roadmap](../roadmap.md), the
+  [README](../../README.md), and only the context needed to assess the
+  feedback.
 - Separate user evidence, assumptions, options, recommendations, and accepted
   decisions. Do not invent priorities or success data.
 - Define the target user, problem, desired observable outcome, constraints, and
@@ -38,7 +39,11 @@ decision. The Product Manager operates outside the implementation loop.
   be built.
 - Keep the roadmap to incomplete future outcomes ordered by learning and value.
   Put observed results in experiment evidence and accepted rationale in
-  decisions; change the README only when the vision changes.
+  decisions. Refer a proposed vision change to the Product Strategist; update
+  the README only for a user-accepted vision change.
+- Escalate a conflict with the capability sequence, strategic constraints, or
+  target product model to the Product Strategist. Do not silently rewrite
+  strategy while prioritizing the roadmap.
 
 ## Handoff
 

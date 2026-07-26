@@ -6,11 +6,14 @@ discussion, review, or read-only exploration. For the information map, see
 
 ## Control plane
 
-The Product Manager and [Technical Lead](agent_roles/technical_lead.md) operate
-outside the implementation loop. The Product Manager sets product direction in
-the roadmap. The Technical Lead turns an agreed outcome into the smallest
-verifiable technical path, integrates accepted work, and records only changed
-durable facts.
+The [Product Strategist](agent_roles/product_strategist.md),
+[Product Manager](agent_roles/product_manager.md), and
+[Technical Lead](agent_roles/technical_lead.md) operate outside the
+implementation loop. The Product Strategist maintains the coherent path from
+vision to capabilities and constraints. The Product Manager turns that direction
+into ordered roadmap outcomes. The Technical Lead turns an agreed outcome into
+the smallest verifiable technical path, integrates accepted work, and records
+only changed durable facts.
 
 Use a task packet only for delegated, risky, experimental, or multi-step work.
 The Technical Lead may implement a localized, verifiable change directly when a
