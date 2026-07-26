@@ -80,3 +80,25 @@ load it.
 
 **Consequences:** PyYAML is the only current runtime dependency because the fox
 feedback and outcome-rendering corpora use YAML.
+
+### 2026-07-26: Test deterministic utility selection before behavioural randomness
+
+**Status:** Accepted
+
+**Context:** The fox currently resolves its independently validated threat and
+food-offer perceptions through a fixed threat-first policy. The next learning
+goal is to determine whether the authoritative-loop pattern supports a real
+conflict between safety and food-seeking. Random action variation would not
+answer that question and would make the initial policy evidence less direct.
+
+**Decision:** Run the next experiment as a fox-local deterministic utility
+policy with a persistent authoritative need state. The policy will score
+existing candidate actions from authoritative state and accepted perceptions;
+the LLM remains a narrow, evidence-grounded perception source. Do not add
+randomness in this experiment.
+
+**Consequences:** The experiment must make policy inputs, utility results,
+selection, and state transitions explainable and replayable. It tests an
+explicit intent stage without authorizing an actor framework, generic utility
+system, or stochastic action selection. Randomness may be reconsidered only
+after this deterministic experiment yields evidence about the policy.
