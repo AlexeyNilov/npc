@@ -123,9 +123,10 @@ after the required Simplifier review and roadmap closure.
   50, advances 50 -> 60 -> 70, selects `flee` at the safety tie, then selects
   `approach`; rejected perceptions score only `do_nothing`.
 - **Reproducibility evidence:** `.venv/bin/pytest
-  tests/test_fox_deterministic_utility.py` passed (9 tests);
-  `.venv/bin/python -m npc.experiments.fox_deterministic_utility` printed 9
-  JSON-safe turn traces; `make check` passed Ruff, mypy, and the 35-test
+  tests/test_fox_deterministic_utility.py` passed (10 tests);
+  `.venv/bin/python -m npc.experiments.fox_deterministic_utility` printed a
+  compact human-readable summary, and its `--json` option printed 9 complete
+  JSON-safe turn traces; `make check` passed Ruff, mypy, and the 36-test
   repository suite; and `git diff --check` passed.
 - **Interpretation and limits:** This supports only the stated fox-local,
   deterministic experiment parameters and authority boundary. It neither

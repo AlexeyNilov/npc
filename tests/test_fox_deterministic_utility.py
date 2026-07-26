@@ -8,6 +8,7 @@ import pytest
 
 from npc.experiments.fox_deterministic_utility import (
     HEARING_RANGE,
+    format_trace,
     load_corpus,
     run_fixture,
     run_turn,
@@ -49,6 +50,16 @@ def test_safety_wins_the_fixed_tie() -> None:
     assert trace.selected_utility == 60
     assert trace.selection_tie_order == ("flee", "approach", "do_nothing")
     assert trace.choice == "flee"
+
+
+def test_trace_formatter_summarizes_the_authoritative_decision() -> None:
+    trace = asyncio.run(run_turn("Fox, I will hurt you, but I offer you this fresh meat.", 10, 60, completion(True, True)))
+
+    assert format_trace(trace) == (
+        "  heard: True; hunger: 60 -> 70; threat: True (accepted); food offer: True (accepted)\n"
+        "  utilities: flee=60, approach=60, do_nothing=1; selected: flee (60)\n"
+        "  distance: 10 -> 15"
+    )
 
 
 def test_retained_hunger_advances_once_per_valid_turn() -> None:

@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import json
 from collections.abc import Mapping
@@ -208,15 +209,44 @@ def _fixture_completion(turns: list[Mapping[str, object]]) -> Completion:
     return complete
 
 
-async def main_async() -> None:
+def format_trace(trace: TurnTrace) -> str:
+    utilities = ", ".join(f"{action}={utility}" for action, utility in trace.utilities)
+    threat = (
+        f"{trace.threat_candidate.threat} ({trace.threat_validation_result})"
+        if trace.threat_candidate is not None
+        else trace.threat_validation_result or "not heard"
+    )
+    food_offer = (
+        f"{trace.food_offer_candidate.food_offer} ({trace.food_offer_validation_result})"
+        if trace.food_offer_candidate is not None
+        else trace.food_offer_validation_result or "not heard"
+    )
+    return (
+        f"  heard: {trace.heard}; hunger: {trace.starting_hunger} -> {trace.resulting_hunger}; "
+        f"threat: {threat}; food offer: {food_offer}\n"
+        f"  utilities: {utilities}; selected: {trace.executed_action} ({trace.selected_utility})\n"
+        f"  distance: {trace.starting_distance} -> {trace.feedback_distance}"
+    )
+
+
+async def main_async(*, json_output: bool = False) -> None:
     corpus_path = Path(__file__).parents[3] / "scenarios" / "fox_deterministic_utility.yaml"
     for case in load_corpus(corpus_path):
-        for trace in await run_fixture(case):
-            print(json.dumps(asdict(trace), sort_keys=True))
+        traces = await run_fixture(case)
+        if json_output:
+            for trace in traces:
+                print(json.dumps(asdict(trace), sort_keys=True))
+            continue
+        print(cast(str, case["id"]))
+        for trace in traces:
+            print(format_trace(trace))
 
 
 def main() -> None:
-    asyncio.run(main_async())
+    parser = argparse.ArgumentParser(description="Run the deterministic fox utility experiment corpus.")
+    parser.add_argument("--json", action="store_true", help="Print one complete JSON trace per turn.")
+    args = parser.parse_args()
+    asyncio.run(main_async(json_output=args.json))
 
 
 if __name__ == "__main__":
