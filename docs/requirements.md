@@ -45,6 +45,73 @@ This document owns observable system behavior.
   canonical state, and feedback. Replaying that trace shall reproduce the
   committed canonical outcome without making another mediation request.
 
+### Fox and hunter shared-world turn
+
+- **When** a developer runs the checked-in shared-world scenario, **the
+  system shall** start one authoritative turn with the fox at a clearing edge,
+  food available in the clearing, a hunter concealed beside it, fresh fox
+  tracks leading to the food, an unset trap, and trap materials ready. The fox
+  is not caught and the food is not consumed. The simulation core alone owns
+  the fox and hunter locations, concealment, tracks, trap state, material
+  readiness, food state, and all later transitions.
+- **When** observation begins, **the system shall** derive each actor's
+  actor-accessible substate from that same initial canonical state before either
+  actor's mediation request or proposal is resolved. The fox shall receive:
+  `You are at the edge of a clearing. You smell food in the clearing. The
+  clearing appears quiet.` The hunter shall receive: `You are concealed beside
+  a clearing. Fresh fox tracks lead toward food. Your trap materials are
+  ready.` The fox shall not receive the hunter, tracks, trap state, or material
+  readiness; the hunter shall not receive the fox's exact location, percept,
+  questions, or eventual proposal.
+- **When** the fox forms its actor-local percept, **the system shall** supply
+  this actor-owned profile: `You are hungry and cautious. You cannot see a
+  concealed hunter or a hidden trap. Treat smells and apparent quiet as clues,
+  not facts.` Its ordered binary questions shall be: `Do I believe an immediate
+  threat is present?` and `Do I believe the food is reachable by approaching?`
+  Its bounded proposal vocabulary shall be `approach_food` and `wait`.
+- **When** the hunter forms its actor-local percept, **the system shall**
+  supply this actor-owned profile: `You are a patient hunter. Fresh tracks are
+  clues to likely movement, not proof of the fox's current position.` Its
+  ordered binary questions shall be: `Do I believe a fox is likely to approach
+  the food this turn?` and `Do I believe I can set the trap now?` Its bounded
+  proposal vocabulary shall be `set_trap` and `wait`.
+- **When** each actor is mediated, **the system shall** make one request per
+  actor using only that actor's accessible substate, profile, and ordered
+  questions. It shall record one subjective percept per actor and retain each
+  answer with its own supporting reference to content in that actor's percept.
+  The fox shall propose `approach_food` only when it believes no immediate
+  threat is present and believes food is reachable; otherwise it shall propose
+  `wait`. The hunter shall propose `set_trap` only when it believes a fox is
+  likely to approach and believes it can set the trap; otherwise it shall
+  propose `wait`.
+- **When** either actor's percept or answer is malformed, lacks valid percept
+  evidence, or yields a proposal outside that actor's vocabulary, **the system
+  shall** fail closed to that actor's `wait` proposal. Neither actor's model
+  output shall directly change canonical state.
+- **When** both actors have submitted proposals, **the simulation core shall**
+  resolve the hunter proposal first and the fox proposal second, after both
+  actors have observed the initial state. A valid `set_trap` with ready
+  materials changes the trap from unset to set. A later `approach_food` meets a
+  set trap, changes the fox to caught, leaves the food unconsumed, and commits
+  the authoritative outcome `fox_caught_by_trap`. The fox shall receive
+  `A hidden trap catches you as you reach the food.` and the hunter shall
+  receive `Your trap catches the fox.`
+- **When** the same source state instead has trap materials unavailable,
+  **the system shall** derive the hunter observation `Your trap materials are
+  not ready.` in place of `Your trap materials are ready.` If the hunter does
+  not set a trap and the fox validly proposes `approach_food`, the simulation
+  core shall move the fox to the food, mark the food consumed, and commit
+  `fox_reaches_food`. The fox shall receive `You reach the food.` and the
+  hunter shall receive `The fox reaches the food.` This alternate authoritative
+  result is the required source-state variation.
+- **When** the shared-world turn completes, **the system shall** retain a
+  JSON-safe trace containing the initial canonical state; both actor-accessible
+  substates, profiles, percepts, ordered questions, answers and percept
+  evidence; both proposals; the authoritative resolution order and decisions;
+  resulting canonical transitions; and actor-specific feedback. Replaying the
+  trace shall reproduce the authoritative sequence without making mediation
+  requests.
+
 ### Bounded fox distance feedback
 
 - **When** a caller starts a fox turn, **the system shall** accept its
