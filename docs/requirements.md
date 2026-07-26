@@ -33,6 +33,13 @@ This document owns observable system behavior.
   value its source state, actor-visible input, actor-owned retained context,
   bounded proposal, resolution order, decisions, transitions, outcome,
   feedback, and resulting state.
+- **When** the supplied clearing declaration starts, **the system shall** treat
+  `trap_materials_ready` as a simulation-owned canonical source input: `true`
+  means the hunter's trap materials are ready, and `false` means they are not
+  ready. The simulation shall expose that readiness only in the hunter's
+  actor-visible input and shall resolve `set_trap` into `trap_set` only when
+  the input is `true`; the engine shall not interpret or alter that clearing
+  meaning.
 - **When** a stateful actor runs its next step, **the system shall** provide
   only that actor's simulation-filtered input and its own retained context.
   Its declared context reducer shall receive only its prior context and its
