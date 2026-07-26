@@ -43,7 +43,7 @@ must be generalised or a claim that the end-state engine already exists.
 
 | Horizon | Capability established | Unlocks |
 | --- | --- | --- |
-| 1. Builder-controlled composition | A simulation builder can supply an independently owned simulation description and heterogeneous actor descriptions to a common causal execution boundary, then run, inspect, and replay one bounded shared-world scenario without modifying generic engine machinery or introducing schema-specific cognition into it. A compatible actor or simulation rule-set replacement remains local to its supplied component and composition declaration. | The first product-shaped authoring surface and stable builder-input, compatibility, authority, trace, replay, and replacement contracts for later horizons. |
+| 1. Builder-controlled composition | A simulation builder can supply an independently owned simulation description and heterogeneous actor descriptions to a common causal execution boundary, then run, inspect, and replay one bounded shared-world scenario without modifying generic engine machinery or introducing schema-specific cognition into it. Horizon 1 demonstrates both replacement dimensions through separate substitutions: a compatible actor replacement while the simulation remains unchanged, and a simulation rule-set replacement while the actors remain unchanged. Each replacement remains local to its supplied component and composition declaration, with generic engine machinery unchanged. | The first product-shaped authoring surface and stable builder-input, compatibility, authority, trace, replay, and replacement contracts for later horizons. |
 | 2. Stateful shared-world execution | A composed scenario advances through multiple authoritative steps with explicit time, ordering, conflict resolution, feedback, and retained context while preserving information boundaries and causal replay. | Meaningful evolving scenarios and stable points from which alternatives can be explored. |
 | 3. Causal branching | A builder can branch a recorded scenario at a selected point, vary bounded source inputs or controlled generative inputs, and inspect comparable outcomes while preserving branch lineage and replayable authoritative causality. | Counterfactual exploration without surrendering causal inspection. |
 | End state | Builders can compose and replace independently described simulations, heterogeneous actors, and bounded generative components in inspectable, replayable, and branchable scenarios without domain-specific changes to generic engine machinery. | The product value described in the vision. |
@@ -135,11 +135,13 @@ concrete API or data shape; observable acceptance behavior remains owned by
   and recordable with the run. The builder makes their compatibility explicit;
   the engine does not repair semantic mismatches by inventing domain adapters,
   actor policy, or world meaning.
-- Replacing an actor implementation or description or a simulation rule set
-  changes only the supplied component and its composition declaration. It must
-  not require domain-specific edits to generic engine machinery or unrelated
-  actors. New domain semantics may still require localized authoring in the
-  simulation or actor that owns them.
+- Actor and simulation replacements are demonstrated separately. Replacing an
+  actor implementation or description changes only that supplied actor and its
+  composition declaration; replacing a simulation rule set changes only the
+  supplied simulation and its declaration. Neither requires domain-specific
+  edits to generic engine machinery or unrelated actors. New domain semantics
+  may still require localized authoring in the simulation or actor that owns
+  them.
 - Composition deliberately couples observation, proposal, resolution, and
   feedback semantics. At minimum, the builder pairs an actor-declared bounded
   proposal vocabulary with simulation-declared accepted proposals; no fixed or
