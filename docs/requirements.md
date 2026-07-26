@@ -4,6 +4,47 @@ This document owns observable system behavior.
 
 ## Actual requirements
 
+### Fox language-mediated causal turn
+
+- **When** a developer runs the checked-in fox causal-turn scenario, **the
+  system shall** start its authoritative simulation core from canonical state
+  in which the fox is in a clearing, food can be smelled nearby, leaves are
+  rustling, and the path to the food is blocked. The simulation core alone
+  owns these facts; the blocked path is not actor-accessible before resolution.
+- **When** that turn begins, **the system shall** deterministically derive the
+  fox's actor-accessible substate before mediation as: `You are in a clearing.
+  You smell food nearby. You hear leaves rustling.` It shall provide no
+  canonical field or generated text that reveals whether the path to the food
+  is blocked.
+- **When** the fox forms its subjective percept, **the system shall** supply
+  the fox-owned epistemic profile: `You are hungry and cautious. You cannot
+  see beyond the clearing or through obstacles. Treat smells and sounds as
+  clues, not facts.` The sole mediation request shall use only that profile,
+  the actor-accessible substate, and these ordered fox-owned binary questions:
+  `Do I believe an immediate threat is present?` followed by `Do I believe the
+  food is reachable by approaching?` The request shall record one subjective
+  percept and retain each answer with its own supporting reference to content
+  in that percept.
+- **When** valid answers say that the fox does not believe an immediate threat
+  is present and does believe the food is reachable, **the system shall** have
+  the fox submit the bounded proposal `approach_food`. The fox shall otherwise
+  submit `wait`. A malformed percept or answer, missing or invalid percept
+  evidence, or any proposal outside `approach_food` and `wait` shall fail
+  closed as `wait`; it shall not directly change canonical state.
+- **When** the simulation core resolves `approach_food` against this
+  scenario's blocked canonical path, **the system shall** commit the
+  authoritative outcome `food_path_blocked`, leave the fox in the clearing,
+  and return the feedback `The path to the food is blocked.` The model's belief
+  that food appeared reachable shall remain actor-local and shall not override
+  the blocked-path fact. Resolving `wait` shall leave the fox in the clearing
+  and return feedback that it waited.
+- **When** a causal turn completes, **the system shall** retain a JSON-safe
+  trace containing the initial canonical state, actor-accessible substate,
+  epistemic profile, subjective percept, ordered questions, answers and
+  percept evidence, submitted proposal, authoritative resolution, resulting
+  canonical state, and feedback. Replaying that trace shall reproduce the
+  committed canonical outcome without making another mediation request.
+
 ### Bounded fox distance feedback
 
 - **When** a caller starts a fox turn, **the system shall** accept its
