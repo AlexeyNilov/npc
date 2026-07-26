@@ -32,10 +32,12 @@ owners, then link to them here.
   observations of that reality. The current experiments have only fox-local
   authoritative inputs and state, not a reusable canonical world model.
 
-**Simulation substrate.** The target engine boundary that maintains canonical
-  reality, resolves actor action proposals, commits outcomes, and returns
-  feedback. It is a strategic capability, not a claim that the current fox code
-  already provides a reusable substrate. See the
+**Authoritative simulation core.** Preferred short form **simulation core**.
+  The target component within the engine that maintains canonical reality,
+  resolves actor action proposals, commits outcomes, and returns feedback. It
+  is distinct from actor cognition, generic LLM mediation, and presentation. It
+  is a strategic capability, not a claim that the current fox code already
+  provides a reusable simulation core. See the
   [strategy](strategy.md#strategic-horizons).
 
 **Controlled variation.** An explicit stochastic or generative input whose
@@ -62,25 +64,55 @@ owners, then link to them here.
 
 ## Actor-loop terms
 
-**Actor loop.** The target model `authoritative reality → actor-specific
-  perception → sensemaking → intent → action proposal → substrate resolution →
-  outcome and canonical transition → feedback`, with feedback informing later
-  perception and sensemaking. It is a product target, not a claim that the
-  current fox code is a reusable engine abstraction. See the
+**Actor loop.** The target model `authoritative reality → actor-accessible
+  substate plus its epistemic profile → subjective percept → actor-owned
+  questions and sensemaking → intent → action proposal → authoritative
+  resolution → outcome and canonical transition → feedback`, with feedback
+  informing later perception and sensemaking. It is a product target, not a
+  claim that the current fox code is a reusable engine abstraction. See the
   [vision](../README.md#vision).
 
 **Reality.** Preferred short form for canonical reality when discussing the
   actor loop. In the current fox utility loop, the inputs treated as facts for
   one turn are a player-message string plus authoritative distance and hunger.
 
+**Actor-accessible substate.** The simulation-filtered part of canonical reality
+  that an actor is permitted to receive for one observation. The simulation
+  enforces this hard information boundary before generative mediation; an LLM
+  is not responsible for hiding facts outside it.
+
+**Epistemic profile.** Actor-supplied context that shapes subjective perception,
+  including sensory limitations, knowledge, worldview, biases, and relevant
+  current context. It remains actor-local and does not alter canonical reality.
+
+**Subjective percept.** A recorded actor-local description generated from an
+  actor-accessible substate and epistemic profile. It may be incomplete or
+  distorted and is not a faithful serialization of, or transition in,
+  canonical reality.
+
 **Perception.** Actor-specific information proposed or derived from reality.
-  Current perception is an LLM-backed, action-relevant proposal about one
-  player message and remains untrusted until deterministic validation accepts
-  it.
+  The target language-mediated boundary produces a subjective percept from an
+  actor-accessible substate and epistemic profile. Current fox perception is
+  narrower: an LLM-backed, action-relevant proposal about one player message
+  that remains untrusted until deterministic validation accepts it.
 
 **Sensemaking.** The actor-local interpretation of perceptions into decision
-  context. Current fox sensemaking is limited to deterministic acceptance or
-  rejection of sensor candidates; rejected perceptions contribute no utility.
+  context. In the target boundary, the actor supplies questions that the engine
+  may evaluate together against one subjective percept while retaining their
+  individual answers and percept evidence. Current fox sensemaking is limited to
+  deterministic acceptance or rejection of sensor candidates; rejected
+  perceptions contribute no utility.
+
+**Actor-owned question.** A sensemaking question defined by an actor and
+  evaluated only against that actor's subjective percept. The engine may batch
+  multiple questions into one model request without taking ownership of their
+  meaning or combining their individual answers and percept evidence.
+
+**Percept evidence.** A reference to content in a recorded subjective percept
+  that supports an answer to an actor-owned question. It explains the basis of
+  an actor's belief, not whether that belief matches canonical reality. This
+  target term is distinct from the current fox sensor's player-text
+  [grounded evidence](#perception-and-validation).
 
 **Intent.** An actor's selected commitment about what it wants to attempt.
   Current fox intent is the deterministic policy stage that selects an action
@@ -88,20 +120,21 @@ owners, then link to them here.
   current traces.
 
 **Action proposal.** A bounded operation an actor wants to attempt. It does not
-  determine its own success or canonical effect; the simulation substrate owns
-  resolution. Current fox actions are selected and executed within one
-  fox-local boundary and do not yet establish this separation.
+  determine its own success or canonical effect; the authoritative simulation
+  core owns resolution. Current fox actions are selected and executed within
+  one fox-local boundary and do not yet establish this separation.
 
 **Action.** The operation represented by an action proposal or, in the current
   fox experiments, a selected deterministic operation. Current fox actions are
   `flee`, `approach`, and `do_nothing`; their exact transitions belong to the
   [requirements](requirements.md).
 
-**Causal closure.** A complete actor-to-substrate sequence in which an actor
-  receives an observation, proposes an action, the substrate resolves and
-  commits its outcome, and the resulting reality becomes feedback with a
-  replayable causal trace. It is the first strategic horizon, not a current
-  implementation claim.
+**Causal closure.** A complete sequence between an actor and the simulation
+  core in which the actor receives an actor-accessible substate, forms a
+  subjective percept, uses its owned questions for sensemaking, and proposes an
+  action; the simulation core resolves and commits its outcome, and the
+  resulting reality becomes feedback with a replayable causal trace. It is the
+  first strategic horizon, not a current implementation claim.
 
 ## Perception and validation
 

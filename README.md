@@ -7,11 +7,23 @@ with heterogeneous actors: individuals, groups, organisations, and non-human
 systems. The intended user is a simulation builder who needs flexible actor
 behaviour without surrendering causal inspection and replay.
 
-Actor loops operate within a shared authoritative simulation substrate: they
-interpret reality and propose actions, while the substrate resolves outcomes
-and maintains canonical state. Generative components may contribute through
-bounded interfaces, but their outputs remain proposals. Only substrate
-resolution may commit a canonical transition.
+Simulation and actor cognition meet through a bounded natural-language
+interface. The simulation supplies an actor-accessible substate after enforcing
+hard information limits. The actor supplies an epistemic profile—its sensory
+limitations, knowledge, worldview, biases, and relevant current context—and
+the questions it uses for sensemaking. Generic LLM mediation combines those
+inputs into a recorded subjective percept and supports the actor's questions
+without requiring its cognition to traverse a simulation-specific schema.
+Natural human language is the default semantic intermediary for the target
+class of simulations; this is a working product assumption, not a claim that
+unstructured language must suit every possible system.
+
+Actor loops interact with a shared authoritative simulation core: they
+interpret reality and propose actions, while the simulation core resolves
+outcomes and maintains canonical state. Generative components may contribute
+through bounded interfaces. A subjective percept may be incomplete or
+distorted, but it remains actor-local rather than canonical. Only the simulation
+core may commit a canonical transition.
 
 Authoritative causality should be traceable, replayable, and eventually
 branchable. Actor behaviour need not always be predictable: controlled
@@ -24,21 +36,23 @@ The intended actor loop is:
 ```text
 Authoritative reality
     ↓
-Actor-specific perception
+Actor-accessible substate + epistemic profile
     ↓
-Sensemaking
+Language-mediated subjective perception
+    ↓
+Actor-owned questions and sensemaking
     ↓
 Intent
     ↓
 Action proposal
     ↓
-Substrate resolution
+Authoritative resolution
     ↓
 Outcome and canonical transition
     ↓
 Feedback
-    ↙        ↘
-Perception   Sensemaking
+    ↙                         ↘
+Subjective perception         Sensemaking
 ```
 
 This is the project's target model, not a claim about the current implementation.

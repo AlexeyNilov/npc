@@ -135,13 +135,13 @@ for narrow binary LLM perception, but the product vision and strategy then
 became too closely centered on the laboratory method and fox-local decisions.
 
 **Decision:** The product destination is a modular simulation engine, not a
-learning laboratory. Actor loops operate within a shared authoritative
-simulation substrate: they interpret reality and propose actions, while the
-substrate resolves outcomes and maintains canonical state. Grow toward that
-destination through the smallest causally complete vertical slices rather than
-by recreating a comprehensive framework up front. Treat the fox as completed
-foundational evidence and, where useful, a stable test actor; do not make
-additional fox cognition the strategic objective.
+learning laboratory. Actor loops interact with a shared authoritative
+simulation core: they interpret reality and propose actions, while the
+simulation core resolves outcomes and maintains canonical state. Grow toward
+that destination through the smallest causally complete vertical slices rather
+than by recreating a comprehensive framework up front. Treat the fox as
+completed foundational evidence and, where useful, a stable test actor; do not
+make additional fox cognition the strategic objective.
 
 The long-term product should let simulation builders author, run, inspect,
 replay, and eventually branch scenarios with heterogeneous actors.
@@ -162,17 +162,18 @@ a capability choice or strategic constraint that it can change.
   expressive resolution but is not preferred while canonical validation and
   causal replay are the product's differentiating constraints.
 - Choose an application-specific vertical immediately. No named external user
-  or problem yet provides stronger capability requirements than the substrate
-  path. The current triggers for revisiting these alternatives remain in
+  or problem yet provides stronger capability requirements than the current
+  domain-neutral discovery path. The triggers for revisiting these alternatives
+  remain in
   [Strategy](strategy.md#reconsideration).
 
 **Consequences:** The strategy pivots from recurring fox decisions to an
-evidenced actor-to-substrate boundary, followed by shared-world composition and
-cross-scale portability. Existing fox evidence and current implementation
-remain valid within their recorded limits. The Product Manager must replace the
-roadmap's now-obsolete product frame and order an outcome that advances causal
-closure. Historical experiment follow-ups remain accurate records of what their
-results unlocked at completion.
+evidenced boundary between actor and simulation core, followed by shared-world
+composition and cross-scale portability. Existing fox evidence and current
+implementation remain valid within their recorded limits. The Product Manager
+must replace the roadmap's now-obsolete product frame and order an outcome that
+advances causal closure. Historical experiment follow-ups remain accurate
+records of what their results unlocked at completion.
 
 ### 2026-07-26: Define determinism as replayable authoritative causality
 
@@ -200,3 +201,53 @@ unchanged and does not retroactively establish stochastic behaviour. Future
 capability choices may introduce controlled variation without weakening
 authority, inspection, or replay. The strategy no longer treats deterministic
 action selection as a permanent product constraint.
+
+### 2026-07-26: Use natural language as the default actor-world semantic interface
+
+**Status:** Accepted
+
+**Context:** Heterogeneous actors need to interpret simulation state without
+embedding simulation-specific schemas and traversal logic in each actor. A
+shared generic sensemaking model would couple actor cognition to the first
+supported world, while a separate model request for every actor question would
+make richer actors unnecessarily expensive. The current fox supports narrow,
+independent LLM questions over one player message, but does not establish an
+interface between a simulation-owned world representation and independently
+described actor cognition.
+
+**Decision:** For the target class of simulations, use natural human language
+as the default semantic intermediary between simulation-owned observation and
+actor-owned cognition. The simulation supplies an actor-accessible substate
+after deterministically enforcing hard information limits. The actor supplies
+an epistemic profile—sensory limitations, knowledge, worldview, biases, and
+relevant current context—and actor-owned questions. Generic LLM mediation
+combines the substate and profile into a recorded subjective percept, then
+answers the actor's questions from that percept.
+
+The engine should group the questions for one percept into one sensemaking
+request while retaining each question, answer, and its percept evidence
+separately. The subjective percept may be incomplete or distorted and may cause
+an actor to form a false belief, but neither percept nor belief becomes
+canonical reality. Only a bounded action proposal crosses from actor cognition
+to authoritative resolution, and only the simulation core commits an
+authoritative transition.
+
+Natural language is a working product assumption rather than a guarantee for
+every possible system. Add a structured supplementary or replacement cognition
+interface only when evidence from a target simulation shows that language
+cannot preserve required precision, cost, latency, or schema independence.
+
+**Consequences:** Simulation and actor implementations can be described and
+developed independently across a semantic boundary rather than sharing
+schema-specific sensemaking code. Their semantics and bounded action-proposal
+contract remain deliberate coupling; natural language does not eliminate those
+contracts.
+
+The causal trace must retain the actor-accessible substate,
+epistemic-profile input, subjective percept, ordered question set, individual
+answers and percept evidence, and controlled model variation needed to explain
+and replay the resulting authoritative transition. The first causal-closure
+slice must exercise this boundary, but one actor or world schema does not
+establish portability. This changes the target product and capability sequence,
+not the current verified fox architecture; a future implementation still
+requires bounded evidence.
