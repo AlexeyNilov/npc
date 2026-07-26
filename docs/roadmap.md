@@ -21,10 +21,12 @@ that boundary in a materially different organisational allocation context. Its
 retaining natural language as the default semantic interface through that
 contrasting slice, within its recorded limits.
 
-The next ordered outcome is Stateful shared-world execution. It carries the
-completed builder-controlled composition boundary through time; no later
-outcome is ordered until its result determines whether recorded multi-step
-state is a sufficient base for causal branching.
+The completed [stateful shared-world execution evidence](evidence/2026-07-26-stateful-shared-world-execution.md)
+shows that the composition boundary can carry one bounded scenario through two
+authoritative steps with actor-local context and replay. No incomplete outcome
+is currently ordered. A later Product Manager decision must add the next
+evidence-bearing outcome; this roadmap does not infer one from the completed
+stateful-execution experiment.
 
 The current fox [architecture](architecture.md) and completed
 [utility evidence](evidence/2026-07-26-fox-deterministic-utility.md) remain
@@ -32,3 +34,6 @@ foundational inputs, not the product frame. The capability path and constraints
 are owned by [Strategy](strategy.md).
 
 ## Ordered future outcomes
+
+No outcome is currently ordered. The Product Manager owns the next addition
+after considering the completed stateful-execution evidence.
