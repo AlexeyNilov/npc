@@ -41,6 +41,9 @@ async def run_turn(
     starting_distance: int,
     completion: Completion,
 ) -> TurnTrace:
+    if isinstance(starting_distance, bool) or not isinstance(starting_distance, int) or starting_distance < MINIMUM_DISTANCE:
+        raise ValueError("starting_distance must be a non-boolean integer greater than or equal to 1")
+
     heard = starting_distance <= HEARING_RANGE
     if not heard:
         return TurnTrace(

@@ -44,11 +44,12 @@ feedback.
 
 `npc.experiments.fox_distance_feedback` is a fox-only wrapper with
 local `TurnTrace`, turn execution, and fixture helpers. Before each turn calls
-`perceive_threat` and `perceive_food_offer`, its authoritative integer starting
-distance is checked against the fixed hearing range of `10`. An inaudible turn
-records no sensor calls and null perception fields; an audible turn calls each
-sensor once and retains its raw candidate, parsed candidate, and
-validation result independently.
+`perceive_threat` and `perceive_food_offer`, `run_turn` rejects a starting
+distance that is not a non-boolean integer greater than or equal to `1` with
+`ValueError`. It then checks the authoritative distance against the fixed
+hearing range of `10`. An inaudible turn records no sensor calls and null
+perception fields; an audible turn calls each sensor once and retains its raw
+candidate, parsed candidate, and validation result independently.
 
 The fox-local policy gives accepted grounded threat priority: threat selects
 `flee`; otherwise accepted grounded food offer selects `approach`; otherwise it

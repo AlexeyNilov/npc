@@ -1,6 +1,6 @@
 # ISSUE-002: Fox distance accepts values outside a physical distance domain
 
-**Status:** Routed
+**Status:** Resolved
 
 **Observed:** 2026-07-25
 
@@ -8,8 +8,8 @@
 
 ## Problem
 
-`run_turn` accepts its `starting_distance` as an integer without enforcing a
-non-negative distance domain. A negative distance is treated as audible and is
+`run_turn` accepted its `starting_distance` as an integer without enforcing a
+non-negative distance domain. A negative distance was treated as audible and
 retained as feedback. Python booleans also satisfy the `int` annotation at
 runtime.
 
@@ -48,4 +48,13 @@ feedback.
 
 ## Resolution
 
-Pending.
+`run_turn` now rejects every starting distance other than a non-boolean integer
+greater than or equal to `1` with `ValueError`, before hearing, completion,
+action, or feedback processing. The direct-turn tests cover `-1`, `True`, and
+a non-integer input and verify completion is not called; the chat-path test
+also verifies neither completion nor narration is invoked for an invalid
+starting distance. Existing valid direct, fixture, and chat behavior remains
+covered by the focused fox-distance and chat suite.
+
+Verified with `.venv/bin/python -m pytest tests/test_fox_distance_feedback.py
+tests/test_fox_chat.py` (14 passed).

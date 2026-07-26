@@ -5,6 +5,8 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import cast
 
+import pytest
+
 from npc.experiments.fox_distance_feedback import (
     APPROACH_DISPLACEMENT,
     FLEE_DISPLACEMENT,
@@ -132,6 +134,21 @@ def test_initially_out_of_range_turn_skips_both_sensors_and_preserves_distance()
     )
     assert trace.choice == trace.executed_action == "do_nothing"
     assert trace.resulting_distance == trace.feedback_distance == 11
+
+
+@pytest.mark.parametrize("starting_distance", [-1, True, "10"])
+def test_invalid_starting_distance_raises_before_calling_completion(starting_distance: object) -> None:
+    calls = 0
+
+    async def complete(_: str, __: str) -> str:
+        nonlocal calls
+        calls += 1
+        return "not used"
+
+    with pytest.raises(ValueError):
+        asyncio.run(run_turn("Fox, hello.", starting_distance, complete))  # type: ignore[arg-type]
+
+    assert calls == 0
 
 
 def test_turn_trace_and_checked_in_corpus_cover_all_fox_actions() -> None:

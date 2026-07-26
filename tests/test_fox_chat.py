@@ -1,6 +1,7 @@
 import asyncio
 from collections.abc import Iterator
 
+import pytest
 from pytest import CaptureFixture, MonkeyPatch
 
 from sample.fox_chat import chat, chat_turn
@@ -76,3 +77,23 @@ def test_chat_turn_carries_authoritative_approach_distance() -> None:
 
     assert trace.canonical_turn.executed_action == "approach"
     assert trace.canonical_turn.feedback_distance == 7
+
+
+def test_chat_turn_rejects_invalid_starting_distance_before_completion_or_narration() -> None:
+    completion_calls = 0
+    narration_calls = 0
+
+    async def complete(_: str, __: str) -> str:
+        nonlocal completion_calls
+        completion_calls += 1
+        return "not used"
+
+    async def narrate(_: str) -> str:
+        nonlocal narration_calls
+        narration_calls += 1
+        return "not used"
+
+    with pytest.raises(ValueError):
+        asyncio.run(chat_turn("Fox, hello.", -1, complete, narrate))
+
+    assert completion_calls == narration_calls == 0
