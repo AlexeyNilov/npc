@@ -36,11 +36,17 @@ for the player. The narrator receives only the completed event data required to
 describe that action. Its response is presentation data: it cannot choose or
 change an action, distance, outcome, or feedback, and it never becomes
 canonical world state or input to a later turn. An unavailable or unusable
-response has a deterministic fallback.
+response has a deterministic fallback. Arbitrary concise narration is allowed
+to keep the implementation small and the player experience expressive, rather
+than structurally rejecting every claim beyond the completed action.
 
-**Consequences:** The configured-model boundary is verified. The narrator is
-limited to describing the completed action; whether to allow extra flavour or
-assertions beyond that action remains unresolved.
+**Consequences:** The configured-model boundary is verified. Free-form flavour
+may be misleading or false to a player even though it cannot alter canonical
+state; this is an accepted current risk. The action-only input, explicit
+non-authoritative instruction, response-length limit, deterministic fallback,
+and retained trace mitigate it without enforcing factual accuracy. If player
+trust becomes a demonstrated problem, revisit claim validation or presentation
+labelling.
 
 ### 2026-07-25: Preserve experiment evidence independently of implementation
 
