@@ -1,10 +1,10 @@
 # Experiment: Stateful shared-world execution
 
-**Status:** Planned
+**Status:** Complete
 
 **Date:** 2026-07-26
 
-**Roadmap outcome:** [Stateful shared-world execution](../roadmap.md#1-stateful-shared-world-execution)
+**Roadmap outcome:** Completed; see the [current roadmap](../roadmap.md).
 
 ## Decision unlocked
 
@@ -80,8 +80,19 @@ result.
 
 ## Result
 
-- **Observed result:** Pending.
-- **Reproducibility evidence:** Pending.
-- **Interpretation and limits:** Pending.
-- **Decision or unresolved question created:** Pending.
-- **Canonical follow-up:** Pending.
+- **Observed result:** Supported. The supplied clearing declaration completed
+  two recorded steps: the hunter set the trap while the fox waited, then the
+  fox approached and was caught from the committed trap state.
+- **Reproducibility evidence:** `.venv/bin/pytest tests/test_composition.py`
+  passed 8 tests. The focused tests serialize the timeline, verify actor-free
+  replay, verify state-derived changed input/outcome, ensure each step derives
+  every observation before mediation, and reject the required one-field trace
+  mutations.
+- **Interpretation and limits:** The bounded contract preserves state,
+  actor-specific context, resolution records, and replay across one committed
+  change. It does not establish an unbounded scheduler, persistence, branch
+  model, universal clock, conflict representation, or clearing lifecycle.
+- **Decision or unresolved question created:** The result supports Product
+  Strategy's evaluation of causal branching; general temporal semantics remain
+  untested.
+- **Canonical follow-up:** [Strategy: Current focus](../strategy.md#current-focus).

@@ -188,14 +188,22 @@ clearing fields or interpret proposals and outcomes. Actor output contains
 only cognition and a proposal; the trace's shown input is the engine-retained,
 simulation-derived value rather than actor-controlled data.
 
+`run_timeline` extends that boundary through exactly two steps without changing
+the one-turn `run` contract. It records `StepRecord` values within a
+`CompositionTimeline`; each includes an ordinal, source and resulting state,
+actor exchange records, and simulation resolution. Stateful actors declare an
+initial context, a context-aware mediation method, and a deterministic reducer.
+The engine gives the reducer only that actor's prior context and own selected
+feedback, then carries its result into the next actor exchange. `replay_timeline`
+re-derives inputs and resolutions and applies those reducers without mediation.
+
 `npc.experiments.composed_clearing` supplies the experiment's clearing actors
 and hunter-first or fox-first rule components. The supplied rules alone derive
 observations, own accepted proposal vocabularies, and apply canonical
-transitions and feedback. `CompositionTrace` retains only values needed for
-inspection and replay. Replay revalidates the declaration, re-derives inputs
-and authoritative resolution from the selected simulation, and never invokes
-an actor. This is one bounded turn; it establishes neither temporal scheduling
-nor a universal world or proposal schema. Its observable contract is owned by
+transitions and feedback. The two-step fixture owns its limited trap-set
+continuation; it is not generic clearing lifecycle policy. This establishes
+neither temporal scheduling nor a universal world or proposal schema. Its
+observable contract is owned by
 [Requirements](requirements.md#builder-controlled-clearing-composition).
 
 ## Village emergency-food rationing turn

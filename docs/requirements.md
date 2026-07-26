@@ -135,6 +135,23 @@ This document owns observable system behavior.
   resulting state. Replay shall re-derive simulation-owned observations and
   resolution without actor mediation and reject a changed recorded declaration,
   pairing, input, proposal, resolution, feedback, or resulting state.
+- **When** a builder runs the supplied stateful clearing declaration, **the
+  system shall** execute exactly two ordinal authoritative steps. The second
+  source state shall equal the first resulting state. Each step shall retain by
+  value its source state, actor-visible input, actor-owned retained context,
+  bounded proposal, resolution order, decisions, transitions, outcome,
+  feedback, and resulting state.
+- **When** a stateful actor runs its next step, **the system shall** provide
+  only that actor's simulation-filtered input and its own retained context.
+  Its declared context reducer shall receive only its prior context and its
+  own simulation-selected feedback. The supplied clearing declaration shall
+  have the hunter set a trap while the fox waits in step one, then catch the
+  approaching fox in step two.
+- **When** a builder replays a two-step clearing timeline, **the system shall**
+  re-derive simulation inputs and authoritative resolutions without mediation,
+  and reject a changed ordinal, source or resulting state, retained context,
+  actor-visible input, proposal, resolution order, decision, transition,
+  outcome, or feedback.
 
 ### Village emergency-food rationing turn
 

@@ -1,16 +1,20 @@
 import asyncio
 import json
 from dataclasses import replace
+from typing import Any, cast
 
 import pytest
 
-from npc.composition import CompositionError, replay, run, validate
+from npc.composition import CompositionError, replay, replay_timeline, run, run_timeline, validate
 from npc.experiments.composed_clearing import (
     BASELINE_DECLARATION,
     CAUTIOUS_FOX_DECLARATION,
     FOX_FIRST_RULES_DECLARATION,
     INVALID_FOX_PAIRING_DECLARATION,
+    TWO_STEP_DECLARATION,
     CanonicalState,
+    ClearingActor,
+    ClearingRules,
 )
 
 
@@ -91,3 +95,113 @@ def test_replay_rejects_every_recorded_authority_fact_without_mediation() -> Non
         with pytest.raises(CompositionError):
             replay(BASELINE_DECLARATION, mutated)
     assert sum(getattr(actor, "mediation_calls", 0) for actor in BASELINE_DECLARATION.actors.values()) == calls_before
+
+
+def test_two_step_timeline_commits_contextual_exchanges_and_replays_without_mediation() -> None:
+    timeline = asyncio.run(run_timeline(TWO_STEP_DECLARATION))
+
+    assert tuple(step.ordinal for step in timeline.steps) == (1, 2)
+    first, second = timeline.steps
+    assert second.source_state == first.resulting_state
+    assert first.actors["fox"].proposal == "wait"
+    assert first.actors["hunter"].proposal == "set_trap"
+    assert first.resulting_state.trap_set is True
+    assert second.actors["fox"].retained_context == "fox:You wait."
+    assert second.actors["hunter"].retained_context == "hunter:The fox does not reach the food."
+    assert second.actors["fox"].proposal == "approach_food"
+    assert second.resolution.order == ("hunter", "fox")
+    assert second.resolution.decisions == ("wait", "fox_caught_by_trap")
+    assert second.resolution.transitions == ("fox_caught",)
+    assert second.resolution.outcome == "fox_caught_by_trap"
+    assert second.resolution.feedback["hunter"] == "Your trap catches the fox."
+    assert second.resulting_state.fox_caught is True
+    json.dumps(timeline.as_json(), sort_keys=True)
+
+    calls_before = sum(getattr(actor, "mediation_calls", 0) for actor in TWO_STEP_DECLARATION.actors.values())
+    assert replay_timeline(TWO_STEP_DECLARATION, timeline) == timeline
+    assert sum(getattr(actor, "mediation_calls", 0) for actor in TWO_STEP_DECLARATION.actors.values()) == calls_before
+
+
+def test_two_step_inputs_are_state_derived_and_actor_channels_remain_isolated() -> None:
+    timeline = asyncio.run(run_timeline(TWO_STEP_DECLARATION))
+    unavailable = asyncio.run(
+        run_timeline(replace(TWO_STEP_DECLARATION, initial_state=CanonicalState(trap_materials_ready=False)))
+    )
+    first, second = timeline.steps
+    unavailable_first, unavailable_second = unavailable.steps
+
+    assert unavailable_first.actors["hunter"].shown_input.endswith("not ready.")
+    assert unavailable_second.resolution.outcome == "fox_reaches_food"
+    assert second.actors["fox"].shown_input == first.actors["fox"].shown_input
+    assert second.actors["fox"].shown_input != second.actors["hunter"].shown_input
+    assert second.actors["fox"].shown_input not in second.actors["hunter"].shown_input
+    assert second.actors["hunter"].shown_input not in second.actors["fox"].shown_input
+    assert second.actors["fox"].retained_context == "fox:You wait."
+    assert second.actors["hunter"].retained_context == "hunter:The fox does not reach the food."
+    assert "hunter:" not in second.actors["fox"].retained_context
+    assert "fox:" not in second.actors["hunter"].retained_context
+    assert first.actors["hunter"].shown_input not in second.actors["fox"].shown_input
+    assert first.actors["fox"].shown_input not in second.actors["hunter"].shown_input
+    assert first.actors["hunter"].proposal not in second.actors["fox"].shown_input
+    assert first.actors["fox"].proposal not in second.actors["hunter"].shown_input
+    assert first.actors["hunter"].cognition not in second.actors["fox"].shown_input
+    assert first.actors["fox"].cognition not in second.actors["hunter"].shown_input
+    assert first.resolution.feedback["hunter"] not in second.actors["fox"].retained_context
+    assert first.resolution.feedback["fox"] not in second.actors["hunter"].retained_context
+    assert unavailable_first.actors["fox"].proposal == "wait"
+
+
+def test_each_step_observes_all_actors_before_mediation_and_only_reduces_between_steps() -> None:
+    events: list[str] = []
+    declaration = replace(
+        TWO_STEP_DECLARATION,
+        simulation=replace(cast(ClearingRules, TWO_STEP_DECLARATION.simulation), events=events),
+        actors={
+            name: replace(cast(ClearingActor, actor), mediation_calls=0, events=events)
+            for name, actor in TWO_STEP_DECLARATION.actors.items()
+        },
+    )
+
+    asyncio.run(run_timeline(declaration))
+
+    assert events == [
+        "observe:fox",
+        "observe:hunter",
+        "mediate:fox",
+        "mediate:hunter",
+        "reduce:fox",
+        "reduce:hunter",
+        "observe:fox",
+        "observe:hunter",
+        "mediate:fox",
+        "mediate:hunter",
+    ]
+
+
+def test_timeline_replay_rejects_each_recorded_authority_fact_without_mediation() -> None:
+    timeline = asyncio.run(run_timeline(TWO_STEP_DECLARATION))
+    first, second = timeline.steps
+    actor = second.actors["fox"]
+
+    def changed_second(**changes: Any) -> Any:
+        return replace(timeline, steps=(first, replace(second, **changes)))
+
+    mutations = (
+        replace(timeline, initial_state=CanonicalState(trap_materials_ready=False)),
+        replace(timeline, steps=(replace(first, ordinal=3), second)),
+        replace(timeline, steps=(replace(first, source_state=CanonicalState(trap_materials_ready=False)), second)),
+        changed_second(resulting_state=CanonicalState()),
+        changed_second(actors={**second.actors, "fox": replace(actor, retained_context="changed")}),
+        changed_second(actors={**second.actors, "fox": replace(actor, shown_input="changed")}),
+        changed_second(actors={**second.actors, "fox": replace(actor, proposal="wait")}),
+        changed_second(resolution=replace(second.resolution, order=("fox", "hunter"))),
+        changed_second(resolution=replace(second.resolution, decisions=("changed",))),
+        changed_second(resolution=replace(second.resolution, transitions=("changed",))),
+        changed_second(resolution=replace(second.resolution, outcome="changed")),
+        changed_second(resolution=replace(second.resolution, feedback={"fox": "changed", "hunter": "changed"})),
+    )
+    calls_before = sum(getattr(actor, "mediation_calls", 0) for actor in TWO_STEP_DECLARATION.actors.values())
+    for mutated in mutations:
+        with pytest.raises(CompositionError):
+            replay_timeline(TWO_STEP_DECLARATION, cast(Any, mutated))
+    assert sum(getattr(actor, "mediation_calls", 0) for actor in TWO_STEP_DECLARATION.actors.values()) == calls_before

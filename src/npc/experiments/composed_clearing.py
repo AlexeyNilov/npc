@@ -31,20 +31,40 @@ class ClearingActor:
     proposal_vocabulary: tuple[str, ...]
     cognition: str
     proposal: str
+    initial_context: str = ""
+    later_proposal: str | None = None
     mediation_calls: int = 0
+    events: list[str] | None = None
 
     async def mediate(self, shown_input: str) -> ActorRun:
         self.mediation_calls += 1
+        if self.events is not None:
+            self.events.append(f"mediate:{self.actor}")
         proposal = self.proposal
         if self.actor == "hunter" and "not ready" in shown_input:
             proposal = "wait"
         return ActorRun(self.cognition, proposal)
+
+    async def mediate_with_context(self, shown_input: str, retained_context: str) -> ActorRun:
+        self.mediation_calls += 1
+        if self.events is not None:
+            self.events.append(f"mediate:{self.actor}")
+        proposal = self.proposal if retained_context == self.initial_context else self.later_proposal or self.proposal
+        if self.actor == "hunter" and "not ready" in shown_input:
+            proposal = "wait"
+        return ActorRun(self.cognition, proposal)
+
+    def reduce_context(self, previous_context: str, feedback: str) -> str:
+        if self.events is not None:
+            self.events.append(f"reduce:{self.actor}")
+        return f"{self.actor}:{feedback}"
 
 
 @dataclass(frozen=True)
 class ClearingRules:
     name: str
     resolution_order: tuple[Actor, Actor]
+    events: list[str] | None = None
 
     @property
     def accepted_proposals(self) -> Mapping[str, tuple[str, ...]]:
@@ -52,6 +72,8 @@ class ClearingRules:
 
     def observe(self, actor: str, canonical_state: CanonicalState) -> str:
         _validate_source_state(canonical_state)
+        if self.events is not None:
+            self.events.append(f"observe:{actor}")
         if actor == "fox":
             return "You are at the edge of a clearing. You smell food in the clearing. The clearing appears quiet."
         if actor == "hunter":
@@ -102,7 +124,6 @@ def _validate_source_state(state: CanonicalState) -> None:
         or not state.hunter_concealed
         or not state.fox_tracks_lead_to_food
         or not state.food_available
-        or state.trap_set
         or state.fox_caught
         or state.food_consumed
     ):
@@ -130,6 +151,24 @@ BASELINE_HUNTER = ClearingActor(
     "Fresh tracks suggest the fox may approach and my materials are ready.",
     "set_trap",
 )
+TWO_STEP_FOX = ClearingActor(
+    "two-step-fox",
+    "fox",
+    ("approach_food", "wait"),
+    "The clearing seems quiet and the food seems reachable.",
+    "wait",
+    "fox:initial",
+    "approach_food",
+)
+TWO_STEP_HUNTER = ClearingActor(
+    "two-step-hunter",
+    "hunter",
+    ("set_trap", "wait"),
+    "Fresh tracks suggest the fox may approach and my materials are ready.",
+    "set_trap",
+    "hunter:initial",
+    "wait",
+)
 INVALID_FOX = ClearingActor(
     "invalid-fox",
     "fox",
@@ -156,5 +195,12 @@ INVALID_FOX_PAIRING_DECLARATION = CompositionDeclaration(
     HUNTER_FIRST_RULES,
     {"fox": INVALID_FOX, "hunter": BASELINE_HUNTER},
     {"fox": ("approach_food", "wait", "set_trap"), "hunter": ("set_trap", "wait")},
+    CanonicalState(),
+)
+TWO_STEP_DECLARATION = CompositionDeclaration(
+    "two-step-clearing",
+    HUNTER_FIRST_RULES,
+    {"fox": TWO_STEP_FOX, "hunter": TWO_STEP_HUNTER},
+    PAIRINGS,
     CanonicalState(),
 )
