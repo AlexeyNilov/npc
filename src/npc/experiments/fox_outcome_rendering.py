@@ -17,9 +17,10 @@ RenderValidation = Literal["accepted", "unusable_response", "narrator_exception"
 CompletedFoxTurn = TurnTrace | UtilityTurnTrace
 FALLBACK_TEXT = "The fox's response cannot be rendered."
 MAX_NARRATION_CHARACTERS = 280
+NARRATION_HUNGER_THRESHOLD = 50
 NARRATOR_INSTRUCTION = (
     "Narration is non-authoritative presentation only. Best-effort narrate only the completed fox action. "
-    "When the prompt supplies authoritative hunger, you may use it as expressive prose context for the fox's food-seeking, "
+    "When the prompt supplies authoritative hunger, you must use it as expressive prose context for the fox's food-seeking, "
     "but this interpretation is not authoritative. "
     "Do not make claims unsupported by the completed action or supplied hunger, including dialogue, unseen events, "
     "locations, or world state. "
@@ -38,7 +39,11 @@ class RenderingTrace:
 
 
 async def render_completed_turn(canonical_turn: CompletedFoxTurn, renderer: Renderer) -> RenderingTrace:
-    resulting_hunger = canonical_turn.resulting_hunger if isinstance(canonical_turn, UtilityTurnTrace) else None
+    resulting_hunger = (
+        canonical_turn.resulting_hunger
+        if isinstance(canonical_turn, UtilityTurnTrace) and canonical_turn.resulting_hunger > NARRATION_HUNGER_THRESHOLD
+        else None
+    )
     prompt = _render_prompt(canonical_turn.executed_action, resulting_hunger)
     preserved_turn = replace(canonical_turn)
     try:

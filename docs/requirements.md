@@ -42,11 +42,12 @@ This document owns observable system behavior.
 - **When** a completed action is `flee`, `approach`, or `do_nothing`, **the
   system shall** call the selected narrator exactly once after completion. The
   configured narrator shall receive an action-derived prompt; for a completed
-  fox utility turn, it may also receive the resulting authoritative hunger as
-  an exact `0` through `100` numeric presentation fact. Its fixed instruction
-  may permit an expressive, non-authoritative food-seeking interpretation of
-  that hunger while otherwise best-effort narrating only the completed action.
-  Narration shall not select an action or change world state.
+  fox utility turn whose resulting hunger is greater than `50`, it shall also
+  receive that exact `0` through `100` numeric presentation fact. Its fixed
+  instruction shall require an expressive, non-authoritative food-seeking
+  interpretation of supplied hunger while otherwise best-effort narrating only
+  the completed action. Narration shall not select an action or change world
+  state.
 - **When** a narrator returns nonblank text of at most 280 Unicode characters,
   **the system shall** use that arbitrary text as non-authoritative narration.
   Blank, oversized, unavailable, or exceptional responses shall return

@@ -71,6 +71,17 @@ def test_utility_turn_narration_receives_only_action_and_resulting_hunger() -> N
     )
 
 
+def test_utility_turn_with_hunger_at_or_below_50_does_not_supply_hunger_to_narration() -> None:
+    async def completion(_: str, __: str) -> str:
+        return '{"threat": false, "certainty": 0.8, "evidence": null}'
+
+    canonical = asyncio.run(run_utility_turn("Fox, hello.", 10, 20, completion))
+    trace = asyncio.run(render_completed_turn(canonical, _renderer("The fox watches.")))
+
+    assert canonical.resulting_hunger == 30
+    assert "hunger" not in trace.prompt
+
+
 def test_nonblank_freeform_completed_actions_render_as_returned() -> None:
     flee = asyncio.run(run_turn("Fox, I will hurt you.", 10, _completion(threat_candidate())))
     do_nothing = asyncio.run(run_turn("Fox, hello.", 10, _completion('{"threat": false, "certainty": 0.4, "evidence": null}')))

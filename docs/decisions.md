@@ -113,9 +113,10 @@ The player wants the configured narrator to use hunger as expressive context.
 
 **Decision:** For a completed utility turn only, the narrator receives the
 resulting authoritative hunger as an exact `0` through `100` value in addition
-to the completed action. It may interpret that hunger as expressive
-food-seeking prose. The CLI's hunger display remains authoritative, while
-narration remains non-authoritative and cannot affect any later turn.
+to the completed action only when that value is greater than `50`. It must
+interpret supplied hunger as expressive food-seeking prose. The CLI's hunger
+display remains authoritative, while narration remains non-authoritative and
+cannot affect any later turn.
 
 **Consequences:** The narration prompt intentionally carries one additional
 canonical fact and permits flavor that may overstate or misdescribe an internal

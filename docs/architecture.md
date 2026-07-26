@@ -66,7 +66,8 @@ not introduce a generic actor, movement, state, or world abstraction.
 around an already completed fox turn trace. It copies that frozen turn by value
 before rendering. Its one-argument narrator receives a prompt derived from
 `executed_action`; a utility turn also supplies its resulting authoritative
-hunger as an exact numeric presentation fact. It is called once after
+hunger as an exact numeric presentation fact only when it is greater than `50`.
+It is called once after
 completion and cannot receive raw player text, perception candidate, certainty,
 distance, or mutable state.
 
@@ -74,7 +75,7 @@ The default command uses an injectable fixture narrator. With
 `--configured-narrator`, the module's fox-local adapter makes one
 `complete_text` call using the action prompt and a fixed instruction that its
 response is best-effort, non-authoritative presentation of only the completed
-action. When the prompt includes resulting utility hunger, the narrator may
+action. When the prompt includes resulting utility hunger, the narrator must
 use it as expressive prose context for food-seeking, but that interpretation is
 non-authoritative. The guidance also directs the narrator to avoid unsupported
 dialogue, unseen events,
