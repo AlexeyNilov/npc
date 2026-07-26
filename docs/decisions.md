@@ -316,3 +316,50 @@ behavioral tests. Actor cognition remains separate from authoritative
 resolution: a valid proposal is not itself an allocation, and an invalid one
 fails closed. This intentionally tests one fixed allocation policy; it does
 not establish a generic fairness, eligibility, or village-governance model.
+
+### 2026-07-26: Prioritize builder-controlled composition
+
+**Status:** Accepted
+
+**Context:** The completed causal-closure, shared-world, and contrasting
+village-rationing outcomes provide bounded evidence for the actor/simulation-core
+authority and semantic boundaries. Their implementations remain fixed,
+scenario-local scaffolding. They do not establish that a simulation builder can
+independently supply compatible simulation and actor descriptions to a reusable
+execution boundary, nor do they establish persistent execution or branching.
+
+The next strategic capability could be an internal temporal runtime,
+counterfactual branching over a fixed scenario, further disposable domain
+experiments, or a builder-controlled composition boundary.
+
+**Decision:** Prioritize builder-controlled composition. Treat the next product
+seam as a semantic protocol among the builder-supplied simulation, the
+builder-supplied actors, and the engine that orchestrates and enforces their
+exchange. The simulation owns accessible-state derivation, admissible
+proposals, authoritative resolution, canonical transitions, and feedback.
+Actors own their descriptions, subjective cognition, the bounded proposals they
+can form, and proposal selection. For the minimum composition test, the builder
+explicitly pairs an actor-declared proposal vocabulary with
+simulation-declared accepted proposals; this does not select a universal
+proposal representation.
+
+After that boundary is evidenced through one causally complete builder outcome,
+extend composed scenarios through stateful shared-world execution and then
+causal branching, as maintained in [Strategy](strategy.md#strategic-horizons).
+
+**Alternatives considered:**
+
+- Generalize temporal execution first. This could lock in time, state, and
+  conflict semantics before a builder-facing outcome establishes their needs.
+- Add branching to a fixed scenario first. This would test branch mechanics
+  without establishing independent composition.
+- Continue with disposable cross-domain slices. Another slice changes strategy
+  only if composition exposes a material failure in the semantic or authority
+  boundary.
+
+**Consequences:** The Product Manager must define and order the smallest
+builder-visible composition outcome in the [roadmap](roadmap.md). The Technical
+Lead may choose the minimum interface and runtime mechanics only after that
+outcome defines their required behavior. This decision does not select an API,
+schema, transport, event model, authoring syntax, scenario domain, or general
+runtime architecture.

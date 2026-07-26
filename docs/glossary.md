@@ -140,8 +140,8 @@ boundary](architecture.md#fox-language-mediated-causal-turn).
   core in which the actor receives an actor-accessible substate, forms a
   subjective percept, uses its owned questions for sensemaking, and proposes an
   action; the simulation core resolves and commits its outcome, and the
-  resulting reality becomes feedback with a replayable causal trace. It is the
-  first strategic horizon, not a current implementation claim.
+  resulting reality becomes feedback with a replayable causal trace. Bounded
+  implementations do not establish a reusable engine capability.
 
 ## Perception and validation
 
