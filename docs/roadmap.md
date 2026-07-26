@@ -13,15 +13,15 @@ simulations and heterogeneous actors with flexible behaviour, while retaining
 causal inspection, replay, and eventual branching. The canonical target and
 value are in the [Vision](../README.md#vision).
 
-**Current roadmap focus:** make the independent actor-description seam explicit
-before composing multiple actors. The completed fox causal-closure slice
-established the smallest language-mediated boundary between an actor and the
-authoritative simulation core: simulation-filtered observation, actor-owned
+**Current roadmap focus:** compose a shared authoritative world from the
+completed causal-closure slice and its now-explicit actor-description seam.
+The fox slice established simulation-filtered observation, actor-owned
 epistemic profile and questions, one recorded subjective percept with separate
 answers and evidence, bounded proposal, authoritative resolution, feedback,
-and replayable causal trace. The next outcome identifies which of those
-elements belong to an independently described actor rather than to the fox
-scenario or simulation core.
+and replayable causal trace. The actor-description outcome then separated
+those actor-owned inputs from the fox scenario and simulation core. The next
+outcome tests whether those boundaries remain clear when distinct actors affect
+one shared canonical reality.
 
 The current fox [architecture](architecture.md) and completed
 [utility evidence](evidence/2026-07-26-fox-deterministic-utility.md) remain
@@ -30,10 +30,10 @@ are owned by [Strategy](strategy.md).
 
 ## Ordered future outcomes
 
-### 2. Compose a shared authoritative world for heterogeneous actors
+### 1. Compose a shared authoritative world for heterogeneous actors
 
-**Strategic horizon:** 2 — shared-world composition. **Depends on:** outcome
-1.
+**Strategic horizon:** 2 — shared-world composition. **Depends on:** the
+completed causal-closure and actor-description outcomes.
 
 **Plain-language goal:** Let different actors act in the same world while
 keeping their knowledge, beliefs, and decisions separate. The simulation acts
@@ -73,10 +73,10 @@ world and should be tested across a materially different scale or schema, or
 whether observed composition pressure calls for a strategy decision about the
 core contracts.
 
-### 3. Test cross-scale portability of the semantic and causal contracts
+### 2. Test cross-scale portability of the semantic and causal contracts
 
 **Strategic horizon:** 3 — cross-scale portability. **Depends on:** outcome
-2.
+1.
 
 **Plain-language goal:** Check that the same actor/world approach works for a
 meaningfully different kind of simulation—not just a larger fox scenario.
