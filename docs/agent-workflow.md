@@ -38,6 +38,9 @@ helper, public boundary, cross-module change, or unresolved design choice.
 Before a packet enters delivery, the Technical Lead confirms:
 
 - one observable outcome, write scope, verification, and stop condition;
+- a concept-provenance audit when the work adds or changes domain information,
+  with every new semantic element traced to an accepted source or a named
+  blocking decision;
 - the relevant canonical context and any durable-information impact;
 - an experiment record and decision unlocked, if this is an experiment;
 - a second scenario or a scaffolding label, if the work claims reuse; and

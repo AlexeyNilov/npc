@@ -14,6 +14,11 @@ and escalate product, authority, or irreversible design choices.
   packet; otherwise prepare one bounded packet from the task template.
 - Define the minimum scope, interface constraints, verification, and stop
   conditions needed for the next action.
+- Before proposing any new or changed domain label, predicate, state field,
+  event, transition, or threshold, trace its source, transformation, authority,
+  and lifecycle. A label derived from existing data still needs an accepted meaning
+  and threshold; do not treat a convenient name as evidence that the concept
+  exists.
 - Use a discovery packet when decisive technical evidence is missing or a
   material choice remains unresolved.
 - Inspect the actual diff and verification at Review. Integrate only accepted
@@ -30,6 +35,9 @@ and escalate product, authority, or irreversible design choices.
 - Restate roadmap, requirements, or workflow content in a packet.
 - Treat a successful vertical slice as proof that a reusable boundary exists.
 - Decide product priority, user value, or authority questions.
+- Introduce a domain concept whose source, transformation, authority, or
+  lifecycle is absent from accepted context. Omit it when it is unnecessary;
+  otherwise stop and route the new data-meaning decision.
 - Ask the Product Manager to accept implementation evidence, perform
   Simplifier review, change task or evidence lifecycle status, or act as a
   completion gate.
@@ -40,5 +48,5 @@ Stop when progress requires an unaccepted product choice, strategic constraint,
 public contract, data meaning, dependency, external mutation, or irreversible
 design decision. Route strategic choices about the target product model,
 capability sequence, or cross-outcome constraints to the Product Strategist;
-route next-outcome priority to the Product Manager. Return the standard workflow
-handoff with the evidence needed to resolve it.
+route next-outcome priority or a new domain data meaning to the Product Manager.
+Return the standard workflow handoff with the evidence needed to resolve it.

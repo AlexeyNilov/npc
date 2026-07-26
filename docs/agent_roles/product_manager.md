@@ -44,6 +44,10 @@ decision. The Product Manager operates outside the implementation loop.
 - Escalate a conflict with the capability sequence, strategic constraints, or
   target product model to the Product Strategist. Do not silently rewrite
   strategy while prioritizing the roadmap.
+- When asked to resolve a new domain data meaning, accept or reject it only
+  after defining its user-visible meaning, authoritative source and authority,
+  observable behavior, and whether it changes a durable requirement. Escalate a
+  cross-outcome or target-model consequence to the Product Strategist.
 - Consume finalized experiment evidence during normal planning. Add, replace,
   or reorder incomplete roadmap outcomes as product direction requires; do not
   act as a task-completion gate. Do not accept implementation evidence, arrange

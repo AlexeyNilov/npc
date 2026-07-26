@@ -24,6 +24,21 @@
 
 State one observable result and why it matters.
 
+## Concept provenance
+
+Required when the task adds or changes a domain label, predicate, state field,
+event, transition, threshold, or other semantic information. Otherwise state
+`Not applicable`.
+
+| Concept | Source | Accepted transformation or meaning | Authority | Lifecycle | Decision if new |
+| --- | --- | --- | --- | --- | --- |
+| | | | | | |
+
+Every concept must trace to accepted canonical context. A convenient label does
+not establish a new fact: if its source, transformation, authority, or lifecycle
+is missing, omit it or mark the packet Blocked and route the data-meaning
+decision to the Product Manager.
+
 ## Experiment evidence
 
 Required only for a bounded experiment.
