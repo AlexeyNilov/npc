@@ -22,5 +22,3 @@ scope has no dialogue, inferred world facts, open-ended memory, certainty
 authority, model-selected state transitions, registry, or actor framework.
 
 ## Ordered future outcomes
-
-Create a fox game + add fox approach logic

@@ -27,19 +27,25 @@ This document owns observable system behavior.
 
 - **When** a developer runs the checked-in fox distance-feedback corpus, **the
   system shall** print one JSON-safe trace per turn containing the player
-  message, starting distance, hearing result, sensor-call status, raw/parsed/
-  validated candidate fields when called, deterministic choice, executed
-  action, resulting distance, and feedback distance.
-- **When** a turn starts at distance `<= 10`, **the system shall** call the
-  existing threat sensor exactly once; only an accepted grounded `threat: true`
-  shall select and execute `flee`, which increases distance by `5`.
-- **When** a turn starts at distance `> 10`, **the system shall** skip the
-  threat sensor, retain null candidate-related fields, execute `do_nothing`,
-  and preserve distance. The resulting distance shall be the next turn's
+  message, starting distance, hearing result, separate threat and food-offer
+  sensor-call statuses, their raw/parsed/validated candidate fields when
+  called, deterministic choice, executed action, resulting distance, and
   feedback distance.
-- **When** an audible candidate is malformed, has invalid certainty, has empty
-  true evidence, or has true evidence absent from the player message, **the
-  system shall** execute `do_nothing` and preserve distance.
+- **When** a turn starts at distance `<= 10`, **the system shall** call the
+  existing threat and food-offer sensors exactly once each. An accepted
+  grounded `threat: true` shall select and execute `flee`, which increases
+  distance by `5`; otherwise an accepted grounded `food_offer: true` shall
+  select and execute `approach`, which decreases distance by `3` but never
+  below `1`.
+- **When** a turn starts at distance `> 10`, **the system shall** skip the
+  sensors, retain null candidate-related fields, execute `do_nothing`, and
+  preserve distance. The resulting distance shall be the next turn's feedback
+  distance.
+- **When** either audible candidate is malformed, has invalid certainty, has
+  empty true evidence, or has true evidence absent from the player message,
+  **the system shall** reject that perception and it shall not cause its action.
+  A rejected threat shall not suppress an accepted food offer; when both
+  perceptions are accepted, `flee` has priority over `approach`.
 
 ### Non-authoritative rendering of completed fox outcomes
 
@@ -49,7 +55,7 @@ This document owns observable system behavior.
   unmodified canonical turn, narration prompt, raw narrator response or null,
   validation/failure status, rendered text, and an explicit
   non-authoritative marker.
-- **When** a completed action is `flee` or `do_nothing`, **the system shall**
+- **When** a completed action is `flee`, `approach`, or `do_nothing`, **the system shall**
   call the selected narrator exactly once after completion. The configured
   narrator shall receive only an action-derived prompt and a fixed instruction
   that its response is presentation, not action selection or world state.

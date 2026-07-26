@@ -20,7 +20,7 @@ def test_chat_turn_runs_the_fox_pipeline_then_renders_non_authoritative_outcome(
 
     trace = asyncio.run(chat_turn("Fox, I will hurt you.", 10, complete, narrate))
 
-    assert len(sensor_calls) == 1
+    assert len(sensor_calls) == 2
     assert trace.canonical_turn.executed_action == "flee"
     assert trace.canonical_turn.feedback_distance == 15
     assert narrator_prompts == [trace.prompt]
@@ -61,3 +61,18 @@ def test_chat_prints_authoritative_feedback_distance_after_each_turn(
     output = capsys.readouterr().out
     assert "Fox: The fox disappears into the trees." in output
     assert "Distance: 15" in output
+
+
+def test_chat_turn_carries_authoritative_approach_distance() -> None:
+    async def complete(_: str, prompt: str) -> str:
+        if "hostile threat" in prompt:
+            return '{"threat": false, "certainty": 0.8, "evidence": null}'
+        return '{"food_offer": true, "certainty": 0.8, "evidence": "I offer you this fresh meat"}'
+
+    async def narrate(_: str) -> str:
+        return "The fox edges nearer."
+
+    trace = asyncio.run(chat_turn("Fox, I offer you this fresh meat.", 10, complete, narrate))
+
+    assert trace.canonical_turn.executed_action == "approach"
+    assert trace.canonical_turn.feedback_distance == 7

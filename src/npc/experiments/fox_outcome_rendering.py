@@ -96,10 +96,10 @@ async def _fixture_canonical_turn(case: Mapping[str, object]) -> TurnTrace:
 
 
 def _fixture_turn_completion(case: Mapping[str, object]) -> Callable[[str, str], Awaitable[str]]:
-    async def complete(_: str, __: str) -> str:
-        completion = case.get("completion")
+    async def complete(_: str, prompt: str) -> str:
+        completion = case.get("threat_completion") if "hostile threat" in prompt else case.get("food_offer_completion")
         if completion is None:
-            raise AssertionError("fixture supplied a completion for an uncalled threat sensor")
+            raise AssertionError("fixture supplied a completion for an uncalled sensor")
         return cast(str, completion)
 
     return complete

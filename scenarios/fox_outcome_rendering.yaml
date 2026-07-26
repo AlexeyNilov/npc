@@ -2,35 +2,48 @@ cases:
   - id: freeform-in-range-flee
     player_message: "Fox, I will hurt you."
     starting_distance: 10
-    completion: '{"threat": true, "certainty": 0.8, "evidence": "I will hurt you"}'
+    threat_completion: '{"threat": true, "certainty": 0.8, "evidence": "I will hurt you"}'
+    food_offer_completion: '{"food_offer": false, "certainty": 0.8, "evidence": null}'
     renderer_output: "The fox bolts into the trees."
     expected_action: flee
     expected_resulting_distance: 15
   - id: freeform-in-range-do-nothing
     player_message: "Fox, hello."
     starting_distance: 10
-    completion: '{"threat": false, "certainty": 0.4, "evidence": null}'
+    threat_completion: '{"threat": false, "certainty": 0.4, "evidence": null}'
+    food_offer_completion: '{"food_offer": false, "certainty": 0.4, "evidence": null}'
     renderer_output: "The fox pauses, then stays put."
     expected_action: do_nothing
     expected_resulting_distance: 10
+  - id: freeform-in-range-approach
+    player_message: "Fox, I offer you this fresh meat."
+    starting_distance: 10
+    threat_completion: '{"threat": false, "certainty": 0.4, "evidence": null}'
+    food_offer_completion: '{"food_offer": true, "certainty": 0.4, "evidence": "I offer you this fresh meat"}'
+    renderer_output: "The fox pads closer, tempted by the meat."
+    expected_action: approach
+    expected_resulting_distance: 7
   - id: blank-narration
     player_message: "Fox, hello."
     starting_distance: 10
-    completion: '{"threat": false, "certainty": 0.4, "evidence": null}'
+    threat_completion: '{"threat": false, "certainty": 0.4, "evidence": null}'
+    food_offer_completion: '{"food_offer": false, "certainty": 0.4, "evidence": null}'
     renderer_output: ""
     expected_action: do_nothing
     expected_resulting_distance: 10
   - id: oversized-narration
     player_message: "Fox, hello."
     starting_distance: 10
-    completion: '{"threat": false, "certainty": 0.4, "evidence": null}'
+    threat_completion: '{"threat": false, "certainty": 0.4, "evidence": null}'
+    food_offer_completion: '{"food_offer": false, "certainty": 0.4, "evidence": null}'
     renderer_output: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     expected_action: do_nothing
     expected_resulting_distance: 10
   - id: narrator-failure
     player_message: "Fox, hello."
     starting_distance: 10
-    completion: '{"threat": false, "certainty": 0.4, "evidence": null}'
+    threat_completion: '{"threat": false, "certainty": 0.4, "evidence": null}'
+    food_offer_completion: '{"food_offer": false, "certainty": 0.4, "evidence": null}'
     renderer_failure: true
     expected_action: do_nothing
     expected_resulting_distance: 10

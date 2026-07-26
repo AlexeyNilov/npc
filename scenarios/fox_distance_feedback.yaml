@@ -1,26 +1,48 @@
 cases:
-  - id: direct-threat-feedback
+  - id: threat-feedback
     initial_distance: 10
     turns:
       - player_message: "Fox, I will hurt you."
-        completion: '{"threat": true, "certainty": 0.8, "evidence": "I will hurt you"}'
+        threat_completion: '{"threat": true, "certainty": 0.8, "evidence": "I will hurt you"}'
+        food_offer_completion: '{"food_offer": false, "certainty": 0.8, "evidence": null}'
         expected_action: flee
         expected_resulting_distance: 15
       - player_message: "Fox, I will hurt you."
-        completion: null
+        threat_completion: null
+        food_offer_completion: null
         expected_action: do_nothing
         expected_resulting_distance: 15
-  - id: rejected-true-candidate
+  - id: offer-feedback
+    initial_distance: 10
+    turns:
+      - player_message: "Fox, I offer you this fresh meat."
+        threat_completion: '{"threat": false, "certainty": 0.8, "evidence": null}'
+        food_offer_completion: '{"food_offer": true, "certainty": 0.8, "evidence": "I offer you this fresh meat"}'
+        expected_action: approach
+        expected_resulting_distance: 7
+      - player_message: "Fox, I offer you this fresh meat."
+        threat_completion: '{"threat": false, "certainty": 0.8, "evidence": null}'
+        food_offer_completion: '{"food_offer": true, "certainty": 0.8, "evidence": "I offer you this fresh meat"}'
+        expected_action: approach
+        expected_resulting_distance: 4
+      - player_message: "Fox, I offer you this fresh meat."
+        threat_completion: '{"threat": false, "certainty": 0.8, "evidence": null}'
+        food_offer_completion: '{"food_offer": true, "certainty": 0.8, "evidence": "I offer you this fresh meat"}'
+        expected_action: approach
+        expected_resulting_distance: 1
+  - id: rejected-offer
     initial_distance: 10
     turns:
       - player_message: "Fox, I will hurt you."
-        completion: '{"threat": true, "certainty": 0.8, "evidence": "I own this forest"}'
+        threat_completion: '{"threat": false, "certainty": 0.8, "evidence": null}'
+        food_offer_completion: '{"food_offer": true, "certainty": 0.8, "evidence": ""}'
         expected_action: do_nothing
         expected_resulting_distance: 10
-  - id: out-of-range-threat
+  - id: out-of-range-offer
     initial_distance: 11
     turns:
-      - player_message: "Fox, I will hurt you."
-        completion: null
+      - player_message: "Fox, I offer you this fresh meat."
+        threat_completion: null
+        food_offer_completion: null
         expected_action: do_nothing
         expected_resulting_distance: 11

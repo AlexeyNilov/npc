@@ -44,20 +44,22 @@ dialogue, world model, registry, or shared actor framework.
 
 ## Bounded fox distance feedback
 
-`npc.experiments.fox_distance_feedback` is a fox-only experiment wrapper with
+`npc.experiments.fox_distance_feedback` is a fox-only wrapper with
 local `TurnTrace`, turn execution, and fixture helpers. Before each turn calls
-`perceive_threat`, its authoritative integer starting distance is checked
-against the fixed hearing range of `10`. An inaudible turn records no sensor
-call and null perception fields; an audible turn calls the shared detector once
-and retains its raw candidate, parsed candidate, and validation result.
+`perceive_threat` and `perceive_food_offer`, its authoritative integer starting
+distance is checked against the fixed hearing range of `10`. An inaudible turn
+records no sensor calls and null perception fields; an audible turn calls each
+shared detector once and retains its raw candidate, parsed candidate, and
+validation result independently.
 
-The wrapper reuses the existing fox `decide_action` policy: only an accepted
-grounded threat selects `flee`. Execution is local and deterministic: `flee`
-adds the fixed displacement of `5`, while `do_nothing` leaves distance
-unchanged. The resulting distance is recorded as feedback and becomes the next
+The fox-local policy gives accepted grounded threat priority: threat selects
+`flee`; otherwise accepted grounded food offer selects `approach`; otherwise it
+selects `do_nothing`. Execution is local and deterministic: `flee` adds `5`,
+`approach` subtracts `3` without going below `1`, and `do_nothing` preserves
+distance. The resulting distance is recorded as feedback and becomes the next
 turn's starting distance. `python -m npc.experiments.fox_distance_feedback`
-loads only fixture completions from `scenarios/fox_distance_feedback.yaml`; it
-does not introduce a generic actor, movement, state, or world abstraction.
+loads fixture completions from `scenarios/fox_distance_feedback.yaml`; it does
+not introduce a generic actor, movement, state, or world abstraction.
 
 ## Non-authoritative rendering of completed fox outcomes
 

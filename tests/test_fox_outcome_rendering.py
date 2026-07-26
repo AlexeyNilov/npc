@@ -53,6 +53,24 @@ def test_nonblank_freeform_completed_actions_render_as_returned() -> None:
     assert flee_trace.validation_result == non_action_trace.validation_result == "accepted"
 
 
+def test_completed_approach_renders_without_changing_distance() -> None:
+    canonical = asyncio.run(
+        run_turn(
+            "Fox, I offer you this fresh meat.",
+            10,
+            _sensor_completion(
+                '{"threat": false, "certainty": 0.4, "evidence": null}',
+                '{"food_offer": true, "certainty": 0.4, "evidence": "I offer you this fresh meat"}',
+            ),
+        )
+    )
+    trace = asyncio.run(render_completed_turn(canonical, _renderer("The fox comes closer.")))
+
+    assert trace.canonical_turn.executed_action == "approach"
+    assert trace.canonical_turn.feedback_distance == 7
+    assert trace.rendered_text == "The fox comes closer."
+
+
 def test_blank_oversized_and_failed_rendering_use_fallback_without_changing_canonical_turn() -> None:
     canonical = asyncio.run(run_turn("Fox, hello.", 10, _completion('{"threat": false, "certainty": 0.4, "evidence": null}')))
     invalid_outputs: list[Callable[[str], Awaitable[str]]] = [
@@ -99,6 +117,7 @@ def test_checked_in_fixtures_cover_completed_turns_and_rendering_failures() -> N
     assert set(cases) == {
         "freeform-in-range-flee",
         "freeform-in-range-do-nothing",
+        "freeform-in-range-approach",
         "blank-narration",
         "oversized-narration",
         "narrator-failure",
@@ -107,6 +126,7 @@ def test_checked_in_fixtures_cover_completed_turns_and_rendering_failures() -> N
 
     assert traces["freeform-in-range-flee"].rendered_text == "The fox bolts into the trees."
     assert traces["freeform-in-range-do-nothing"].rendered_text == "The fox pauses, then stays put."
+    assert traces["freeform-in-range-approach"].rendered_text == "The fox pads closer, tempted by the meat."
     assert traces["blank-narration"].rendered_text == FALLBACK_TEXT
     assert traces["oversized-narration"].rendered_text == FALLBACK_TEXT
     assert traces["narrator-failure"].raw_renderer_output is None
@@ -120,6 +140,13 @@ def test_checked_in_fixtures_cover_completed_turns_and_rendering_failures() -> N
 def _completion(response: str) -> Callable[[str, str], Awaitable[str]]:
     async def complete(_: str, __: str) -> str:
         return response
+
+    return complete
+
+
+def _sensor_completion(threat_response: str, food_offer_response: str) -> Callable[[str, str], Awaitable[str]]:
+    async def complete(_: str, prompt: str) -> str:
+        return threat_response if "hostile threat" in prompt else food_offer_response
 
     return complete
 

@@ -37,10 +37,11 @@ system structure.
 
 The first audience is the project's developer. The current demonstrations use a
 shared, bounded threat-detection capability: a territorial wolf deterministically
-attacks an accepted threat, while a fox deterministically flees one. A fixed
-two-turn fox experiment also applies authoritative distance to gate hearing,
-executes `flee` as a fixed distance change, and feeds the resulting distance
-into the next turn. A completed fox action can then be rendered once by the
+attacks an accepted threat, while a fox deterministically flees one. The fox
+also approaches an accepted explicit food offer when no accepted threat is
+present. Its authoritative distance gates hearing, executes `flee` as `+5` and
+`approach` as `-3` with a minimum distance of `1`, and feeds the resulting
+distance into the next turn. A completed fox action can then be rendered once by the
 configured LLM as arbitrary concise, non-authoritative presentation, or by a
 deterministic fallback when narration is unavailable or unusable. The LLM
 supplies only an evidence-grounded perception or bounded presentation; it
@@ -61,8 +62,8 @@ python sample/fox_chat.py
 ```
 
 Each input is an independent player turn. The existing deterministic fox
-pipeline selects and executes `flee` or `do_nothing`; the configured LLM then
-renders only that completed outcome. The loop carries only authoritative
+pipeline selects and executes `flee`, `approach`, or `do_nothing`; the
+configured LLM then renders only that completed outcome. The loop carries only authoritative
 distance into the next turn. It does not roleplay the fox or retain dialogue
 history. Type `/exit` to quit.
 
