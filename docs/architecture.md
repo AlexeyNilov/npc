@@ -16,11 +16,13 @@ answer is usable only when deterministic validation accepts its exact evidence;
 `false`, ambiguity, malformed output, ungrounded evidence, and invalid
 certainty all fail closed. Certainty is trace-only and does not change action.
 
-The current fox policy maps accepted threat to `flee`; all other threat results
-do nothing. Future perceptions should follow this pattern unless a documented
+The distance-feedback experiment maps accepted threat to `flee`; all other
+threat results do nothing. The utility experiment reuses the same validated
+perception contract as an input to deterministic utility scoring. Future
+perceptions should follow this narrow, validated pattern unless a documented
 decision and evidence justify a different contract.
 
-## Current fox actor-loop mapping
+## Current fox utility actor-loop mapping
 
 The following maps the intended actor-loop model to the current verified fox
 delivery. It identifies the current boundary rather than implying that every
@@ -28,13 +30,13 @@ stage is a general engine abstraction.
 
 | Actor-loop stage | What exists now |
 | --- | --- |
-| Reality | One player-message string and the authoritative distance from the fox. |
+| Reality | One player-message string plus the fox's authoritative distance and hunger. |
 | Perception | When the player is within hearing range, two independent LLM-proposed, evidence-grounded sensors assess threat and an explicit food offer. |
-| Sensemaking | Deterministic validation accepts or rejects each sensor result, then applies the fixed `threat_over_food_offer` priority. |
-| Intent | Not separate yet; the fixed priority policy selects the action directly. |
+| Sensemaking | Deterministic validation accepts or rejects each sensor result; rejected results contribute no utility. |
+| Intent | A fox-local deterministic policy scores `flee`, `approach`, and `do_nothing`, then applies its fixed tie order. |
 | Action | The fox deterministically selects and executes `flee`, `approach`, or `do_nothing`. |
-| Outcome | Execution produces the resulting authoritative distance. |
-| Feedback | That distance becomes the next turn's starting distance. |
+| Outcome | Execution produces the resulting authoritative distance and advances hunger under the experiment's fixed rule. |
+| Feedback | Resulting distance and hunger become the next turn's starting state. |
 
 Completed outcomes may also receive LLM narration. This is presentation only:
 it is outside the authoritative loop and cannot affect action, outcome, or

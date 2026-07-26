@@ -12,23 +12,25 @@ choices. Link to those owners rather than copying their contents.
 
 ## Current direction
 
-**Decision:** Establish whether deterministic policy can balance competing fox
-motives before testing behavioural randomness or portability to another actor.
+**Decision:** Assess whether the supported deterministic utility loop recurs
+under a contrasting fox decision before considering reuse, behavioural
+randomness, or portability to another actor.
 **Confidence:** Medium.
 
-This tests whether the existing authoritative-loop boundary remains useful when
-the actor has a genuine safety-versus-food trade-off, rather than a fixed
-threat-first priority. The accepted rationale is in
+The completed utility experiment supports the authoritative loop for a genuine
+safety-versus-food trade-off rather than only a fixed threat-first priority.
+The next assessment determines whether its candidate durable boundary recurs,
+as recorded in [the experiment evidence](evidence/2026-07-26-fox-deterministic-utility.md).
+The accepted utility rationale is in
 [Decisions](decisions.md#2026-07-26-test-deterministic-utility-selection-before-behavioural-randomness).
 
 ## Capability path
 
 | Order | Outcome | Establishes / unlocks |
 | --- | --- | --- |
-| 1 | [Deterministic fox utility experiment](roadmap.md#ordered-future-outcomes) | Whether a fox-local authoritative policy can make explainable, replayable competing-motive choices. |
-| 2 | Recurrence assessment | Which elements of the perception-to-feedback loop survive a contrasting decision. |
-| 3 | Reuse decision | Whether the recurring elements warrant a small reusable loop boundary. |
-| 4 | Portability test | Whether the evidenced boundary transfers to another decision or actor. |
+| 1 | [Recurrence assessment](roadmap.md#ordered-future-outcomes) | Which elements of the perception-to-feedback loop survive a contrasting decision. |
+| 2 | Reuse decision | Whether the recurring elements warrant a small reusable loop boundary. |
+| 3 | Portability test | Whether the evidenced boundary transfers to another decision or actor. |
 
 ## Strategic constraints
 

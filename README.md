@@ -36,22 +36,24 @@ implementation. Experiments should reveal which parts of it must become durable
 system structure.
 
 The first audience is the project's developer. The current demonstration is a
-bounded fox loop. When within hearing range, the fox receives two independent,
-evidence-grounded LLM perceptions: threat and explicit food offer. Deterministic
-validation and a fixed threat-first policy select `flee`, `approach`, or
-`do_nothing`. Authoritative distance gates hearing, executes `flee` as `+5` and
-`approach` as `-3` with a minimum distance of `1`, and feeds the resulting
-distance into the next turn. A completed fox action can then be rendered once by
+bounded fox utility loop. When within hearing range, the fox receives two
+independent, evidence-grounded LLM perceptions: threat and explicit food offer.
+Deterministic validation and a fixed utility policy select `flee`, `approach`,
+or `do_nothing` from those accepted perceptions and authoritative hunger.
+Authoritative distance gates hearing, executes `flee` as `+5` and `approach` as
+`-3` with a minimum distance of `1`, and feeds the resulting distance and
+hunger into the next turn. A completed fox action can then be rendered once by
 the configured LLM as arbitrary concise, non-authoritative presentation, or by
 a deterministic fallback when narration is unavailable or unusable. The LLM
 supplies only an evidence-grounded perception or bounded presentation; it never
-chooses an action, determines reachability, or changes distance.
+chooses an action, scores a utility, determines reachability, or changes
+authoritative state.
 
 The central learning hypothesis is that small, deterministic decision scenarios
 can reveal which model elements survive a second, contrasting decision. Both
 decisions may belong to the same actor.
-Player conversation, persistent state, and broader actor capabilities are later
-tests of that model, not the current foundation.
+Player conversation and broader actor capabilities are later tests of that
+model, not the current foundation.
 
 ## Run an interactive fox turn loop
 

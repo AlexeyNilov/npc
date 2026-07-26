@@ -31,6 +31,25 @@ This document owns observable system behavior.
   A rejected threat shall not suppress an accepted food offer; when both
   perceptions are accepted, `flee` has priority over `approach`.
 
+### Deterministic fox utility turns
+
+- **When** a caller starts a deterministic fox utility turn, **the system
+  shall** accept hunger only as a non-boolean integer from `0` through `100`.
+  For any other value, it shall raise `ValueError` before hearing or sensor
+  invocation.
+- **When** the fox hears a player message, **the system shall** derive
+  candidate utilities only from accepted threat and food-offer perceptions and
+  authoritative starting hunger: `flee` scores `60` for an accepted threat,
+  `approach` scores starting hunger for an accepted food offer, and
+  `do_nothing` scores `1`. It shall select the highest score, resolving equal
+  scores in the order `flee`, `approach`, then `do_nothing`.
+- **When** the utility turn completes, **the system shall** apply the selected
+  action's existing distance transition, increase hunger by `10` without
+  exceeding `100`, and retain the resulting distance and hunger as feedback.
+  Its trace shall retain the authoritative starting and resulting hunger,
+  accepted-perception results, candidate utilities, selected score, tie order,
+  action, and distance feedback.
+
 ### Non-authoritative rendering of completed fox outcomes
 
 - **When** a developer runs the checked-in fox outcome-rendering corpus with
