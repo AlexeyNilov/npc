@@ -102,3 +102,22 @@ selection, and state transitions explainable and replayable. It tests an
 explicit intent stage without authorizing an actor framework, generic utility
 system, or stochastic action selection. Randomness may be reconsidered only
 after this deterministic experiment yields evidence about the policy.
+
+### 2026-07-26: Permit expressive hunger interpretation in utility narration
+
+**Status:** Accepted
+
+**Context:** The utility chat displays authoritative hunger numerically, but
+the optional narration does not make that state legible as player-facing prose.
+The player wants the configured narrator to use hunger as expressive context.
+
+**Decision:** For a completed utility turn only, the narrator receives the
+resulting authoritative hunger as an exact `0` through `100` value in addition
+to the completed action. It may interpret that hunger as expressive
+food-seeking prose. The CLI's hunger display remains authoritative, while
+narration remains non-authoritative and cannot affect any later turn.
+
+**Consequences:** The narration prompt intentionally carries one additional
+canonical fact and permits flavor that may overstate or misdescribe an internal
+state. It still excludes player text, perception evidence, distance, and
+mutable state, and it does not validate the narrator's free-form wording.

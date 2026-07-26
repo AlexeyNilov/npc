@@ -63,19 +63,22 @@ not introduce a generic actor, movement, state, or world abstraction.
 ## Non-authoritative rendering of completed fox outcomes
 
 `npc.experiments.fox_outcome_rendering` is a fox-only presentation wrapper
-around an already completed `fox_distance_feedback.TurnTrace`. It copies that
-frozen turn by value before rendering. Its one-argument narrator receives a
-prompt derived only from `executed_action`; it is called once after completion
-and cannot receive raw player text, perception candidate, certainty, distance,
-or mutable state.
+around an already completed fox turn trace. It copies that frozen turn by value
+before rendering. Its one-argument narrator receives a prompt derived from
+`executed_action`; a utility turn also supplies its resulting authoritative
+hunger as an exact numeric presentation fact. It is called once after
+completion and cannot receive raw player text, perception candidate, certainty,
+distance, or mutable state.
 
 The default command uses an injectable fixture narrator. With
 `--configured-narrator`, the module's fox-local adapter makes one
 `complete_text` call using the action prompt and a fixed instruction that its
 response is best-effort, non-authoritative presentation of only the completed
-action. It directs the narrator to avoid unsupported claims such as inferred
-motive, dialogue, unseen events, locations, and world state; this guidance does
-not semantically validate the response. A nonblank response of at most 280
+action. When the prompt includes resulting utility hunger, the narrator may
+use it as expressive prose context for food-seeking, but that interpretation is
+non-authoritative. The guidance also directs the narrator to avoid unsupported
+dialogue, unseen events,
+locations, and world state; it does not semantically validate the response. A nonblank response of at most 280
 Unicode characters is retained as arbitrary player-facing narration; blank,
 oversized, or exceptional responses produce the fixed fallback. A frozen
 `RenderingTrace` retains the copied canonical turn, prompt, raw output or null,
@@ -114,4 +117,5 @@ under the `Narration (non-authoritative)` label. It carries only the canonical
 feedback distance and resulting hunger to the next iteration. The loop has no
 conversation history, fox persona, or path from narration back to the next
 action. The renderer can preserve either completed fox trace type, but still
-receives only the completed action for narration.
+receives only the completed action and, for utility turns, resulting hunger for
+narration.

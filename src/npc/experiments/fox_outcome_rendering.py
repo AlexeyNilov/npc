@@ -19,7 +19,9 @@ FALLBACK_TEXT = "The fox's response cannot be rendered."
 MAX_NARRATION_CHARACTERS = 280
 NARRATOR_INSTRUCTION = (
     "Narration is non-authoritative presentation only. Best-effort narrate only the completed fox action. "
-    "Do not make claims unsupported by that action, including inferred motive, dialogue, unseen events, "
+    "When the prompt supplies authoritative hunger, you may use it as expressive prose context for the fox's food-seeking, "
+    "but this interpretation is not authoritative. "
+    "Do not make claims unsupported by the completed action or supplied hunger, including dialogue, unseen events, "
     "locations, or world state. "
     "Do not choose an action or change world state, outcome, or feedback."
 )
@@ -36,7 +38,8 @@ class RenderingTrace:
 
 
 async def render_completed_turn(canonical_turn: CompletedFoxTurn, renderer: Renderer) -> RenderingTrace:
-    prompt = _render_prompt(canonical_turn.executed_action)
+    resulting_hunger = canonical_turn.resulting_hunger if isinstance(canonical_turn, UtilityTurnTrace) else None
+    prompt = _render_prompt(canonical_turn.executed_action, resulting_hunger)
     preserved_turn = replace(canonical_turn)
     try:
         raw_renderer_output = await renderer(prompt)
@@ -82,8 +85,9 @@ def load_corpus(path: Path) -> list[dict[str, object]]:
     return [cast(dict[str, object], case) for case in cast(list[dict[str, object]], data["cases"])]
 
 
-def _render_prompt(action: Action) -> str:
-    return f"Completed fox action: {action}. Provide concise player-facing narration."
+def _render_prompt(action: Action, resulting_hunger: int | None = None) -> str:
+    hunger = f" Authoritative fox hunger after the action: {resulting_hunger}/100." if resulting_hunger is not None else ""
+    return f"Completed fox action: {action}.{hunger} Provide concise player-facing narration."
 
 
 def _validate_response(raw_renderer_output: str) -> RenderValidation:

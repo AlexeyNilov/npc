@@ -25,6 +25,7 @@ def test_chat_turn_runs_the_fox_pipeline_then_renders_non_authoritative_outcome(
     assert trace.canonical_turn.executed_action == "flee"
     assert trace.canonical_turn.feedback_distance == 15
     assert narrator_prompts == [trace.prompt]
+    assert "hunger after the action: 60/100" in trace.prompt
     assert trace.rendered_text == "The fox slips behind the trees."
     assert trace.non_authoritative is True
 

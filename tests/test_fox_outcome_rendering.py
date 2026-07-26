@@ -8,6 +8,7 @@ from typing import cast
 from pytest import MonkeyPatch
 
 from npc.experiments import fox_outcome_rendering
+from npc.experiments.fox_deterministic_utility import run_turn as run_utility_turn
 from npc.experiments.fox_distance_feedback import run_turn
 from npc.experiments.fox_outcome_rendering import (
     FALLBACK_TEXT,
@@ -39,11 +40,35 @@ def test_configured_narrator_receives_only_completed_action_and_is_called_once(m
     assert "non-authoritative" in calls[0][1]
     assert "only the completed fox action" in calls[0][1]
     assert "unsupported" in calls[0][1]
-    for prohibited_claim in ("inferred motive", "dialogue", "unseen events", "locations", "world state"):
+    for prohibited_claim in ("dialogue", "unseen events", "locations", "world state"):
         assert prohibited_claim in calls[0][1]
+    assert "food-seeking" in calls[0][1]
     for forbidden in (canonical.player_message, "distance", "candidate", "certainty", "evidence", "heard"):
         assert forbidden not in trace.prompt
-        assert forbidden not in calls[0][1]
+    assert "hunger" not in trace.prompt
+
+
+def test_utility_turn_narration_receives_only_action_and_resulting_hunger() -> None:
+    async def completion(_: str, prompt: str) -> str:
+        if "hostile threat" in prompt:
+            return '{"threat": false, "certainty": 0.8, "evidence": null}'
+        return '{"food_offer": true, "certainty": 0.8, "evidence": "I offer you this fresh meat"}'
+
+    prompts: list[str] = []
+
+    async def narrator(prompt: str) -> str:
+        prompts.append(prompt)
+        return "The fox approaches, hunger 80/100."
+
+    canonical = asyncio.run(run_utility_turn("Fox, I offer you this fresh meat.", 10, 70, completion))
+    trace = asyncio.run(render_completed_turn(canonical, narrator))
+
+    assert trace.canonical_turn == canonical
+    assert prompts == [trace.prompt]
+    assert (
+        trace.prompt == "Completed fox action: approach. Authoritative fox hunger after the action: 80/100. "
+        "Provide concise player-facing narration."
+    )
 
 
 def test_nonblank_freeform_completed_actions_render_as_returned() -> None:

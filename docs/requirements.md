@@ -41,11 +41,12 @@ This document owns observable system behavior.
   marker.
 - **When** a completed action is `flee`, `approach`, or `do_nothing`, **the
   system shall** call the selected narrator exactly once after completion. The
-  configured narrator shall receive only an action-derived prompt and a fixed
-  instruction to best-effort narrate only the completed action as
-  non-authoritative presentation, not action selection or world state, and to
-  avoid unsupported factual claims, including inferred motive, dialogue,
-  unseen events, locations, and world state.
+  configured narrator shall receive an action-derived prompt; for a completed
+  fox utility turn, it may also receive the resulting authoritative hunger as
+  an exact `0` through `100` numeric presentation fact. Its fixed instruction
+  may permit an expressive, non-authoritative food-seeking interpretation of
+  that hunger while otherwise best-effort narrating only the completed action.
+  Narration shall not select an action or change world state.
 - **When** a narrator returns nonblank text of at most 280 Unicode characters,
   **the system shall** use that arbitrary text as non-authoritative narration.
   Blank, oversized, unavailable, or exceptional responses shall return
