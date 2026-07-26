@@ -474,7 +474,23 @@ actor mediation.
 
 Use scenario-local event selection and sequencing. Do not infer a general
 randomness, scheduling, event, persistence, or branching framework from this
-application.
+application. A developer or launcher may select the bounded turn limit at
+session start as recorded initial configuration; an observer may not select it.
+
+For this first observer delivery, retain deterministic scenario-local fox and
+hunter proposal policies, but give each actor one real-LLM, actor-local
+cognition call per turn. The model receives only that actor's filtered
+observation and retained feedback and is prompted to state a concise question
+and sensemaking. Its output is untrusted presentation/cognition, recorded with
+a visible fallback, and has no path to its proposal or canonical state. This
+preserves controlled event selection as the sole source of session variation
+while testing whether differently informed actor perspectives make the
+clearing readable.
+
+The normal observer surface also makes one real-LLM narration call after each
+completed turn. Narration is limited to the recorded causal account and has a
+structured fallback. Both actor cognition and narration are retained for
+inspection; exact replay consumes those records without another model call.
 
 This decision supersedes the player-intervention and player-agency parts of
 [Validate the engine through a small clearing game before further platform
@@ -498,5 +514,7 @@ that demonstration is not the input model for the new application.
 curiosity, anticipation, causal comprehension, meaningful consequences, and
 interest in replay or another run—not agency, choices, or strategy. The first
 delivery must record simulation-owned events and replay them exactly while
-keeping all observer controls outside canonical causality. Later outcomes
-remain gated by the observer evaluation.
+keeping all observer controls outside canonical causality. The first delivery
+uses real-LLM actor cognition and narration only outside authoritative
+proposal, event, and resolution paths; visible fallbacks cannot affect the
+recorded session. Later outcomes remain gated by the observer evaluation.

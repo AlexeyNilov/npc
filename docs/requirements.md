@@ -4,6 +4,103 @@ This document owns observable system behavior.
 
 ## Actual requirements
 
+### Autonomous observer clearing session
+
+- **When** an observer starts the supplied autonomous clearing session from its
+  normal terminal entry point, **the system shall** present the premise that a
+  fox is looking for food while a hunter may prepare a trap, then begin from a
+  canonical state in which food is unavailable, the hunter has no trap
+  materials, no trap is set, and the fox has neither reached food nor been
+  caught. A developer or launcher shall supply the session turn limit `N` at
+  start as a non-boolean integer from `1` through `10`; the system shall record
+  it by value as an authoritative initial input. For any other value, it shall
+  raise `ValueError` before event selection or actor reaction. The observer
+  shall supply no causal input.
+- **When** a nonterminal clearing turn begins, **the simulation shall** select
+  exactly one event uniformly from this scenario's event vocabulary and record
+  its ordinal and selected name before applying its effect. An event may be
+  selected more than once:
+
+  - `food_scent` makes food available, exposes a food scent to the fox, and
+    exposes fresh fox tracks to the hunter;
+  - `trap_materials_arrive` makes trap materials available and exposes their
+    arrival to the hunter, while exposing neither the materials nor their
+    arrival to the fox.
+
+  The selected event is controlled variation. Its selection policy, name,
+  ordinal, and effect are authoritative history, rather than observer input or
+  presentation data.
+- **When** the supplied actors react to an event, **the system shall** make one
+  real-LLM, actor-local cognition call for each actor using only that actor's
+  filtered observation and own retained feedback context. Its fixed prompt
+  shall require a JSON object with nonblank `question` and `sensemaking`
+  strings based only on those supplied facts. The returned cognition is untrusted,
+  non-authoritative, and shall not select or alter a proposal, state,
+  resolution, event, or feedback. The system shall retain the prompt, raw
+  response or null, validation status, and accepted cognition or fixed
+  actor-local fallback in the causal record. Blank, malformed, unavailable, or
+  exceptional output shall use that fallback without preventing the turn.
+  The system shall then use deterministic scenario-local policies. The fox shall propose
+  `approach_food` when its observation contains a food scent and otherwise
+  `wait`. The hunter shall propose `set_trap` when its observation says trap
+  materials are available and no trap is set, and otherwise `wait`. No model,
+  network service, or observer message shall select or alter either proposal.
+- **When** an actor is asked to react, **the system shall** provide only that
+  actor's filtered observation and its own retained feedback context. The fox
+  may receive its food-scent observation and its own previous feedback, but
+  shall not receive trap-material availability, trap state, the hunter's
+  observation, proposal, feedback, or the selected event name. The hunter may
+  receive trap-material availability, fresh-track observation, trap state, and
+  its own previous feedback, but shall not receive food availability, the
+  fox's observation, proposal, or feedback, or the selected event name.
+- **When** the simulation resolves reactions, **the system shall** resolve the
+  hunter before the fox. A valid `set_trap` sets a trap only when materials are
+  available and no trap is already set; otherwise it is rejected without a
+  canonical transition. A valid `approach_food` ends the session with
+  `caught` when a trap is set, and otherwise ends it with `fed` when food is
+  available. `wait` makes no canonical transition. Only this simulation
+  resolution may commit canonical state or select actor feedback.
+- **When** the session has not ended through `caught` or `fed`, **the system
+  shall** run the next turn until it has resolved `N` turns. It shall then end
+  as `clearing_quiet`. Thus a run whose first selected event is `food_scent`
+  ends `fed` on its first turn; after `trap_materials_arrive` enables the
+  hunter to set a trap, any later `food_scent` ends `caught`; and a run with no
+  `food_scent` in its `N` recorded events ends `clearing_quiet`. No event is
+  selected after an ending.
+- **When** a turn completes, **the system shall** append a JSON-safe,
+  by-value causal record in this order: selected event and ordinal, event
+  effect, each actor's filtered observation and retained context, its LLM
+  cognition record, each deterministic policy result and proposal, resolution
+  and feedback, resulting canonical state, and, where applicable, ending. The
+  normal terminal surface shall make one real-LLM observer-narration call after
+  each completed turn using only the completed causal record. Narration is
+  untrusted, non-authoritative presentation; the surface shall present it as a
+  concise current-turn account and allow an observer to inspect a readable
+  account that distinguishes the recorded causal stages.
+- **When** an observer pauses a session, inspects its history, resumes it,
+  replays it, or starts a fresh run, **the system shall** treat the control as
+  noncausal. Pause shall occur between completed turns; inspection shall not
+  modify history; resume shall execute only the next pending turn; exact replay
+  shall consume the recorded event history without random selection, actor
+  mediation, or model call; and a fresh run shall start a new history from the specified
+  initial state and may select a different event sequence. The normal terminal
+  surface shall make start, pause, causal inspection, exact replay, and fresh
+  run available without source edits or observer-supplied causal choices.
+- **When** replay receives a history whose event name, ordinal, event effect,
+  observation, proposal, resolution, feedback, resulting state, ending, or
+  initial `N` is changed, missing, or reordered, **the system shall** reject
+  it rather than choose a replacement event, mediate an actor again, or
+  continue from an altered state.
+- **When** actor cognition is unavailable, malformed, blank, or exceptional,
+  **the system shall** retain and display a fixed, readable actor-local
+  fallback. The fallback shall not prevent the deterministic policy from
+  proposing its action or alter canonical state, event selection, actor policy,
+  or replay. **When** observer prose rendering is unavailable, malformed,
+  blank, or exceptional, **the system shall** display a fixed, readable
+  structured fallback composed only from the already-recorded event, proposals,
+  resolution, state, and ending. It shall not alter canonical state, event
+  selection, actor policy, or replay.
+
 ### Builder-controlled clearing composition
 
 - **When** a builder supplies a readable declaration naming one simulation
