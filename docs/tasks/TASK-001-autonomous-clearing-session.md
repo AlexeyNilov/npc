@@ -1,6 +1,6 @@
 # TASK-001: Run, inspect, and replay one autonomous clearing session
 
-**Status:** In progress
+**Status:** Review
 
 **Owner:** autonomous_clearing
 
@@ -153,24 +153,23 @@ a reusable system boundary.
 
 ## Handoff
 
-**Status and outcome:** In progress; the accepted terminal interaction changed
-from observer-driven turn stepping to automatic session progression with
-visible retained LLM exchanges.
+**Status and outcome:** Review; the terminal now runs each launched session to
+its ending without observer input, prints retained causal and LLM-exchange
+facts for every completed turn, and exposes only post-ending noncausal controls.
 
 **Changed files and ownership impact:** Added the scenario runtime, terminal
 launcher, and behavioral tests; README owns the observer entry point and
 Architecture owns the verified scenario boundary. Requirements and Decisions
 remain user-owned context.
 
-**Verification:** Review revisions: `.venv/bin/pytest
-tests/test_autonomous_clearing.py` (10 passed); `make check` (59 passed); `git
-diff --check` passed. Focused tests cover causal ordering, final-turn narration
-facts, replay isolation, required authority mutations, all required fallback
-categories, exact replay of a three-turn `clearing_quiet` session, readable
-retained-record inspection, a nonterminal pause, and clean fresh-run history.
+**Verification:** `.venv/bin/pytest tests/test_autonomous_clearing.py` (11
+passed); `make check` (60 passed); `git diff --check` passed. Focused tests
+cover automatic no-input launch, retained prompt/raw-output visibility,
+unavailable markers, inspection/replay isolation from LLM calls, automatic
+fresh runs, causal ordering, replay authority validation, and fallbacks.
 
-**Assumptions, risks, and next action:** The configured LLM adapter uses the
-existing local `complete_text` client; unavailable or invalid output visibly
-falls back without changing authority. Revise the terminal surface and its
-behavioral tests for automatic progression and visible retained exchanges, then
-return to Simplifier review.
+**Assumptions, risks, and next action:** The configured LLM adapter still uses
+the existing local `complete_text` client; no arbitrary timeout threshold was
+introduced after the reported live-path stall, because such a threshold would
+be a new contract choice. Unavailable or invalid output visibly falls back
+without changing authority. Request the required Simplifier review.

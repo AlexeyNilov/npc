@@ -86,10 +86,11 @@ limit:
 python sample/autonomous_clearing.py --turn-limit 3
 ```
 
-Use `start`, `pause`, `inspect`, `resume`, `replay`, `fresh`, or `exit` at the
-terminal prompt. These controls do not select simulation events or actor
-actions. The session records each selected event and its causal effects, then
-replays that retained history without selecting events or calling a model.
+The session runs automatically to its ending, printing each causal account and
+its retained LLM exchanges. Afterwards use `inspect`, `replay`, `fresh`, or
+`exit`. These controls do not select simulation events or actor actions. The
+session records each selected event and its causal effects, then replays that
+retained history without selecting events or calling a model.
 
 ## Project documentation
 

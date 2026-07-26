@@ -366,6 +366,37 @@ def format_causal_account(turns: Sequence[TurnRecord]) -> str:
     return "\n\n".join(accounts)
 
 
+def _raw_response(raw_output: str | None) -> str:
+    return raw_output if raw_output is not None else "[unavailable]"
+
+
+def format_turn_presentation(turn: TurnRecord) -> str:
+    """Print the completed causal account with its retained, non-authoritative exchanges."""
+    exchanges = []
+    for actor in ("fox", "hunter"):
+        cognition = turn.actors[actor].cognition
+        exchanges.append(
+            f"{actor.title()} cognition prompt: {cognition.prompt}\nRaw LLM response: {_raw_response(cognition.raw_output)}"
+        )
+    exchanges.append(f"Narration prompt: {turn.narration.prompt}\nRaw LLM response: {_raw_response(turn.narration.raw_output)}")
+    return format_causal_account((turn,)) + "\n" + "\n".join(exchanges)
+
+
+async def _run_terminal_session(
+    turn_limit: int,
+    selector: EventSelector,
+    cognition: TextCall,
+    narrator: TextCall,
+    output_fn: Callable[[str], None],
+) -> SessionRecord:
+    active = _ActiveSession(turn_limit, selector, cognition, narrator, ClearingState(), {"fox": "", "hunter": ""}, [])
+    ending: str | None = None
+    while ending is None:
+        ending = await _advance(active)
+        output_fn(format_turn_presentation(active.turns[-1]))
+    return SessionRecord(turn_limit, ClearingState(), tuple(active.turns), ending)
+
+
 def run_terminal(
     turn_limit: int,
     *,
@@ -375,36 +406,23 @@ def run_terminal(
     cognition: TextCall = _configured_call,
     narrator: TextCall = _configured_call,
 ) -> None:
-    """Standard-library observer controls; controls never supply causal values."""
+    """Run automatically, then offer only noncausal post-ending observer controls."""
     limit = _validate_limit(turn_limit)
-    active: _ActiveSession | None = None
-    current: SessionRecord | None = None
     output_fn("Autonomous clearing: a fox seeks food while a hunter may prepare a trap.")
+    choose = selector or _default_selector
+    current = asyncio.run(_run_terminal_session(limit, choose, cognition, narrator, output_fn))
+    output_fn(f"Session ended: {current.ending}.")
     while True:
-        command = input_fn("[start, pause, inspect, resume, replay, fresh, exit] ").strip().lower()
+        command = input_fn("[inspect, replay, fresh, exit] ").strip().lower()
         if command == "exit":
             return
-        if command in {"start", "fresh"}:
-            active = _ActiveSession(
-                limit, selector or _default_selector, cognition, narrator, ClearingState(), {"fox": "", "hunter": ""}, []
-            )
-            current = None
-            output_fn("Session started and paused before its next turn.")
-        elif command == "pause" and active is not None:
-            output_fn("Paused between completed turns.")
-        elif command == "inspect" and active is not None:
-            output_fn(format_causal_account(active.turns))
-        elif command == "inspect" and current is not None:
+        if command == "inspect":
             output_fn(format_causal_account(current.turns))
-        elif command == "replay" and current is not None:
+        elif command == "replay":
             asyncio.run(replay(current))
             output_fn("Replay verified exactly.")
-        elif command == "resume" and active is not None:
-            ending = asyncio.run(_advance(active))
-            output_fn(active.turns[-1].narration.text)
-            if ending is not None:
-                current = SessionRecord(limit, ClearingState(), tuple(active.turns), ending)
-                active = None
-                output_fn(f"Session ended: {ending}.")
+        elif command == "fresh":
+            current = asyncio.run(_run_terminal_session(limit, choose, cognition, narrator, output_fn))
+            output_fn(f"Session ended: {current.ending}.")
         else:
-            output_fn("Choose start, pause, inspect, resume, replay, fresh, or exit.")
+            output_fn("Choose inspect, replay, fresh, or exit.")

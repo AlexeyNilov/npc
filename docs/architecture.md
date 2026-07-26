@@ -149,10 +149,11 @@ observable contract is owned by
 ## Autonomous observer clearing session
 
 `npc.experiments.autonomous_clearing` is a separate, scenario-local terminal
-runtime. A launcher supplies a validated turn limit, while the observer can
-start a paused session, inspect completed causal records, advance one pending
-turn, replay a completed session, or begin a fresh one. The observer supplies
-no causal input.
+runtime. A launcher supplies a validated turn limit and the session advances
+automatically to its ending, printing each completed causal account alongside
+the retained actor-cognition and narration prompt/raw-response pairs. After the
+ending, the observer can inspect completed causal records, replay a completed
+session, or begin a fresh one. The observer supplies no causal input.
 
 Each turn records the selected event before its effect, actor-filtered
 observations and actor-local feedback, non-authoritative LLM cognition,
