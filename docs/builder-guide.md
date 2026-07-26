@@ -1,8 +1,9 @@
 # Builder guide: the clearing composition experiment
 
 This guide lets you run and modify the completed builder-controlled-composition
-experiment. It is a small, deterministic, one-turn sandbox—not a command-line
-product surface or a general simulation framework.
+experiment, including its bounded two-step clearing timeline. It is a small,
+deterministic experiment—not a command-line product surface or a general
+simulation framework.
 
 Start with:
 
@@ -12,8 +13,9 @@ Start with:
   recorder, and replay verifier.
 
 For verified behavior and limits, see the
-[composition requirement](requirements.md#builder-controlled-clearing-composition)
-and [evidence record](evidence/2026-07-26-builder-controlled-composition.md).
+[composition requirement](requirements.md#builder-controlled-clearing-composition),
+[composition evidence](evidence/2026-07-26-builder-controlled-composition.md),
+and [stateful-execution evidence](evidence/2026-07-26-stateful-shared-world-execution.md).
 
 ## The basic model
 
@@ -100,6 +102,25 @@ Add `--json` to inspect the complete retained trace.
 The substitutions are intentionally separate. Do not change the generic runner
 or unrelated actor to make one work; that defeats the experiment's main test.
 
+## Run the bounded two-step declaration
+
+`TWO_STEP_DECLARATION` runs exactly two authoritative steps with
+`run_timeline()`. In the first step the hunter sets a trap while the fox waits.
+The engine retains each actor's own context from its own feedback, then starts
+the second step from the committed state; the fox approaches and is caught.
+
+Run and replay that timeline from the repository root:
+
+```bash
+PYTHONPATH=src .venv/bin/python sample/stateful_clearing.py
+```
+
+Inspect `steps[0]` and `steps[1]`. Each contains an explicit ordinal, source
+state, actor-visible inputs and retained contexts, proposals, simulation-owned
+resolution and feedback, and resulting state. Replay derives the recorded
+inputs and authoritative resolutions again without mediating either actor. Add
+`--json` to print the complete retained timeline.
+
 ## See structural validation fail safely
 
 The invalid declaration deliberately gives a fox component the hunter-only
@@ -180,10 +201,12 @@ diagnostic, information-boundary, and replay behavior.
 
 ## Current limits
 
-This experiment establishes one bounded clearing turn. It does not yet provide:
+This experiment establishes one bounded clearing turn and one supplied,
+exact-two-step clearing timeline. It does not yet provide:
 
 - a CLI, GUI, configuration-file format, or plugin system for builders;
-- multiple turns, time, scheduling, or persistent scenario execution;
+- an arbitrary number of turns, a scheduler, a universal time model, or
+  persistent scenario execution;
 - branching or counterfactual comparison;
 - universal world/action schemas;
 - engine-level semantic compatibility or domain-validity diagnosis; or
