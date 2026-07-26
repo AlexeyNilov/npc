@@ -39,6 +39,22 @@ not establish a new fact: if its source, transformation, authority, or lifecycle
 is missing, omit it or mark the packet Blocked and route the data-meaning
 decision to the Product Manager.
 
+## Terminology
+
+Required when the task introduces, changes, or reuses an ambiguous
+project-specific term across a code or documentation boundary. Otherwise state
+`Not applicable`.
+
+| Term | Glossary entry or packet-local classification | Reason / affected boundary |
+| --- | --- | --- |
+| | | |
+
+Use the [glossary](../glossary.md) preferred name for shared terms. If a new
+term needs one stable meaning across packets or durable documents, include the
+glossary in write scope and add its entry after the underlying meaning is
+accepted. Do not add disposable experiment names merely because they appear in
+a packet.
+
 ## Experiment evidence
 
 Required only for a bounded experiment.

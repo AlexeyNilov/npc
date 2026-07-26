@@ -41,6 +41,9 @@ Before a packet enters delivery, the Technical Lead confirms:
 - a concept-provenance audit when the work adds or changes domain information,
   with every new semantic element traced to an accepted source or a named
   blocking decision;
+- a terminology plan when the work introduces, changes, or reuses an ambiguous
+  project-specific term across a boundary, with its glossary entry or an
+  explicit packet-local/disposable classification;
 - the relevant canonical context and any durable-information impact;
 - an experiment record and decision unlocked, if this is an experiment;
 - a second scenario or a scaffolding label, if the work claims reuse; and

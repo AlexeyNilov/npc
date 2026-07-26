@@ -15,6 +15,9 @@ Remove complexity not required by the accepted outcome or verification.
   state, event, transition, or threshold that lacks the packet's required
   source, accepted transformation, authority, or lifecycle. Do not invent a
   missing meaning to make the change fit.
+- When a packet's terminology plan cites the glossary or introduces a shared
+  term, flag inconsistent naming or an entry that claims behavior, authority,
+  or rationale belonging to another canonical owner.
 - Return bounded findings or a minimal revision, including what was removed and
   why.
 

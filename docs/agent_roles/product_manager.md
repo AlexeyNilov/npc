@@ -48,6 +48,9 @@ decision. The Product Manager operates outside the implementation loop.
   after defining its user-visible meaning, authoritative source and authority,
   observable behavior, and whether it changes a durable requirement. Escalate a
   cross-outcome or target-model consequence to the Product Strategist.
+- Use the [glossary](../glossary.md) preferred name when the meaning already
+  exists. When an accepted new meaning needs a shared project term, require its
+  glossary entry while keeping the underlying behavior in its canonical owner.
 - Consume finalized experiment evidence during normal planning. Add, replace,
   or reorder incomplete roadmap outcomes as product direction requires; do not
   act as a task-completion gate. Do not accept implementation evidence, arrange

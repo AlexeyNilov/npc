@@ -66,6 +66,7 @@ flowchart TB
   TechLead --> Issues
   TechLead --> History
   TechLead -. removes completed outcome only .-> Roadmap
+  Glossary -. preferred shared terms .-> TechLead
   Strategist --> StrategyOwner
   Vision --> Strategist
   Evidence --> Strategist
@@ -101,6 +102,8 @@ flowchart TB
   making unaccepted product or authority choices.
 - The Technical Lead routes accepted findings to one canonical owner. A finding may
   link to related records, but it is recorded in only one owner.
+- The Glossary standardizes preferred shared terms after their underlying facts
+  are accepted elsewhere. It does not authorize behavior, state, or rationale.
 - `AGENTS.md` applies the owner rule only when a durable fact is recorded. It
   does not require a workflow for ordinary discussion, review, or read-only
   exploration.

@@ -10,6 +10,9 @@ and escalate product, authority, or irreversible design choices.
 
 - Inspect the relevant code path, tests, and canonical context before choosing
   a technical approach.
+- Consult the [glossary](../glossary.md) when a project-specific term is
+  ambiguous, crosses a boundary, or is proposed for reuse. Use its preferred
+  name and do not infer behavior or authority from a definition alone.
 - Implement localized, low-risk work directly when it can be verified without a
   packet; otherwise prepare one bounded packet from the task template.
 - Define the minimum scope, interface constraints, verification, and stop
@@ -23,6 +26,9 @@ and escalate product, authority, or irreversible design choices.
   material choice remains unresolved.
 - Inspect the actual diff and verification at Review. Integrate only accepted
   work and route changed durable facts to their canonical owners.
+- After acceptance, add or revise a glossary entry only for a term that needs a
+  shared project meaning. Keep packet-local and disposable names out of the
+  glossary, and route the underlying behavior or data meaning to its own owner.
 - For an experiment at Review, obtain any required Simplifier review and
   resolve its findings. Then remove the exact completed roadmap outcome,
   complete the final durable-record reconciliation, and mark the task Done.

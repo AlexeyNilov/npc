@@ -5,6 +5,19 @@ It prevents terminology drift; it does **not** own observable behavior, current
 mechanisms, rationale, or experiment results. Those remain with their canonical
 owners and are linked below.
 
+## Adding and using terms
+
+Consult this document when a project-specific term is ambiguous, crosses a
+documentation or code boundary, or is proposed for reuse. Do not preload it for
+unrelated work.
+
+Add or change an entry only when an accepted term needs one preferred project
+meaning across more than one packet, boundary, or durable document. Keep
+experiment-local or disposable names local unless they become shared. A glossary
+entry standardizes a name; it does not authorize new state, behavior, a
+threshold, or a product decision. Record those facts with their canonical
+owners, then link to them here.
+
 ## Authority and state
 
 **Authoritative.** Data that the deterministic system is permitted to use to constrain or
