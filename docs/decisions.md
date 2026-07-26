@@ -390,3 +390,113 @@ clearing composition and its bounded two-step timeline, plus the interactive
 fox demo. PyYAML and the current LLM dependency remain required by that demo.
 Future use of a retired scenario requires a new bounded outcome or explicit
 restoration decision rather than treating historical code as supported.
+
+### 2026-07-26: Validate the engine through a small clearing game before further platform expansion
+
+**Status:** Accepted
+
+**Context:** The completed composition, two-step execution, and fixed
+initial-source comparison support the actor/simulation authority boundary and
+causal replay within their bounded clearing fixtures. The resulting
+[builder guide](builder-guide.md) remains a developer-facing experiment rather
+than evidence that the engine creates player or builder value. In particular,
+the fixed comparison does not establish demand for branching or a reason to
+generalise temporal, persistence, or authoring machinery.
+
+The next path could continue extracting a domain-neutral platform, deepen
+runtime and branch mechanics, or use the existing boundary to create one
+complete application. The user prioritised building something fun and
+meaningful and postponing capabilities justified only in theory.
+
+**Decision:** Adopt a reversible application-first sequence. Build a small
+clearing game in which a player makes bounded interventions, differently
+informed actors respond, and the simulation resolves inspectable consequences.
+Treat the engine as internal technology during this horizon. Scenario-local
+rules, sequencing, content, and presentation are acceptable; add reusable
+engine machinery only when the playable outcome cannot be complete without a
+named capability.
+
+Restart and replay are sufficient for the first short session. Defer
+persistence, arbitrary scheduling, branching, general variation, scenario
+editing, plugins, and universal schemas until a demonstrated player or builder
+job requires them.
+
+This decision supersedes the capability sequence selected in
+[Prioritize builder-controlled composition](#2026-07-26-prioritize-builder-controlled-composition),
+not its evidenced component-ownership and authority boundaries. It does not
+change the target user or product vision in the README and does not decide that
+the game is the final product.
+
+**Alternatives considered:**
+
+- Continue directly toward a builder-facing composition platform. This would
+  generalise a boundary before demonstrating that an application built with it
+  is useful.
+- Generalise temporal execution or branching. The completed bounded slices show
+  feasibility but provide no player or builder demand for those capabilities.
+- Change the product vision immediately from a builder tool to a game. One
+  untested game concept does not justify that irreversible interpretation.
+
+**Consequences:** Strategy now proceeds from a complete playable application,
+to player-value evidence, and only then to application-earned reuse. The
+roadmap orders one clearing-game delivery outcome and one bounded playtest
+decision. Later outcomes remain unordered until that evidence identifies what
+players value and whether the game, another application, or a builder product
+deserves further investment.
+
+### 2026-07-26: Run the clearing as an autonomous observer simulation
+
+**Status:** Accepted
+
+**Context:** The accepted application-first direction initially assumed that a
+player would act as a forest warden and causally intervene in the clearing. The
+user subsequently rejected that interaction model. The intended experience is
+to observe a simulation in which events occur independently and differently
+informed actors react to them.
+
+The application could retain bounded player interventions, play one fixed
+scripted history, build a general event framework, or introduce only the
+scenario-owned random events needed for one autonomous clearing session.
+
+**Decision:** The immediate application user is an observer, not a causal
+participant. The observer may start, pause, inspect, replay, or restart a
+session, but supplies no simulation event, actor proposal, rule, random source,
+or other input that changes canonical history.
+
+The clearing simulation owns a bounded event vocabulary, the meaning and
+effects of each event, and the policy under which an event may occur. Random
+selection is controlled variation: the selected event and its causal position
+are recorded before the simulation applies an authoritative effect. Actors
+receive only their filtered observations and retained context, form bounded
+reaction proposals, and remain unable to commit canonical changes. Exact replay
+uses the recorded event and authoritative history without fresh selection or
+actor mediation.
+
+Use scenario-local event selection and sequencing. Do not infer a general
+randomness, scheduling, event, persistence, or branching framework from this
+application.
+
+This decision supersedes the player-intervention and player-agency parts of
+[Validate the engine through a small clearing game before further platform
+expansion](#2026-07-26-validate-the-engine-through-a-small-clearing-game-before-further-platform-expansion).
+It retains that decision's application-first sequencing, platform deferrals,
+and conclusion that the README vision has not changed. It also does not alter
+the current interactive fox demonstration or its player-message requirements;
+that demonstration is not the input model for the new application.
+
+**Alternatives considered:**
+
+- Retain a forest-warden intervention loop. This directly conflicts with the
+  accepted observer-only experience.
+- Use one fixed scripted event sequence. This would be autonomous but would not
+  test whether controlled variation and actor reactions create curiosity across
+  fresh runs.
+- Design a reusable random-event runtime first. The first observer session
+  needs a bounded event source, not a universal event or scheduling model.
+
+**Consequences:** Strategy and roadmap now measure observer value through
+curiosity, anticipation, causal comprehension, meaningful consequences, and
+interest in replay or another run—not agency, choices, or strategy. The first
+delivery must record simulation-owned events and replay them exactly while
+keeping all observer controls outside canonical causality. Later outcomes
+remain gated by the observer evaluation.

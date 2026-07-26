@@ -29,13 +29,21 @@ owners, then link to them here.
   developer. The project developer currently fills this role. See the
   [vision](../README.md#vision) and [strategy](strategy.md#strategic-horizons).
 
+**Observer.** The immediate user of an autonomous simulation application. An
+  observer may start, pause, inspect, replay, or restart a session, but supplies
+  no simulation event, actor proposal, rule, or other input that changes the
+  canonical history of a run. Presentation controls are noncausal. The observer
+  is distinct from the simulation builder and from actors inside the
+  simulation. See the [current strategic focus](strategy.md#current-focus).
+
 **Simulation description.** The builder-supplied definition that provides or
   identifies a simulation's canonical state and meaning-bearing authority
-  capabilities. Those capabilities derive actor-accessible observations,
-  declare accepted proposals, resolve them under simulation-specific rules,
-  commit canonical transitions, and select feedback. A simulation description
-  is not necessarily passive data or a separate process; its authoring and
-  execution mechanism remains deliberately unspecified. See the
+  capabilities. Those capabilities define simulation-event policy and effects,
+  derive actor-accessible observations, declare accepted proposals, resolve
+  them under simulation-specific rules, commit canonical transitions, and
+  select feedback. A simulation description is not necessarily passive data or
+  a separate process; its authoring and execution mechanism remains
+  deliberately unspecified. See the
   [target composition model](strategy.md#target-modular-composition-model).
 
 **Composition declaration.** A builder-owned, readable input that names one
@@ -82,6 +90,13 @@ owners, then link to them here.
   request, result, and place in the causal trace are recorded. It may influence
   a proposal or an authoritative rule only through its declared boundary; it
   is not implicit model output or unrecorded randomness.
+
+**Simulation event.** A simulation-owned occurrence introduced by declared
+  initial conditions, deterministic rules, or controlled variation. The
+  simulation alone defines its meaning, validates or applies its canonical
+  effects, and decides what each actor may observe. A randomly selected event
+  and its causal position are recorded before resolution so exact replay needs
+  no fresh random selection.
 
 **Canonical turn.** The completed, authoritative `TurnTrace` passed to presentation. Rendering
   preserves it by value and cannot modify it. See the [current rendering
