@@ -251,3 +251,28 @@ slice must exercise this boundary, but one actor or world schema does not
 establish portability. This changes the target product and capability sequence,
 not the current verified fox architecture; a future implementation still
 requires bounded evidence.
+
+### 2026-07-26: Select village emergency-food rationing for the cross-scale experiment
+
+**Status:** Accepted
+
+**Context:** The next roadmap outcome needs one materially contrasting scenario
+before Technical Lead planning can define its domain behavior. The completed
+fox-and-hunter slice is a fixed, individual-scale clearing-and-trap scenario;
+it cannot supply the new domain facts, claimant information boundaries, or
+allocation authority required for a portability test.
+
+**Decision:** Use a bounded village relief-organisation scenario in which the
+organisation allocates a fixed emergency food reserve after a supply
+disruption. Its user-visible decision is how to distribute the reserve between
+household claims. Household information may remain local to the relevant
+claimant, while the relief organisation owns the canonical inventory and
+authoritatively accepts or rejects allocations under explicit allocation rules.
+
+**Consequences:** This supplies the Horizon-3 comparison with a materially
+different actor scale, world schema, and system context without implying a
+general village-management product. The Technical Lead may now specify the
+scenario's observable behavior and bounded corpus, preserving the selected
+information and authority boundaries. The experiment remains the test of the
+language-default strategy; it does not authorize extraction of a shared
+framework from the fox code.
