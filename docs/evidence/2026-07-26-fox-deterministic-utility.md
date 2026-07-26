@@ -1,6 +1,6 @@
 # Experiment: deterministic fox safety-versus-food utility
 
-**Status:** Planned
+**Status:** Review
 
 **Date:** 2026-07-26
 
@@ -72,9 +72,9 @@ distance, and resulting hunger used by the following turn.
   neither perception at hunger `0` (`do_nothing`); offer only at hunger `20`
   (`approach`); threat only (`flee`); the same accepted threat-and-offer
   conflict at hunger `30` (`flee`) and hunger `90` (`approach`); and a
-  three-turn retained-state case starting at hunger `40`: neither perception
-  raises it to `50`, the next conflict selects `flee` on the safety tie and
-  raises it to `60`, and the final identical audible conflict selects
+  three-turn retained-state case starting at hunger `50`: neither perception
+  raises it to `60`, the next conflict selects `flee` on the safety tie and
+  raises it to `70`, and the final identical audible conflict selects
   `approach`. Rejected candidates remain unavailable to scoring. The retained
   case starts at distance `1`, so `flee` produces distance `6` and the final
   turn remains audible.
@@ -117,8 +117,24 @@ distance, and resulting hunger used by the following turn.
 
 Complete at Review.
 
-- **Observed result:**
-- **Reproducibility evidence:**
-- **Interpretation and limits:**
-- **Decision or unresolved question created:**
-- **Canonical follow-up:**
+- **Observed result:** Supported. The corpus records `flee` for the accepted
+  threat-and-offer conflict at hunger 30 and `approach` for the otherwise
+  equivalent conflict at hunger 90. Its retained-state path starts at hunger
+  50, advances 50 -> 60 -> 70, selects `flee` at the safety tie, then selects
+  `approach`; rejected perceptions score only `do_nothing`.
+- **Reproducibility evidence:** `.venv/bin/pytest
+  tests/test_fox_deterministic_utility.py` passed (9 tests);
+  `.venv/bin/python -m npc.experiments.fox_deterministic_utility` printed 9
+  JSON-safe turn traces; `make check` passed Ruff, mypy, and the 35-test
+  repository suite; and `git diff --check` passed.
+- **Interpretation and limits:** This supports only the stated fox-local,
+  deterministic experiment parameters and authority boundary. It neither
+  establishes consumption, reachability, a reusable utility abstraction, nor
+  behavior for another actor or stochastic policy.
+- **Decision or unresolved question created:** The supported local result
+  unlocks the decision of whether its authoritative hunger-to-selection-to-
+  feedback sequence recurs under a contrasting decision before any reuse
+  decision.
+- **Canonical follow-up:** Technical Lead to arrange the required Simplifier
+  review, then assess recurrence and route any accepted finding to its
+  canonical owner.
