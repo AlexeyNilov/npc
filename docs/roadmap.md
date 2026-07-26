@@ -23,10 +23,15 @@ contrasting slice, within its recorded limits.
 
 The completed [stateful shared-world execution evidence](evidence/2026-07-26-stateful-shared-world-execution.md)
 shows that the composition boundary can carry one bounded scenario through two
-authoritative steps with actor-local context and replay. No incomplete outcome
-is currently ordered. A later Product Manager decision must add the next
-evidence-bearing outcome; this roadmap does not infer one from the completed
-stateful-execution experiment.
+authoritative steps with actor-local context and replay. The completed
+[bounded causal-branching evidence](evidence/2026-07-26-bounded-causal-branching.md)
+then shows that a builder can compare that scenario's recorded initial source
+state with one explicitly recorded source variation, while retaining separate
+authoritative histories and independent replay. It does not establish an
+after-step branch, a reusable branch model, or that causal branching is the
+next product capability worth pursuing. No incomplete outcome is currently
+ordered; a later Product Manager decision must identify a material user value
+or decision before adding one.
 
 The current fox [architecture](architecture.md) and completed
 [utility evidence](evidence/2026-07-26-fox-deterministic-utility.md) remain
