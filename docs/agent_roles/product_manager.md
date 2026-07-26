@@ -16,6 +16,12 @@ decision. The Product Manager operates outside the implementation loop.
   decisions. Do not invent priorities or success data.
 - Define the target user, problem, desired observable outcome, constraints, and
   the decision that the next result must unlock.
+- Write roadmap outcomes in plain language that a Technical Lead can use to
+  understand the product goal before encountering the formal constraints. When
+  a concrete current example helps, include a short, clearly illustrative
+  example; label it as non-binding so it does not silently become a product or
+  implementation requirement. Prefer explaining the actor, what it knows,
+  what it may attempt, who decides what happens, and what becomes inspectable.
 - Default to direct delivery when the behavior is specified, technically
   routine, safely reversible, and verifiable by ordinary tests or user
   acceptance. Do not describe routine implementation, compatibility checks, or
