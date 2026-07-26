@@ -44,7 +44,7 @@ def test_chat_turn_carries_distance_and_does_not_turn_narration_into_next_turn_i
     assert "watches" not in second.canonical_turn.player_message
 
 
-def test_chat_prints_authoritative_feedback_distance_after_each_turn(
+def test_chat_prints_explicit_non_authoritative_narration_and_authoritative_feedback_distance_after_each_turn(
     monkeypatch: MonkeyPatch, capsys: CaptureFixture[str]
 ) -> None:
     messages: Iterator[str] = iter(["Fox, I will hurt you.", "/exit"])
@@ -60,7 +60,8 @@ def test_chat_prints_authoritative_feedback_distance_after_each_turn(
     asyncio.run(chat(10, complete, narrate))
 
     output = capsys.readouterr().out
-    assert "Fox: The fox disappears into the trees." in output
+    assert "Narration (non-authoritative): The fox disappears into the trees." in output
+    assert "Fox:" not in output
     assert "Distance: 15" in output
 
 

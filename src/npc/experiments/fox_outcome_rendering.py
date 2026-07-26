@@ -16,7 +16,10 @@ RenderValidation = Literal["accepted", "unusable_response", "narrator_exception"
 FALLBACK_TEXT = "The fox's response cannot be rendered."
 MAX_NARRATION_CHARACTERS = 280
 NARRATOR_INSTRUCTION = (
-    "Narration is non-authoritative presentation only. Do not choose an action or change world state, outcome, or feedback."
+    "Narration is non-authoritative presentation only. Best-effort narrate only the completed fox action. "
+    "Do not make claims unsupported by that action, including inferred motive, dialogue, unseen events, "
+    "locations, or world state. "
+    "Do not choose an action or change world state, outcome, or feedback."
 )
 
 

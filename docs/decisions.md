@@ -41,12 +41,14 @@ to keep the implementation small and the player experience expressive, rather
 than structurally rejecting every claim beyond the completed action.
 
 **Consequences:** The configured-model boundary is verified. Free-form flavour
-may be misleading or false to a player even though it cannot alter canonical
-state; this is an accepted current risk. The action-only input, explicit
-non-authoritative instruction, response-length limit, deterministic fallback,
-and retained trace mitigate it without enforcing factual accuracy. If player
-trust becomes a demonstrated problem, revisit claim validation or presentation
-labelling.
+may still be misleading or false to a player even though it cannot alter
+canonical state; this is an accepted residual risk. The action-only input,
+instruction to best-effort narrate only the completed action and avoid
+unsupported claims, explicit `Narration (non-authoritative)` presentation
+label, response-length limit, deterministic fallback, and retained trace
+mitigate it without enforcing factual accuracy. If player trust remains a
+demonstrated problem, revisit claim validation or a more constrained
+presentation.
 
 ### 2026-07-25: Preserve experiment evidence independently of implementation
 

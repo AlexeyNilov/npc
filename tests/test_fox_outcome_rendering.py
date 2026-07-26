@@ -36,6 +36,11 @@ def test_configured_narrator_receives_only_completed_action_and_is_called_once(m
     assert len(calls) == 1
     assert calls[0][0] == trace.prompt
     assert "flee" in trace.prompt
+    assert "non-authoritative" in calls[0][1]
+    assert "only the completed fox action" in calls[0][1]
+    assert "unsupported" in calls[0][1]
+    for prohibited_claim in ("inferred motive", "dialogue", "unseen events", "locations", "world state"):
+        assert prohibited_claim in calls[0][1]
     for forbidden in (canonical.player_message, "distance", "candidate", "certainty", "evidence", "heard"):
         assert forbidden not in trace.prompt
         assert forbidden not in calls[0][1]
@@ -51,6 +56,10 @@ def test_nonblank_freeform_completed_actions_render_as_returned() -> None:
     assert flee_trace.rendered_text == "The fox vanishes through the brush."
     assert non_action_trace.rendered_text == "The fox watches in silence."
     assert flee_trace.validation_result == non_action_trace.validation_result == "accepted"
+    assert flee_trace.canonical_turn == flee
+    assert flee_trace.canonical_turn.feedback_distance == flee.feedback_distance == 15
+    assert non_action_trace.canonical_turn == do_nothing
+    assert non_action_trace.canonical_turn.feedback_distance == do_nothing.feedback_distance == 10
 
 
 def test_completed_approach_renders_without_changing_distance() -> None:

@@ -72,21 +72,24 @@ or mutable state.
 The default command uses an injectable fixture narrator. With
 `--configured-narrator`, the module's fox-local adapter makes one
 `complete_text` call using the action prompt and a fixed instruction that its
-response is non-authoritative presentation, not action selection or world
-state. A nonblank response of at most 280 Unicode characters is retained as
-arbitrary player-facing narration; blank, oversized, or exceptional responses
-produce the fixed fallback. A frozen `RenderingTrace` retains the copied
-canonical turn, prompt, raw output or null, validation/failure status, rendered
-text, and `non_authoritative=True`; rendered text has no path to action,
-distance, feedback, or perception. The module's YAML fixtures and narrator are
-disposable scaffolding, not a general renderer, dialogue, state, or event
-framework.
+response is best-effort, non-authoritative presentation of only the completed
+action. It directs the narrator to avoid unsupported claims such as inferred
+motive, dialogue, unseen events, locations, and world state; this guidance does
+not semantically validate the response. A nonblank response of at most 280
+Unicode characters is retained as arbitrary player-facing narration; blank,
+oversized, or exceptional responses produce the fixed fallback. A frozen
+`RenderingTrace` retains the copied canonical turn, prompt, raw output or null,
+validation/failure status, rendered text, and `non_authoritative=True`; rendered
+text has no path to action, distance, feedback, or perception. The module's YAML
+fixtures and narrator are disposable scaffolding, not a general renderer,
+dialogue, state, or event framework.
 
 ## Interactive fox turns
 
 `sample/fox_chat.py` is a terminal loop modeled on the local sample chat,
 but it does not stream or roleplay a response. For each player input it calls
 the existing `run_turn`, then `render_completed_turn`, prints the resulting
-non-authoritative narration, and carries only the canonical feedback distance
-to the next iteration. The loop has no conversation history, fox persona, or
-path from narration back to the next action.
+non-authoritative narration under the `Narration (non-authoritative)` label,
+and carries only the canonical feedback distance to the next iteration. The
+loop has no conversation history, fox persona, or path from narration back to
+the next action.

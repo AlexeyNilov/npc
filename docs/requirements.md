@@ -42,8 +42,10 @@ This document owns observable system behavior.
 - **When** a completed action is `flee`, `approach`, or `do_nothing`, **the
   system shall** call the selected narrator exactly once after completion. The
   configured narrator shall receive only an action-derived prompt and a fixed
-  instruction that its response is presentation, not action selection or world
-  state.
+  instruction to best-effort narrate only the completed action as
+  non-authoritative presentation, not action selection or world state, and to
+  avoid unsupported factual claims, including inferred motive, dialogue,
+  unseen events, locations, and world state.
 - **When** a narrator returns nonblank text of at most 280 Unicode characters,
   **the system shall** use that arbitrary text as non-authoritative narration.
   Blank, oversized, unavailable, or exceptional responses shall return
@@ -54,8 +56,9 @@ This document owns observable system behavior.
 
 - **When** a developer runs `python sample/fox_chat.py`, **the system shall**
   accept one player message at a time, run the existing fox turn, print its
-  non-authoritative completed-outcome narration, and use only the canonical
-  feedback distance as the following turn's starting distance.
+  completed-outcome narration under a label containing `Narration` and
+  `non-authoritative`, and use only the canonical feedback distance as the
+  following turn's starting distance.
 - **When** the player exits the loop, **the system shall** end without retaining
   dialogue history. The loop shall not generate a roleplayed fox reply or use
   narration as input to a later turn.

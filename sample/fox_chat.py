@@ -53,7 +53,7 @@ async def chat(
 
         trace = await chat_turn(player_message, distance, completion, narrator)
         distance = trace.canonical_turn.feedback_distance
-        print(f"Fox: {trace.rendered_text}")
+        print(f"Narration (non-authoritative): {trace.rendered_text}")
         print(f"Distance: {distance}")
 
 
