@@ -79,6 +79,7 @@ for the command's behavior and state boundaries.
 
 ## Project documentation
 
+- [Builder guide: clearing composition experiment](docs/builder-guide.md)
 - [Requirements](docs/requirements.md)
 - [Architecture](docs/architecture.md)
 - [Glossary](docs/glossary.md)
