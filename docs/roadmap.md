@@ -40,10 +40,21 @@ meaningfully different kind of simulation—not just a larger fox scenario.
 fixed emergency food reserve after a supply disruption. The user-visible
 problem is deciding how to distribute the limited reserve between household
 claims while some information remains local to each claimant and the
-organisation alone has the authoritative inventory and allocation rules. The
+simulation core alone has the authoritative inventory and allocation rules. The
 observable outcome is an accepted or rejected allocation, the resulting
 remaining reserve, and actor-specific feedback that does not reveal withheld
 household information.
+
+**Accepted experiment policy:** Two household actors submit claims from their
+private household views. The relief-organisation actor sees only a public
+claims ledger and the canonical reserve, then submits a bounded allocation
+proposal; the simulation core alone validates and commits it. The fixed corpus
+uses a six-unit reserve, two four-unit claims, and public priority tiers one
+then two. The authoritative rule fully serves the higher-priority claim before
+the lower-priority claim. A four-unit reserve variation must change the
+organisation's observation and the accepted allocation, while private
+household facts remain unavailable to the organisation and to the other
+household.
 
 This is deliberately a small allocation decision, not a village-management
 simulation. It contrasts with the fox-and-hunter slice in actor scale,

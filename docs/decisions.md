@@ -266,7 +266,7 @@ allocation authority required for a portability test.
 organisation allocates a fixed emergency food reserve after a supply
 disruption. Its user-visible decision is how to distribute the reserve between
 household claims. Household information may remain local to the relevant
-claimant, while the relief organisation owns the canonical inventory and
+claimant, while the simulation core owns the canonical inventory and
 authoritatively accepts or rejects allocations under explicit allocation rules.
 
 **Consequences:** This supplies the Horizon-3 comparison with a materially
@@ -276,3 +276,43 @@ scenario's observable behavior and bounded corpus, preserving the selected
 information and authority boundaries. The experiment remains the test of the
 language-default strategy; it does not authorize extraction of a shared
 framework from the fox code.
+
+### 2026-07-26: Set the village-rationing experiment policy
+
+**Status:** Accepted
+
+**Context:** Selecting village emergency-food rationing established the
+contrasting context but not the actor/core split, information boundary, or
+minimal allocation policy needed to make the experiment reproducible. Leaving
+those meanings to implementation would let the Technical Lead invent product
+policy and could weaken the established authority boundary.
+
+**Decision:** Use two household claimant actors and one relief-organisation
+actor. Each household receives only its private household view and submits one
+bounded food claim. The organisation receives only the canonical reserve and a
+public ledger containing each claim's household identifier, requested units,
+and priority tier; it receives neither household's private food situation,
+dependants, nor other private household facts. The organisation submits one
+bounded allocation proposal. The simulation core, rather than the
+organisation, validates the proposal and is the only authority that may commit
+the allocation.
+
+The initial corpus has a six-unit reserve; each household requests four units;
+and the public ledger ranks the first household at priority tier one and the
+second at tier two. The authoritative allocation rule fully serves claims in
+ascending priority-tier order until the reserve is exhausted. Thus the unique
+valid allocation at six units is four units to the first household and two to
+the second. An allocation that exceeds a request or reserve, or differs from
+that priority rule, is rejected without changing canonical reserve or
+allocations. The required controlled variation changes only the canonical
+reserve from six to four units; its unique valid allocation is four units to
+the first household and zero to the second. That variation must alter the
+organisation's derived observation and authoritative outcome without exposing
+any private household facts.
+
+**Consequences:** The Technical Lead is authorized to translate this accepted
+policy into Requirements, a bounded experiment packet, fixture corpus, and
+behavioral tests. Actor cognition remains separate from authoritative
+resolution: a valid proposal is not itself an allocation, and an invalid one
+fails closed. This intentionally tests one fixed allocation policy; it does
+not establish a generic fairness, eligibility, or village-governance model.

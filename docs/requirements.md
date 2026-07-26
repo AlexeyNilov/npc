@@ -112,6 +112,59 @@ This document owns observable system behavior.
   trace shall reproduce the authoritative sequence without making mediation
   requests.
 
+### Village emergency-food rationing turn
+
+- **When** a developer runs the checked-in village-rationing corpus, **the
+  system shall** start from canonical state containing a six-unit emergency
+  food reserve and no committed household allocations. The fixed corpus shall
+  give household one a four-unit claim at priority tier one and household two a
+  four-unit claim at priority tier two. The simulation core alone owns the
+  reserve, the claim ledger, allocation rule, and committed allocations.
+- **When** the household claimants form their actor-local percepts, **the
+  system shall** provide each one only its own private household view and its
+  own profile and ordered question set. Each claimant may submit only its own
+  four-unit claim or `wait`. Neither claimant shall receive the other
+  claimant's private view, profile, questions, percept, or proposal.
+- **When** a claimant submits its valid four-unit claim, **the simulation core
+  shall** record the claimant's household identifier, requested units, and
+  priority tier in the public claim ledger before relief-organisation
+  mediation. A failed-closed `wait` claim shall not add a ledger entry.
+- **When** the relief-organisation actor forms its actor-local percept, **the
+  system shall** provide only the canonical reserve and the public claim
+  ledger, whose entries contain household identifier, requested units, and
+  priority tier. The request shall contain neither household's private view,
+  food situation, dependants, profile, questions, percept, nor proposal. The
+  organisation may submit only one bounded allocation proposal for the two
+  public claims; it cannot directly commit an allocation.
+- **When** each actor is mediated, **the system shall** make one request per
+  actor using only that actor's accessible substate, profile, and ordered
+  questions. It shall record one subjective percept per actor and retain each
+  answer with its own supporting reference to that actor's percept. A
+  malformed percept or answer, missing or invalid percept evidence, or a
+  proposal outside that actor's vocabulary shall fail closed and make no
+  unauthorized canonical change.
+- **When** both four-unit claims are present and the organisation proposes the
+  priority allocation, **the simulation core shall** validate and commit four
+  units for household one and two units for household two, leaving no reserve.
+  It shall return actor-specific allocation feedback without exposing either
+  household's private view to another actor.
+- **When** only the canonical reserve changes from six to four units, **the
+  system shall** derive an organisation observation that states four available
+  units in place of six, while retaining the same public claims and withholding
+  the same private household facts. The same priority rule shall commit four
+  units for household one and zero for household two, leaving no reserve.
+- **When** an allocation exceeds a public claim or the reserve, or differs
+  from the priority rule, **the simulation core shall** reject it without
+  changing the reserve or committed allocations. A submitted proposal is not
+  itself an allocation.
+- **When** a village-rationing turn completes, **the system shall** retain a
+  JSON-safe trace containing the initial canonical state; each actor's
+  accessible substate, profile, percept, ordered questions, answers and
+  percept evidence; submitted claims and allocation proposal; authoritative
+  validation decision and transitions; resulting canonical state; and
+  actor-specific feedback. Replaying that trace shall reproduce the committed
+  or rejected authoritative outcome without making another mediation request.
+
 ### Bounded fox distance feedback
 
 - **When** a caller starts a fox turn, **the system shall** accept its
