@@ -20,22 +20,41 @@ owners, then link to them here.
 
 ## Authority and state
 
-**Authoritative.** Data that the deterministic system is permitted to use to constrain or
-  advance the actor loop. In the current fox experiments, starting distance,
-  starting hunger, selected action, and their deterministic transitions are
-  authoritative. An LLM never supplies authoritative state, scores, selection,
-  reachability, or execution.
+**Authoritative.** Data, rules, or transitions that the simulation is permitted
+  to use to constrain or advance canonical reality. In the current fox
+  experiments, starting distance, starting hunger, selected action, and their
+  deterministic transitions are authoritative. Generated output does not
+  become authoritative merely by being produced; an authoritative boundary
+  must validate or resolve it for its permitted use.
+
+**Canonical reality.** The authoritative actor and world facts accepted by the
+  simulation at a point in its causal history. Actors may receive different
+  observations of that reality. The current experiments have only fox-local
+  authoritative inputs and state, not a reusable canonical world model.
+
+**Simulation substrate.** The target engine boundary that maintains canonical
+  reality, resolves actor action proposals, commits outcomes, and returns
+  feedback. It is a strategic capability, not a claim that the current fox code
+  already provides a reusable substrate. See the
+  [strategy](strategy.md#strategic-horizons).
+
+**Controlled variation.** An explicit stochastic or generative input whose
+  request, result, and place in the causal trace are recorded. It may influence
+  a proposal or an authoritative rule only through its declared boundary; it
+  is not implicit model output or unrecorded randomness.
 
 **Canonical turn.** The completed, authoritative `TurnTrace` passed to presentation. Rendering
   preserves it by value and cannot modify it. See the [current rendering
   design](architecture.md#non-authoritative-rendering-of-completed-fox-outcomes).
 
-**Feedback.** The authoritative state retained from a completed turn as the next turn's
-  starting state. Current fox feedback is resulting distance and, for the
-  utility experiment, resulting hunger.
+**Feedback.** Information from a resolved outcome that informs later perception
+  or sensemaking. Authoritative feedback may include committed state used by a
+  later turn. Current fox feedback is resulting distance and, for the utility
+  experiment, resulting hunger.
 
-**Outcome.** The authoritative result of executing a selected action in a turn. It is
-  established before feedback and before optional narration.
+**Outcome.** The authoritative result of resolving an action proposal against
+  canonical reality. In the current fox loop it is the result of executing a
+  selected action. It is established before feedback and optional narration.
 
 **Persistent need state.** An authoritative actor-local state retained across turns and used by policy.
   `hunger` is the current experiment's only such state; it is not a general
@@ -43,26 +62,46 @@ owners, then link to them here.
 
 ## Actor-loop terms
 
-**Actor loop.** The target model `reality → perception → sensemaking → intent → action →
-outcome → feedback`, with feedback informing later perception and
-sensemaking. It is a product target, not a claim that the current fox code is
-a reusable engine abstraction. See the [vision](../README.md#vision).
+**Actor loop.** The target model `authoritative reality → actor-specific
+  perception → sensemaking → intent → action proposal → substrate resolution →
+  outcome and canonical transition → feedback`, with feedback informing later
+  perception and sensemaking. It is a product target, not a claim that the
+  current fox code is a reusable engine abstraction. See the
+  [vision](../README.md#vision).
 
-**Reality.** The inputs treated as facts for a turn. In the current fox utility loop:
-one player-message string plus authoritative distance and hunger.
+**Reality.** Preferred short form for canonical reality when discussing the
+  actor loop. In the current fox utility loop, the inputs treated as facts for
+  one turn are a player-message string plus authoritative distance and hunger.
 
-**Perception.** An LLM-backed, action-relevant proposal about one player message. A
-perception is untrusted until deterministic validation accepts it.
+**Perception.** Actor-specific information proposed or derived from reality.
+  Current perception is an LLM-backed, action-relevant proposal about one
+  player message and remains untrusted until deterministic validation accepts
+  it.
 
-**Sensemaking.** Deterministic acceptance or rejection of a sensor candidate. Rejected
-perceptions contribute no utility and cause no action.
+**Sensemaking.** The actor-local interpretation of perceptions into decision
+  context. Current fox sensemaking is limited to deterministic acceptance or
+  rejection of sensor candidates; rejected perceptions contribute no utility.
 
-**Intent.** The deterministic policy stage that selects an action from accepted
-perceptions and authoritative state. It is called `choice` in current traces.
+**Intent.** An actor's selected commitment about what it wants to attempt.
+  Current fox intent is the deterministic policy stage that selects an action
+  from accepted perceptions and authoritative state; it is called `choice` in
+  current traces.
 
-**Action.** A selected, deterministic operation. Current fox actions are `flee`,
-`approach`, and `do_nothing`; their exact transitions belong to the
-[requirements](requirements.md).
+**Action proposal.** A bounded operation an actor wants to attempt. It does not
+  determine its own success or canonical effect; the simulation substrate owns
+  resolution. Current fox actions are selected and executed within one
+  fox-local boundary and do not yet establish this separation.
+
+**Action.** The operation represented by an action proposal or, in the current
+  fox experiments, a selected deterministic operation. Current fox actions are
+  `flee`, `approach`, and `do_nothing`; their exact transitions belong to the
+  [requirements](requirements.md).
+
+**Causal closure.** A complete actor-to-substrate sequence in which an actor
+  receives an observation, proposes an action, the substrate resolves and
+  commits its outcome, and the resulting reality becomes feedback with a
+  replayable causal trace. It is the first strategic horizon, not a current
+  implementation claim.
 
 ## Perception and validation
 
@@ -82,8 +121,10 @@ the candidate.
 the perception contract but is trace-only: it does not alter policy, utility,
 or action.
 
-**Fail closed.** Treat malformed, ambiguous, invalid, or ungrounded perception output as
-unaccepted, so it has no effect on action selection.
+**Fail closed.** Treat malformed, ambiguous, invalid, or ungrounded perception
+  output as unaccepted, so it has no effect on action selection. A rejected
+  action proposal makes no unauthorized canonical transition, although its
+  recorded rejection may become feedback.
 
 **Hearing gate.** The deterministic reachability check that permits sensor calls only when the
 fox's starting distance is within the current hearing range. A skipped sensor
@@ -133,6 +174,9 @@ inspection and replay of the experiment; it is not itself world state.
 **Disposable scaffolding.** Experiment-specific wrappers, corpora, trace types, constants, or adapters
 that support learning but are not yet candidates for reuse.
 
-**Replayable / reproducible.** A fixed corpus and deterministic rules yield the same inspectable trace when
-run again. This describes the experiment's bounded behavior, not general
-simulation determinism.
+**Replayable / reproducible.** Recorded initial state, ordered inputs, submitted
+  proposals, resolution decisions, and controlled variation reproduce the same
+  authoritative transition sequence. Current experiments achieve this with
+  fixed corpora and deterministic rules. Replay does not require regenerated
+  presentation prose to be identical or all future actor behaviour to be
+  predictable.

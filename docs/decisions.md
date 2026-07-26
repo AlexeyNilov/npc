@@ -122,3 +122,65 @@ cannot affect any later turn.
 canonical fact and permits flavor that may overstate or misdescribe an internal
 state. It still excludes player text, perception evidence, distance, and
 mutable state, and it does not validate the narrator's free-form wording.
+
+### 2026-07-26: Center the product on a modular authoritative simulation engine
+
+**Status:** Accepted
+
+**Context:** The prior LLM-system effort attempted a broad simulation design at
+once and became too complex to advance comfortably. This project deliberately
+reduced that scope from a complete system, to an NPC, to a trader, and finally
+to a small fox actor. That decomposition produced useful evidence, especially
+for narrow binary LLM perception, but the product vision and strategy then
+became too closely centered on the laboratory method and fox-local decisions.
+
+**Decision:** The product destination is a modular simulation engine, not a
+learning laboratory. Actor loops operate within a shared authoritative
+simulation substrate: they interpret reality and propose actions, while the
+substrate resolves outcomes and maintains canonical state. Grow toward that
+destination through the smallest causally complete vertical slices rather than
+by recreating a comprehensive framework up front. Treat the fox as completed
+foundational evidence and, where useful, a stable test actor; do not make
+additional fox cognition the strategic objective.
+
+The long-term product should let simulation builders author, run, inspect,
+replay, and eventually branch scenarios with heterogeneous actors.
+
+Use the prior LLM-system design and external approaches as decision inputs, not
+as architectures to import wholesale. Comparative discovery must be bounded to
+a capability choice or strategic constraint that it can change.
+
+**Consequences:** The strategy pivots from recurring fox decisions to an
+evidenced actor-to-substrate boundary, followed by shared-world composition and
+cross-scale portability. Existing fox evidence and current implementation
+remain valid within their recorded limits. The Product Manager must replace the
+roadmap's now-obsolete product frame and order an outcome that advances causal
+closure. Historical experiment follow-ups remain accurate records of what their
+results unlocked at completion.
+
+### 2026-07-26: Define determinism as replayable authoritative causality
+
+**Status:** Accepted
+
+**Context:** The current fox policies and transitions are deterministic, and
+the earlier vision could be read as requiring all future actor behaviour to be
+predictable. That interpretation would confuse the current experiment method
+with the engine's durable value and unnecessarily exclude controlled variation.
+
+**Decision:** Require authoritative causality to be explicit, traceable, and
+replayable. Actor behaviour need not remain fully predictable. Randomness or
+generative variation may be introduced for a defined outcome when the run
+records the initial state, ordered inputs, submitted proposals, resolution
+decisions, and controlled variation needed to reproduce its causal transitions.
+Generated output never bypasses authoritative validation or directly mutates
+canonical reality.
+
+Treat bounded, verifiable proposals as the durable method for containing LLM
+uncertainty. Binary evidence-grounded questions are its first supported
+perception form, not a claim that every future LLM role must be binary.
+
+**Consequences:** The completed deterministic utility experiment remains
+unchanged and does not retroactively establish stochastic behaviour. Future
+capability choices may introduce controlled variation without weakening
+authority, inspection, or replay. The strategy no longer treats deterministic
+action selection as a permanent product constraint.

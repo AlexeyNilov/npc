@@ -2,29 +2,39 @@
 
 ## Vision
 
-NPC engine is a learning laboratory for discovering how to design autonomous,
-deterministic agentic systems. It is the first subgoal toward a future universal
-simulation engine: a successful engine should provide lessons and foundations
-that can later be carried into that broader effort.
+NPC engine aims to become a modular engine for building inspectable simulations
+with heterogeneous actors: individuals, groups, organisations, and non-human
+systems. The intended user is a simulation builder who needs flexible actor
+behaviour without surrendering causal inspection and replay.
 
-The project explores a general model for **agentic simulated actors**.
-Although the first form is an NPC, the model should eventually describe actors
-at many scales: individuals, groups, organisations, and non-human systems.
+Actor loops operate within a shared authoritative simulation substrate: they
+interpret reality and propose actions, while the substrate resolves outcomes
+and maintains canonical state. Generative components may contribute through
+bounded interfaces, but their outputs remain proposals. Only substrate
+resolution may commit a canonical transition.
+
+Authoritative causality should be traceable, replayable, and eventually
+branchable. Actor behaviour need not always be predictable: controlled
+variation may be introduced when the run records its initial state, ordered
+inputs, submitted proposals, resolution decisions, and variation results needed
+to reproduce its authoritative transitions.
 
 The intended actor loop is:
 
 ```text
-Reality
+Authoritative reality
     ↓
-Perception
+Actor-specific perception
     ↓
 Sensemaking
     ↓
 Intent
     ↓
-Action
+Action proposal
     ↓
-Outcome
+Substrate resolution
+    ↓
+Outcome and canonical transition
     ↓
 Feedback
     ↙        ↘
@@ -33,9 +43,9 @@ Perception   Sensemaking
 
 This is the project's target model, not a claim about the current implementation.
 
-The first audience is the project's developer. The current runnable
-demonstration is a deterministic turn loop with LLM-assisted perception and
-non-authoritative narration. Its current design is in
+The project is currently exercised by its developer. The runnable demonstration
+is a deterministic fox turn loop with LLM-assisted perception and
+non-authoritative narration. Its verified design is in
 [Architecture](docs/architecture.md), its observable behavior is in
 [Requirements](docs/requirements.md), and what the utility experiment
 established is in [its evidence record](docs/evidence/2026-07-26-fox-deterministic-utility.md).
