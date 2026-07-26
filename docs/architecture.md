@@ -84,6 +84,26 @@ text has no path to action, distance, feedback, or perception. The module's YAML
 fixtures and narrator are disposable scaffolding, not a general renderer,
 dialogue, state, or event framework.
 
+## Fox deterministic utility experiment
+
+`npc.experiments.fox_deterministic_utility` is a separate fox-local experiment;
+it does not change `fox_distance_feedback` or its fixed threat-first policy.
+It validates an authoritative starting hunger integer from `0` through `100`,
+uses the existing hearing-gated threat and food-offer sensors, and scores only
+accepted perceptions. The fixed experiment scores `flee` at `60` for an
+accepted threat, `approach` at the starting hunger for an accepted food offer,
+and `do_nothing` at `1`; equal scores retain the fixed action order of `flee`,
+`approach`, then `do_nothing`. The selected action uses the existing local
+distance transition. Each valid completed turn then advances hunger by `10`,
+saturating at `100`, for the next turn.
+
+The frozen trace retains the starting and resulting hunger, sensor validation
+data, candidate utilities, selected score, tie order, action, and distance
+feedback. Its YAML corpus and command-line wrapper are experiment scaffolding,
+not a reusable need, utility, actor, or state framework. The experiment's
+observed result and limits are owned by
+[its evidence record](evidence/2026-07-26-fox-deterministic-utility.md).
+
 ## Interactive fox turns
 
 `sample/fox_chat.py` is a terminal loop modeled on the local sample chat,

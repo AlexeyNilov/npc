@@ -25,9 +25,4 @@ registry, or actor framework.
 
 ## Ordered future outcomes
 
-1. **Evidence-bearing deterministic fox utility experiment.** Demonstrate or
-   refute that a fox-local persistent need state and deterministic utility
-   selection can explainably balance safety against food-seeking while
-   preserving the existing LLM-authority boundary and replayable feedback.
-   The strategic rationale and constraints are owned by
-   [Strategy](strategy.md#current-direction).
+No incomplete future outcomes are currently recorded.

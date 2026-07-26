@@ -1,11 +1,10 @@
 # Experiment: deterministic fox safety-versus-food utility
 
-**Status:** Review
+**Status:** Complete
 
 **Date:** 2026-07-26
 
-**Roadmap outcome:** [Evidence-bearing deterministic fox utility
-experiment](../roadmap.md#ordered-future-outcomes)
+**Roadmap outcome:** Completed; see the current roadmap.
 
 ## Decision unlocked
 
@@ -136,6 +135,4 @@ after the required Simplifier review and roadmap closure.
   unlocks the decision of whether its authoritative hunger-to-selection-to-
   feedback sequence recurs under a contrasting decision before any reuse
   decision.
-- **Canonical follow-up:** Technical Lead to arrange the required Simplifier
-  review, then assess recurrence and route any accepted finding to its
-  canonical owner.
+- **Canonical follow-up:** Strategy recurrence assessment.
