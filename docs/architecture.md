@@ -175,3 +175,27 @@ bounded-scenario scaffolding. They do not establish a reusable actor, world,
 scheduler, conflict-resolution, or mediation framework. Its observable
 contract is owned by
 [Requirements](requirements.md#fox-and-hunter-shared-world-turn).
+
+## Village emergency-food rationing turn
+
+`npc.experiments.village_rationing` is a separate, bounded three-actor
+scenario. It derives each household's private observation and mediates its
+bounded claim before deriving the relief organisation's observation from only
+the canonical reserve and resulting public claim ledger. The organisation's
+bounded allocation proposal remains untrusted input: the simulation core
+recomputes the fixed priority allocation and only commits an exact match.
+
+The source-state guard accepts only the two checked-in initial reserves (six
+or four units) with no committed allocations. Six units and both valid claims
+accept the 4/2 allocation; changing only the initial reserve makes the
+organisation observe four units and accepts 4/0. Malformed, unsupported, or
+rule-inconsistent actor output produces no unauthorised canonical change.
+The frozen trace retains actor records, ledger, proposal, validation decision,
+transitions, resulting state, and actor-specific feedback. `replay` re-derives
+the actor inputs and re-runs authoritative validation without mediation.
+
+The module, trace types, fixture corpus, and resolver are disposable
+bounded-scenario scaffolding. They do not establish a reusable village,
+claim, allocation, actor, world, or mediation framework. Its observable
+contract is owned by
+[Requirements](requirements.md#village-emergency-food-rationing-turn).

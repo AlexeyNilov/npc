@@ -1,6 +1,6 @@
 # Experiment: village emergency-food rationing portability
 
-**Status:** Planned
+**Status:** Review
 
 **Date:** 2026-07-26
 
@@ -70,8 +70,24 @@ At task Review, complete every field and set the evidence status to `Review`.
 The Technical Lead sets the final status after required review and roadmap
 closure.
 
-- **Observed result:** Pending.
-- **Reproducibility evidence:** Pending.
-- **Interpretation and limits:** Pending.
-- **Decision or unresolved question created:** Pending.
-- **Canonical follow-up:** Pending.
+- **Observed result:** Supported. The checked-in corpus records accepted 4/2
+  and 4/0 priority allocations for six- and four-unit canonical reserves,
+  respectively, and rejects the over-reserve 4/4 proposal with unchanged
+  canonical state. Behavioral tests also exercise separate actor inputs,
+  private-fact exclusion from other requests and feedback, malformed and
+  unsupported mediation failure for every actor, JSON-safe traces, and replay
+  without a mediation call.
+- **Reproducibility evidence:** `.venv/bin/pytest
+  tests/test_village_rationing.py` passed (16 tests); focused Ruff and mypy
+  checks passed; `make test` and `make check` passed the 72-test repository
+  suite; and `git diff --check` passed.
+- **Interpretation and limits:** The result supports this fixed, disposable
+  three-actor scenario's causal boundary. It does not establish a village
+  management model, eligibility or fairness policy beyond the accepted priority
+  rule, persistent household state, live-model cost or latency, or a reusable
+  framework.
+- **Decision or unresolved question created:** The evidence supports retaining
+  natural language as the default semantic interface through this contrasting
+  allocation slice; the Technical Lead must still reconcile the required
+  Simplifier review and roadmap closure before finalizing the decision.
+- **Canonical follow-up:** Technical Lead completion reconciliation.
