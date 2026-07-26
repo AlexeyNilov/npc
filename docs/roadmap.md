@@ -27,4 +27,4 @@ registry, or actor framework.
    selection can explainably balance safety against food-seeking while
    preserving the existing LLM-authority boundary and replayable feedback.
    The strategic rationale and constraints are owned by
-   [Strategy](strategy.md#current-strategic-frame).
+   [Strategy](strategy.md#current-direction).

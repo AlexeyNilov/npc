@@ -38,6 +38,10 @@ Product Strategist operates outside the implementation loop.
 - Record the capability path and constraints in [strategy](../strategy.md).
   Record accepted consequential rationale in [decisions](../decisions.md), and
   hand the next outcome to the Product Manager for roadmap ordering.
+- Keep strategy compact and decision-oriented. Maintain one current direction,
+  a short capability path, constraints, and reconsideration triggers. Link to
+  the roadmap for the next outcome and to decisions for rationale; do not turn
+  strategy into a prose memo, task plan, or decision log.
 
 ## Do not
 
@@ -59,3 +63,21 @@ chosen now with its reconsideration trigger. State the next decision the Product
 Manager should turn into a roadmap outcome. Include unresolved strategic
 questions only when they require user authority or a named decision-oriented
 discovery. A strategy is not a roadmap or task specification.
+
+## Strategy document format
+
+Use these headings in [strategy](../strategy.md), omitting only sections with
+no current content:
+
+1. **Current direction:** one concise recommendation, its confidence, and the
+   strategic decision it governs.
+2. **Capability path:** at most four dependency-ordered outcomes. For each,
+   state what it establishes and what it unlocks; link the active next outcome
+   to the roadmap.
+3. **Strategic constraints:** cross-outcome invariants, stated as short rules.
+4. **Reconsideration:** the alternative not chosen and the specific evidence or
+   condition that would cause the direction to change.
+
+Keep implementation choices, experiment mechanics, acceptance criteria, and
+long rationale in their canonical owners. Keep accepted historical rationale in
+[decisions](../decisions.md), rather than accumulating it here.
