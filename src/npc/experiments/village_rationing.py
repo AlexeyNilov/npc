@@ -159,9 +159,17 @@ def _allocation_proposal(raw_proposal: object) -> AllocationProposal | None:
     if not isinstance(raw_proposal, dict) or set(raw_proposal) != {"household_one", "household_two"}:
         return None
     allocations = (raw_proposal["household_one"], raw_proposal["household_two"])
-    if any(isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 4 for value in allocations):
+    if not _is_bounded_allocation_proposal(allocations):
         return None
     return cast(AllocationProposal, allocations)
+
+
+def _is_bounded_allocation_proposal(proposal: object) -> bool:
+    return (
+        isinstance(proposal, tuple)
+        and len(proposal) == 2
+        and all(isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= 4 for value in proposal)
+    )
 
 
 def _claim_ledger(household_one: ActorRecord, household_two: ActorRecord) -> tuple[tuple[str, int, int], ...]:
@@ -226,9 +234,10 @@ def replay(trace: TurnTrace) -> TurnTrace:
         != _organisation_observation(trace.initial_canonical_state.reserve_units, expected_ledger)
         or trace.household_one.proposal not in ("claim_4", "wait", None)
         or trace.household_two.proposal not in ("claim_4", "wait", None)
-        or not _valid_record(trace.household_one)
-        or not _valid_record(trace.household_two)
-        or not _valid_record(trace.organisation)
+        or (trace.organisation.proposal is not None and not _is_bounded_allocation_proposal(trace.organisation.proposal))
+        or not _valid_record(trace.household_one, HOUSEHOLD_ONE_DESCRIPTION)
+        or not _valid_record(trace.household_two, HOUSEHOLD_TWO_DESCRIPTION)
+        or not _valid_record(trace.organisation, ORGANISATION_DESCRIPTION)
     ):
         raise ValueError("trace does not match its recorded actor inputs")
     proposal = trace.organisation.proposal if isinstance(trace.organisation.proposal, tuple) else None
@@ -243,10 +252,16 @@ def replay(trace: TurnTrace) -> TurnTrace:
     return trace
 
 
-def _valid_record(record: ActorRecord) -> bool:
+def _valid_record(record: ActorRecord, description: ActorDescription) -> bool:
+    if record.questions != description.questions:
+        return False
     if record.subjective_percept is None:
         return record.answers == () and record.proposal is None
-    return len(record.answers) == 2 and all(answer.evidence in record.subjective_percept for answer in record.answers)
+    return (
+        len(record.answers) == 2
+        and tuple(answer.question for answer in record.answers) == description.questions
+        and all(answer.evidence in record.subjective_percept for answer in record.answers)
+    )
 
 
 def _validate_source_state(state: CanonicalState) -> None:

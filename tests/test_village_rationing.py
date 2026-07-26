@@ -109,28 +109,40 @@ def test_six_unit_turn_separates_private_inputs_and_commits_priority_allocation(
 
 
 def test_changing_only_reserve_changes_organisation_observation_and_authoritative_result() -> None:
-    calls: dict[str, str] = {}
+    calls: dict[str, list[str]] = {"household_one": [], "household_two": [], "organisation": []}
 
     async def household_one(accessible: str, _: str, __: tuple[str, ...]) -> str:
-        calls["household_one"] = accessible
+        calls["household_one"].append(accessible)
         return valid_household_response(HOUSEHOLD_ONE_DESCRIPTION)
 
     async def household_two(accessible: str, _: str, __: tuple[str, ...]) -> str:
-        calls["household_two"] = accessible
+        calls["household_two"].append(accessible)
         return valid_household_response(HOUSEHOLD_TWO_DESCRIPTION)
 
     async def organisation(accessible: str, _: str, __: tuple[str, ...]) -> str:
-        calls["organisation"] = accessible
-        return valid_organisation_response({"household_one": 4, "household_two": 0})
+        calls["organisation"].append(accessible)
+        allocation = (
+            {"household_one": 4, "household_two": 2} if "6 units" in accessible else {"household_one": 4, "household_two": 0}
+        )
+        return valid_organisation_response(allocation)
 
-    trace = asyncio.run(run_turn(household_one, household_two, organisation, CanonicalState(reserve_units=4)))
+    six_unit_trace = asyncio.run(run_turn(household_one, household_two, organisation, CanonicalState(reserve_units=6)))
+    four_unit_trace = asyncio.run(run_turn(household_one, household_two, organisation, CanonicalState(reserve_units=4)))
 
-    assert calls["household_one"] == "Your household has no food for today; your two dependants need emergency rations."
-    assert calls["household_two"] == "Your household has no food for today; your infant needs emergency rations."
-    assert calls["organisation"].startswith("Emergency food reserve: 4 units.")
-    assert trace.resulting_canonical_state.reserve_units == 0
-    assert trace.resulting_canonical_state.committed_allocations == (("household_one", 4), ("household_two", 0))
-    assert trace.validation_decision == "accepted"
+    assert (
+        calls["household_one"]
+        == [
+            "Your household has no food for today; your two dependants need emergency rations.",
+        ]
+        * 2
+    )
+    assert calls["household_two"] == ["Your household has no food for today; your infant needs emergency rations."] * 2
+    assert calls["organisation"][0].startswith("Emergency food reserve: 6 units.")
+    assert calls["organisation"][1].startswith("Emergency food reserve: 4 units.")
+    assert six_unit_trace.claim_ledger == four_unit_trace.claim_ledger
+    assert six_unit_trace.resulting_canonical_state.committed_allocations == (("household_one", 4), ("household_two", 2))
+    assert four_unit_trace.resulting_canonical_state.committed_allocations == (("household_one", 4), ("household_two", 0))
+    assert six_unit_trace.validation_decision == four_unit_trace.validation_decision == "accepted"
 
 
 def test_invalid_allocation_is_rejected_without_canonical_change() -> None:
@@ -213,6 +225,34 @@ def test_fixture_trace_is_json_safe_and_replays_without_mediation() -> None:
     json.dumps(asdict(trace), sort_keys=True)
     assert replay(trace) == trace
     with pytest.raises(ValueError, match="does not match"):
+        replay(replace(trace, household_one=replace(trace.household_one, questions=("tampered", "questions"))))
+    with pytest.raises(ValueError, match="does not match"):
+        replay(
+            replace(
+                trace,
+                household_one=replace(
+                    trace.household_one,
+                    answers=(replace(trace.household_one.answers[0], question="tampered"), trace.household_one.answers[1]),
+                ),
+            )
+        )
+    with pytest.raises(ValueError, match="does not match"):
         replay(replace(trace, allocation_proposal=(4, 4)))
+    with pytest.raises(ValueError, match="does not match"):
+        replay(
+            replace(
+                trace,
+                organisation=replace(trace.organisation, proposal=(5, 0)),
+                allocation_proposal=(5, 0),
+                validation_decision="rejected",
+                transitions=(),
+                resulting_canonical_state=trace.initial_canonical_state,
+                feedback={
+                    "household_one": "No emergency-food allocation was committed for your household.",
+                    "household_two": "No emergency-food allocation was committed for your household.",
+                    "organisation": "The allocation proposal was rejected.",
+                },
+            )
+        )
     with pytest.raises(ValueError, match="does not match"):
         replay(replace(trace, feedback={**trace.feedback, "organisation": "changed"}))

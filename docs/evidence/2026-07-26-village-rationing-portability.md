@@ -1,11 +1,10 @@
 # Experiment: village emergency-food rationing portability
 
-**Status:** Review
+**Status:** Complete
 
 **Date:** 2026-07-26
 
-**Roadmap outcome:** [Test cross-scale portability of the semantic and causal
-contracts](../roadmap.md#1-test-cross-scale-portability-of-the-semantic-and-causal-contracts)
+**Roadmap outcome:** Completed; see the current roadmap.
 
 ## Decision unlocked
 
@@ -73,10 +72,13 @@ closure.
 - **Observed result:** Supported. The checked-in corpus records accepted 4/2
   and 4/0 priority allocations for six- and four-unit canonical reserves,
   respectively, and rejects the over-reserve 4/4 proposal with unchanged
-  canonical state. Behavioral tests also exercise separate actor inputs,
-  private-fact exclusion from other requests and feedback, malformed and
-  unsupported mediation failure for every actor, JSON-safe traces, and replay
-  without a mediation call.
+  canonical state. One behavioral test reuses the same three mediation
+  callbacks across the two reserve inputs, derives the organisation response
+  from its received reserve observation, and confirms unchanged household
+  observations and claims. Behavioral tests also exercise separate actor
+  inputs, private-fact exclusion from other requests and feedback, malformed
+  and unsupported mediation failure for every actor, JSON-safe traces, and
+  replay without a mediation call.
 - **Reproducibility evidence:** `.venv/bin/pytest
   tests/test_village_rationing.py` passed (16 tests); focused Ruff and mypy
   checks passed; `make test` and `make check` passed the 72-test repository
@@ -88,6 +90,5 @@ closure.
   framework.
 - **Decision or unresolved question created:** The evidence supports retaining
   natural language as the default semantic interface through this contrasting
-  allocation slice; the Technical Lead must still reconcile the required
-  Simplifier review and roadmap closure before finalizing the decision.
-- **Canonical follow-up:** Technical Lead completion reconciliation.
+  allocation slice.
+- **Canonical follow-up:** None — completion reconciliation finished.
