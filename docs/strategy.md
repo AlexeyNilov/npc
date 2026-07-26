@@ -15,8 +15,9 @@ choices. Link to those owners rather than copying their contents.
 **Status:** Accepted.
 
 **Long-term capability:** Turn the evidenced actor/simulation-core boundary into
-a builder-controlled composition capability, then extend composed scenarios
-through stateful execution and causal branching until the
+a composition capability controlled by the
+[simulation builder](glossary.md#product-roles-and-components), then extend
+composed scenarios through stateful execution and causal branching until the
 [product vision](../README.md#vision) is reachable.
 
 **Confidence:** Medium. The completed causal-closure and shared-world slices,

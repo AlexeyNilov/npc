@@ -18,6 +18,26 @@ entry standardizes a name; it does not authorize new state, behavior, a
 threshold, or a product decision. Record those facts with their canonical
 owners, then link to them here.
 
+## Product roles and components
+
+**Simulation builder.** Preferred short form **builder** only when the product
+  context is clear. The intended product-user role responsible for supplying
+  and composing simulation descriptions and actor descriptions, then running,
+  inspecting, replaying, and eventually branching their scenarios. The term
+  does not prescribe whether authoring uses code, configuration, or another
+  interface, and it is not synonymous with a software build tool or engine
+  developer. The project developer currently fills this role. See the
+  [vision](../README.md#vision) and [strategy](strategy.md#strategic-horizons).
+
+**Engine.** The target product and runtime as a whole. It provides the
+  composition and execution environment for simulations and actors. It contains
+  the authoritative simulation core and supplies generic mediation,
+  orchestration, and causal recording around it. Generic engine machinery does
+  not invent simulation-specific policy or actor cognition; it enforces and
+  coordinates their declared boundaries. The current experiment modules do not
+  yet constitute a reusable engine. See the [vision](../README.md#vision) and
+  [strategy](strategy.md#strategic-thesis).
+
 ## Authority and state
 
 **Authoritative.** Data, rules, or transitions that the simulation is permitted
