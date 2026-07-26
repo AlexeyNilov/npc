@@ -1,9 +1,9 @@
 # Builder guide: the clearing composition experiment
 
 This guide lets you run and modify the completed builder-controlled-composition
-experiment, including its bounded two-step clearing timeline. It is a small,
-deterministic experiment—not a command-line product surface or a general
-simulation framework.
+experiment, including its bounded two-step clearing timeline and fixed
+initial-source comparison. It is a small, deterministic experiment—not a
+command-line product surface or a general simulation framework.
 
 Start with:
 
@@ -15,7 +15,8 @@ Start with:
 For verified behavior and limits, see the
 [composition requirement](requirements.md#builder-controlled-clearing-composition),
 [composition evidence](evidence/2026-07-26-builder-controlled-composition.md),
-and [stateful-execution evidence](evidence/2026-07-26-stateful-shared-world-execution.md).
+[stateful-execution evidence](evidence/2026-07-26-stateful-shared-world-execution.md),
+and [bounded-causal-branching evidence](evidence/2026-07-26-bounded-causal-branching.md).
 
 ## The basic model
 
@@ -154,6 +155,47 @@ resolution and feedback, and resulting state. Replay derives the recorded
 inputs and authoritative resolutions again without mediating either actor. Add
 `--json` to print the complete retained timeline.
 
+## Compare the fixed initial-source alternative
+
+The completed causal-branching experiment compares two independently recorded
+two-step timelines. The parent is `TWO_STEP_DECLARATION`; the alternative has
+its own initial state, differing only in the clearing-owned
+`trap_materials_ready` source input (`true` to `false`) before step one. The
+engine does not interpret readiness or create a general branch: the supplied
+clearing rules expose readiness only to the hunter and resolve its effect.
+
+Run and replay the fixed comparison from the repository root:
+
+```bash
+PYTHONPATH=src .venv/bin/python - <<'PY'
+import asyncio
+import json
+
+from npc.experiments.composed_clearing import (
+    replay_bounded_causal_comparison,
+    run_bounded_causal_comparison,
+)
+
+comparison = asyncio.run(run_bounded_causal_comparison())
+replay_bounded_causal_comparison(comparison)
+print(json.dumps(comparison.as_json(), indent=2, sort_keys=True))
+PY
+```
+
+Inspect these fields in the output:
+
+- `parent_point` is `initial_source_state`; it is before ordinal step one.
+- `source_variation` records the sole `trap_materials_ready` difference.
+- `parent_timeline` retains the ready-materials history: the hunter sets a
+  trap and the fox is caught.
+- `alternative_timeline` retains the unavailable-materials history: the
+  hunter waits, no trap is set, and the fox reaches food.
+
+Each timeline is authoritative on its own: replay validates both separately
+without mediating either actor. This is deliberately one fixed comparison, not
+an API for selecting another point, changing a committed outcome, or adding
+arbitrary variations.
+
 ## See structural validation fail safely
 
 The invalid declaration deliberately gives a fox component the hunter-only
@@ -240,7 +282,8 @@ exact-two-step clearing timeline. It does not yet provide:
 - a CLI, GUI, configuration-file format, or plugin system for builders;
 - an arbitrary number of turns, a scheduler, a universal time model, or
   persistent scenario execution;
-- branching or counterfactual comparison;
+- arbitrary branching or counterfactual comparison beyond the fixed
+  initial-source readiness variation;
 - universal world/action schemas;
 - engine-level semantic compatibility or domain-validity diagnosis; or
 - a live LLM mediation adapter for these supplied components.
