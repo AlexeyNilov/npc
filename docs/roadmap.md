@@ -30,49 +30,6 @@ are owned by [Strategy](strategy.md).
 
 ## Ordered future outcomes
 
-### 1. Compose a shared authoritative world for heterogeneous actors
-
-**Strategic horizon:** 2 — shared-world composition. **Depends on:** the
-completed causal-closure and actor-description outcomes.
-
-**Plain-language goal:** Let different actors act in the same world while
-keeping their knowledge, beliefs, and decisions separate. The simulation acts
-as the referee when their actions interact.
-
-**Illustrative fox example (non-binding):** A fox smells food while a hunter
-hears movement. The fox gets only fox-appropriate observations and the hunter
-gets only hunter-appropriate observations. Each forms its own percept and
-proposes an action: the fox approaches; the hunter sets a trap. The simulation
-decides the order and outcome, such as whether the fox arrives before the trap
-is ready, and records why that authoritative result occurred.
-
-**Target user and problem:** A simulation builder needs actors with different
-information access and interpretation to affect one shared reality, rather
-than running isolated actor loops that merely resemble a simulation.
-
-**Desired observable outcome:** A bounded scenario contains at least two
-heterogeneous actors. For a common canonical state, the simulation gives each
-actor only its own actor-accessible substate; each forms and records its own
-percept and answers; and each submits bounded proposals. The simulation core
-owns time, ordering, conflict resolution, and committed transitions. The
-resulting trace makes clear which observations, proposals, resolution decisions
-and feedback caused each authoritative change, and replay reproduces that
-sequence.
-
-**Constraints:** Actor percepts, beliefs, and narration remain actor-local and
-non-authoritative. Actors must not share simulation-schema-specific sensemaking
-code merely to participate. Do not generalize scheduling or conflict machinery
-beyond what the bounded scenario needs.
-
-**Ordinary completion evidence:** A checked-in contention or ordering case
-demonstrates distinct actor-accessible substates, distinct recorded percepts,
-authoritative ordering and resolution, and reproducible canonical results.
-
-**Decision unlocked:** Whether the semantic boundary is credible for a shared
-world and should be tested across a materially different scale or schema, or
-whether observed composition pressure calls for a strategy decision about the
-core contracts.
-
 ### 2. Test cross-scale portability of the semantic and causal contracts
 
 **Strategic horizon:** 3 — cross-scale portability. **Depends on:** outcome

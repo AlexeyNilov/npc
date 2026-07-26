@@ -1,0 +1,33 @@
+cases:
+  - id: ready-materials-catches-fox
+    canonical_state:
+      fox_location: clearing_edge
+      hunter_location: beside_clearing
+      hunter_concealed: true
+      fox_tracks_lead_to_food: true
+      food_available: true
+      trap_set: false
+      trap_materials_ready: true
+      fox_caught: false
+      food_consumed: false
+    mediation_responses:
+      fox: >-
+        {"percept":"The clearing seems quiet and the food seems reachable.","answers":[{"question":"Do I believe an immediate threat is present?","answer":false,"evidence":"The clearing seems quiet and the food seems reachable."},{"question":"Do I believe the food is reachable by approaching?","answer":true,"evidence":"The clearing seems quiet and the food seems reachable."}]}
+      hunter: >-
+        {"percept":"Fresh tracks suggest the fox may approach and my materials are ready.","answers":[{"question":"Do I believe a fox is likely to approach the food this turn?","answer":true,"evidence":"Fresh tracks suggest the fox may approach and my materials are ready."},{"question":"Do I believe I can set the trap now?","answer":true,"evidence":"Fresh tracks suggest the fox may approach and my materials are ready."}]}
+  - id: unavailable-materials-fox-reaches-food
+    canonical_state:
+      fox_location: clearing_edge
+      hunter_location: beside_clearing
+      hunter_concealed: true
+      fox_tracks_lead_to_food: true
+      food_available: true
+      trap_set: false
+      trap_materials_ready: false
+      fox_caught: false
+      food_consumed: false
+    mediation_responses:
+      fox: >-
+        {"percept":"The clearing seems quiet and the food seems reachable.","answers":[{"question":"Do I believe an immediate threat is present?","answer":false,"evidence":"The clearing seems quiet and the food seems reachable."},{"question":"Do I believe the food is reachable by approaching?","answer":true,"evidence":"The clearing seems quiet and the food seems reachable."}]}
+      hunter: >-
+        {"percept":"Fresh tracks suggest an approach, but materials are not ready.","answers":[{"question":"Do I believe a fox is likely to approach the food this turn?","answer":true,"evidence":"Fresh tracks suggest an approach, but materials are not ready."},{"question":"Do I believe I can set the trap now?","answer":false,"evidence":"Fresh tracks suggest an approach, but materials are not ready."}]}

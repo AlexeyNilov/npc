@@ -150,3 +150,28 @@ is not thereby a universal action.
 The module and its YAML fixture are disposable experiment scaffolding, not a
 general actor, world, or mediation framework. Its observable contract is owned by
 [Requirements](requirements.md#fox-language-mediated-causal-turn).
+
+## Fox and hunter shared-world turn
+
+`npc.experiments.fox_hunter_shared_world` is a separate, bounded
+shared-authoritative-world slice. It starts from one canonical clearing state,
+derives both actor-accessible substates before either mediation request, then
+keeps the fox and hunter mediation inputs and actor-local records separate.
+The simulation core retains both resulting proposals before it applies the
+fixed hunter-then-fox resolution order.
+
+The core alone applies the scenario's trap and food transitions. With ready
+materials, the hunter's accepted `set_trap` proposal sets the trap before the
+fox's `approach_food` proposal is resolved, yielding the caught-fox outcome.
+Changing only canonical material readiness changes the hunter's observation;
+the fixture's valid hunter response then waits, and the same fox proposal
+reaches and consumes the food. The frozen trace records both actor records,
+proposal order, resolution decisions, transitions, outcome, and actor-specific
+feedback. `replay` re-derives actor observations and re-resolves the recorded
+proposals without mediation.
+
+The module, trace types, fixture corpus, and fixed resolver are disposable
+bounded-scenario scaffolding. They do not establish a reusable actor, world,
+scheduler, conflict-resolution, or mediation framework. Its observable
+contract is owned by
+[Requirements](requirements.md#fox-and-hunter-shared-world-turn).
