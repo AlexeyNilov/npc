@@ -8,11 +8,13 @@ from typing import Any, Literal, cast
 
 import yaml  # type: ignore[import-untyped]
 
+from npc.experiments.fox_deterministic_utility import TurnTrace as UtilityTurnTrace
 from npc.experiments.fox_distance_feedback import Action, TurnTrace, run_turn
 from npc.infrastructure.language_model import complete_text
 
 Renderer = Callable[[str], Awaitable[str]]
 RenderValidation = Literal["accepted", "unusable_response", "narrator_exception"]
+CompletedFoxTurn = TurnTrace | UtilityTurnTrace
 FALLBACK_TEXT = "The fox's response cannot be rendered."
 MAX_NARRATION_CHARACTERS = 280
 NARRATOR_INSTRUCTION = (
@@ -25,7 +27,7 @@ NARRATOR_INSTRUCTION = (
 
 @dataclass(frozen=True)
 class RenderingTrace:
-    canonical_turn: TurnTrace
+    canonical_turn: CompletedFoxTurn
     prompt: str
     raw_renderer_output: str | None
     validation_result: RenderValidation
@@ -33,7 +35,7 @@ class RenderingTrace:
     non_authoritative: bool
 
 
-async def render_completed_turn(canonical_turn: TurnTrace, renderer: Renderer) -> RenderingTrace:
+async def render_completed_turn(canonical_turn: CompletedFoxTurn, renderer: Renderer) -> RenderingTrace:
     prompt = _render_prompt(canonical_turn.executed_action)
     preserved_turn = replace(canonical_turn)
     try:

@@ -61,11 +61,13 @@ After installing the project, run:
 python sample/fox_chat.py
 ```
 
-Each input is an independent player turn. The existing deterministic fox
-pipeline selects and executes `flee`, `approach`, or `do_nothing`; the
-configured LLM then renders only that completed outcome. The loop carries only authoritative
-distance into the next turn. It does not roleplay the fox or retain dialogue
-history. Type `/exit` to quit.
+Each input is an independent player turn. The deterministic utility experiment
+scores `flee`, `approach`, and `do_nothing` from validated perception and the
+fox's persistent hunger; the configured LLM then renders only that completed
+outcome. The loop carries authoritative distance and hunger into the next turn,
+prints the selected utility, and does not roleplay the fox or retain dialogue
+history. Type `/exit` to quit. Use `--starting-hunger 0` through
+`--starting-hunger 100` to begin at a different hunger level.
 
 ## Project documentation
 

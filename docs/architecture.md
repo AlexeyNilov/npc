@@ -104,12 +104,14 @@ not a reusable need, utility, actor, or state framework. The experiment's
 observed result and limits are owned by
 [its evidence record](evidence/2026-07-26-fox-deterministic-utility.md).
 
-## Interactive fox turns
+## Interactive fox utility turns
 
 `sample/fox_chat.py` is a terminal loop modeled on the local sample chat,
 but it does not stream or roleplay a response. For each player input it calls
-the existing `run_turn`, then `render_completed_turn`, prints the resulting
-non-authoritative narration under the `Narration (non-authoritative)` label,
-and carries only the canonical feedback distance to the next iteration. The
-loop has no conversation history, fox persona, or path from narration back to
-the next action.
+the fox-local utility `run_turn`, then `render_completed_turn`, prints the
+selected action, candidate utilities, and resulting non-authoritative narration
+under the `Narration (non-authoritative)` label. It carries only the canonical
+feedback distance and resulting hunger to the next iteration. The loop has no
+conversation history, fox persona, or path from narration back to the next
+action. The renderer can preserve either completed fox trace type, but still
+receives only the completed action for narration.

@@ -52,13 +52,15 @@ This document owns observable system behavior.
   `The fox's response cannot be rendered.` and leave every canonical-turn
   field, including action and feedback distance, unchanged.
 
-### Interactive deterministic fox turns
+### Interactive deterministic fox utility turns
 
 - **When** a developer runs `python sample/fox_chat.py`, **the system shall**
-  accept one player message at a time, run the existing fox turn, print its
-  completed-outcome narration under a label containing `Narration` and
-  `non-authoritative`, and use only the canonical feedback distance as the
-  following turn's starting distance.
+  accept one player message at a time, run the deterministic fox utility turn,
+  print its action and candidate utilities, print its completed-outcome
+  narration under a label containing `Narration` and `non-authoritative`, and
+  use only its canonical feedback distance and resulting hunger as the next
+  turn's authoritative state. It shall accept `--starting-distance` and
+  `--starting-hunger` arguments.
 - **When** the player exits the loop, **the system shall** end without retaining
   dialogue history. The loop shall not generate a roleplayed fox reply or use
   narration as input to a later turn.

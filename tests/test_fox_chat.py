@@ -19,7 +19,7 @@ def test_chat_turn_runs_the_fox_pipeline_then_renders_non_authoritative_outcome(
         narrator_prompts.append(prompt)
         return "The fox slips behind the trees."
 
-    trace = asyncio.run(chat_turn("Fox, I will hurt you.", 10, complete, narrate))
+    trace = asyncio.run(chat_turn("Fox, I will hurt you.", 10, 50, complete, narrate))
 
     assert len(sensor_calls) == 2
     assert trace.canonical_turn.executed_action == "flee"
@@ -36,10 +36,19 @@ def test_chat_turn_carries_distance_and_does_not_turn_narration_into_next_turn_i
     async def narrate(_: str) -> str:
         return "The fox watches without moving."
 
-    first = asyncio.run(chat_turn("Fox, hello.", 10, complete, narrate))
-    second = asyncio.run(chat_turn("Fox, hello again.", first.canonical_turn.feedback_distance, complete, narrate))
+    first = asyncio.run(chat_turn("Fox, hello.", 10, 50, complete, narrate))
+    second = asyncio.run(
+        chat_turn(
+            "Fox, hello again.",
+            first.canonical_turn.feedback_distance,
+            first.canonical_turn.resulting_hunger,
+            complete,
+            narrate,
+        )
+    )
 
     assert first.canonical_turn.feedback_distance == second.canonical_turn.starting_distance == 10
+    assert first.canonical_turn.resulting_hunger == second.canonical_turn.starting_hunger == 60
     assert second.canonical_turn.player_message == "Fox, hello again."
     assert "watches" not in second.canonical_turn.player_message
 
@@ -57,12 +66,14 @@ def test_chat_prints_explicit_non_authoritative_narration_and_authoritative_feed
 
     monkeypatch.setattr("builtins.input", lambda _: next(messages))
 
-    asyncio.run(chat(10, complete, narrate))
+    asyncio.run(chat(10, 50, complete, narrate))
 
     output = capsys.readouterr().out
     assert "Narration (non-authoritative): The fox disappears into the trees." in output
     assert "Fox:" not in output
     assert "Distance: 15" in output
+    assert "hunger: 60" in output
+    assert "Action: flee (60); utilities: flee=60, approach=0, do_nothing=1" in output
 
 
 def test_chat_turn_carries_authoritative_approach_distance() -> None:
@@ -74,7 +85,7 @@ def test_chat_turn_carries_authoritative_approach_distance() -> None:
     async def narrate(_: str) -> str:
         return "The fox edges nearer."
 
-    trace = asyncio.run(chat_turn("Fox, I offer you this fresh meat.", 10, complete, narrate))
+    trace = asyncio.run(chat_turn("Fox, I offer you this fresh meat.", 10, 20, complete, narrate))
 
     assert trace.canonical_turn.executed_action == "approach"
     assert trace.canonical_turn.feedback_distance == 7
@@ -95,6 +106,6 @@ def test_chat_turn_rejects_invalid_starting_distance_before_completion_or_narrat
         return "not used"
 
     with pytest.raises(ValueError):
-        asyncio.run(chat_turn("Fox, hello.", -1, complete, narrate))
+        asyncio.run(chat_turn("Fox, hello.", -1, 50, complete, narrate))
 
     assert completion_calls == narration_calls == 0
