@@ -29,6 +29,15 @@ owners, then link to them here.
   developer. The project developer currently fills this role. See the
   [vision](../README.md#vision) and [strategy](strategy.md#strategic-horizons).
 
+**Simulation description.** The builder-supplied definition that provides or
+  identifies a simulation's canonical state and meaning-bearing authority
+  capabilities. Those capabilities derive actor-accessible observations,
+  declare accepted proposals, resolve them under simulation-specific rules,
+  commit canonical transitions, and select feedback. A simulation description
+  is not necessarily passive data or a separate process; its authoring and
+  execution mechanism remains deliberately unspecified. See the
+  [target composition model](strategy.md#target-modular-composition-model).
+
 **Engine.** The target product and runtime as a whole. It provides the
   composition and execution environment for simulations and actors. It contains
   the authoritative simulation core and supplies generic mediation,

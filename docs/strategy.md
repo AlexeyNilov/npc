@@ -15,9 +15,10 @@ choices. Link to those owners rather than copying their contents.
 **Status:** Accepted.
 
 **Long-term capability:** Turn the evidenced actor/simulation-core boundary into
-a composition capability controlled by the
-[simulation builder](glossary.md#product-roles-and-components), then extend
-composed scenarios through stateful execution and causal branching until the
+a composition capability through which the
+[simulation builder](glossary.md#product-roles-and-components) can supply and
+replace independently owned simulations and actors, then extend composed
+scenarios through stateful execution and causal branching until the
 [product vision](../README.md#vision) is reachable.
 
 **Confidence:** Medium. The completed causal-closure and shared-world slices,
@@ -42,10 +43,10 @@ must be generalised or a claim that the end-state engine already exists.
 
 | Horizon | Capability established | Unlocks |
 | --- | --- | --- |
-| 1. Builder-controlled composition | A simulation builder can supply an independently owned simulation definition and heterogeneous actor descriptions to a common causal execution boundary, then run, inspect, and replay one bounded shared-world scenario without modifying the engine or introducing schema-specific cognition into it. | The first product-shaped authoring surface and stable builder-input, authority, trace, and replay contracts for later horizons. |
+| 1. Builder-controlled composition | A simulation builder can supply an independently owned simulation description and heterogeneous actor descriptions to a common causal execution boundary, then run, inspect, and replay one bounded shared-world scenario without modifying generic engine machinery or introducing schema-specific cognition into it. A compatible actor or simulation rule-set replacement remains local to its supplied component and composition declaration. | The first product-shaped authoring surface and stable builder-input, compatibility, authority, trace, replay, and replacement contracts for later horizons. |
 | 2. Stateful shared-world execution | A composed scenario advances through multiple authoritative steps with explicit time, ordering, conflict resolution, feedback, and retained context while preserving information boundaries and causal replay. | Meaningful evolving scenarios and stable points from which alternatives can be explored. |
 | 3. Causal branching | A builder can branch a recorded scenario at a selected point, vary bounded source inputs or controlled generative inputs, and inspect comparable outcomes while preserving branch lineage and replayable authoritative causality. | Counterfactual exploration without surrendering causal inspection. |
-| End state | Builders can compose independently described simulations, heterogeneous actors, and bounded generative components in inspectable, replayable, and branchable scenarios. | The product value described in the vision. |
+| End state | Builders can compose and replace independently described simulations, heterogeneous actors, and bounded generative components in inspectable, replayable, and branchable scenarios without domain-specific changes to generic engine machinery. | The product value described in the vision. |
 
 The dependency order is strict: Horizon 1 establishes the authored inputs,
 authority boundary, and trace/replay contract; Horizon 2 carries those contracts
@@ -81,19 +82,41 @@ declare the bounded ordering or conflict rule needed to close its run; pull
 forward reusable temporal semantics only when that builder outcome cannot be
 causally complete without them.
 
-**Target boundary, not a current implementation claim:** Horizon 1 tests whether
-a builder can compose an explicit semantic contract among a simulation
-description, actor descriptions, and the engine. For the minimum test, the
-builder pairs an actor-declared proposal vocabulary with simulation-declared
-accepted proposals; this does not make fixed or parameter-free vocabularies a
-universal interface. The simulation supplies the filtered actor-accessible
-substate and owns authoritative resolution and feedback; the actor owns its
-description, subjective cognition, and proposal selection; the engine
-orchestrates and records the exchange without inventing domain meaning. Natural
-language remains the default on the perception and sensemaking side, while
-anything crossing into simulation authority remains a bounded proposal.
-Independence means avoiding shared schema-specific cognition, not eliminating
-deliberate coupling at observation, proposal, and feedback semantics.
+### Target modular composition model
+
+**Target, not a current implementation claim:** The product is a composition
+system with four independently owned responsibilities. Independence means that
+a component can be replaced through its declared contracts without changing
+generic engine machinery or unrelated components. It does not mean zero
+coupling, zero domain-authoring work, or separate deployment processes.
+
+| Responsibility | Owns | Boundary |
+| --- | --- | --- |
+| Builder | Supplies or selects simulation and actor descriptions, makes their compatibility explicit, and runs, inspects, replays, and eventually branches the composition. | Chooses compatible meaning-bearing components without encoding their policy in engine defaults. |
+| Actor, including an agent-backed actor | Owns its description, epistemic profile, questions, retained context, subjective cognition, bounded proposal vocabulary, and proposal selection. | Consumes only its filtered observation and feedback; it neither reads canonical reality directly nor determines a proposal's canonical effect. |
+| Simulation | Supplies the domain authority: canonical facts and their meanings, actor-specific observation filtering, admissible proposal semantics, resolution and conflict rules, canonical transitions, and feedback selection. | Owns world meaning and policy without absorbing actor cognition or generic orchestration. |
+| Engine | Provides the composition and execution environment. Its generic machinery mediates and sequences exchanges, isolates actor channels, validates contract structure and authority paths, and records and replays causality. At runtime it hosts or invokes the builder-supplied simulation authority as the authoritative simulation core within the engine. | Enforces the protocol without interpreting world fields, deciding domain validity, or inventing actor or simulation meaning. |
+
+```text
+Builder composes:
+Simulation description ↔ Engine ↔ Actor descriptions
+
+Runtime exchange managed and recorded by the engine:
+simulation-filtered observation → actor cognition → bounded proposal
+    → simulation-owned resolution and canonical transition
+    → actor-specific feedback
+```
+
+As defined in the
+[glossary](glossary.md#product-roles-and-components), a simulation description
+must carry or identify the capabilities that own domain authority; it is not
+assumed to be passive data. This model does not yet choose whether a supplied
+component uses code, configuration, a domain-specific language, or an external
+process. Natural language remains the default on the perception and sensemaking
+side, while anything crossing into simulation authority remains a bounded
+proposal. The engine understands the causal roles and contract envelopes, not
+what a blocked path, food reserve, priority rule, or other world-specific term
+means.
 
 The Product Manager should define the builder-visible meaning of independent
 supply and compatibility, and the run, inspection, and replay outcome that
@@ -103,15 +126,35 @@ escalating any new public meaning or irreversible interface choice.
 
 ## Strategic constraints
 
-- Actor loops interpret observations and propose actions; the simulation core
-  alone resolves outcomes and maintains canonical reality.
-- The simulation enforces hard information-access limits before mediation and
-  supplies only each actor's accessible substate.
-- Actors own their epistemic profiles, questions, retained context, the bounded
-  proposals they can form, and proposal selection. Simulations own which
-  proposals they accept and their authoritative resolution semantics. The
-  builder makes compatibility explicit; engine-owned mediation and
-  orchestration do not invent actor- or simulation-specific meaning.
+These are capability-level requirements for any eventual authoring interface,
+runtime contract, or adapter. They constrain the product without selecting a
+concrete API or data shape; observable acceptance behavior remains owned by
+[Requirements](requirements.md).
+
+- Independently supplied actor and simulation descriptions must be identifiable
+  and recordable with the run. The builder makes their compatibility explicit;
+  the engine does not repair semantic mismatches by inventing domain adapters,
+  actor policy, or world meaning.
+- Replacing an actor implementation or description or a simulation rule set
+  changes only the supplied component and its composition declaration. It must
+  not require domain-specific edits to generic engine machinery or unrelated
+  actors. New domain semantics may still require localized authoring in the
+  simulation or actor that owns them.
+- Composition deliberately couples observation, proposal, resolution, and
+  feedback semantics. At minimum, the builder pairs an actor-declared bounded
+  proposal vocabulary with simulation-declared accepted proposals; no fixed or
+  parameter-free vocabulary is presumed universal.
+- The simulation enforces semantic information-access rules and supplies only
+  each actor's accessible substate. The engine enforces channel and recipient
+  isolation so actors cannot bypass that projection; it cannot infer whether
+  domain-specific filtering is semantically correct.
+- Actor loops interpret observations and propose actions. Proposals remain
+  untrusted requests; the simulation core alone applies domain admissibility and
+  resolution rules, commits outcomes, and maintains canonical reality.
+- Generic engine validation may reject malformed envelopes, undeclared
+  pairings, missing results, or unauthorized transition paths. Only the
+  simulation may decide domain questions such as preconditions, resource
+  sufficiency, conflicts, transition effects, or feedback meaning.
 - Natural language remains the default semantic intermediary. Subjective
   percepts, beliefs, and sensemaking answers are actor-local, recorded, and may
   be incomplete or distorted; they never become canonical merely by being
@@ -144,3 +187,4 @@ escalating any new public meaning or irreversible interface choice.
 | Structured or domain-specific cognition as the default | A target builder outcome shows that natural language repeatedly loses action-relevant precision, cannot meet usable cost or latency, or requires actors to share simulation-schema traversal logic. |
 | Application-first vertical strategy | A concrete simulation builder and problem provide stronger capability requirements than the current domain-neutral path, or repeated composition attempts cannot produce useful builder value without application-specific engine or schema coupling. |
 | Generative environment or Game Master authority | A target outcome cannot be represented by explicit resolution without embedding its domain policy in the core, and bounded evidence shows generated resolution can preserve canonical validation and causal replay. |
+| Universal engine-interpreted world or rule model | Repeated builder-controlled compositions show stable world and rule semantics across materially different simulations, and component-supplied rules cannot provide usable authoring, validation, inspection, or replay without a shared representation. Standardise only the common meaning supported by that evidence. |
