@@ -8,14 +8,24 @@ outcomes, not coding activities or speculative engine abstractions.
 
 ## Product frame
 
-**Target user:** the project's developer, learning how a deterministic actor
-can use an LLM as a narrow perception sensor without granting it authority over
-the actor's actions.
+**Target user:** a simulation builder who needs independently described
+simulations and heterogeneous actors with flexible behaviour, while retaining
+causal inspection, replay, and eventual branching. The canonical target and
+value are in the [Vision](../README.md#vision).
 
-**Current learning boundary:** assess whether the evidenced deterministic
-perception-to-feedback boundary recurs before considering reuse. The capability
-path and constraints are in [Strategy](strategy.md); the current implementation
-is in [Architecture](architecture.md); and the completed utility result is in
-[its evidence record](evidence/2026-07-26-fox-deterministic-utility.md).
+**Current roadmap focus:** establish
+[Horizon 1 causal closure](strategy.md#strategic-horizons) through the smallest
+language-mediated boundary between an actor and the authoritative simulation
+core. The simulation supplies an actor-accessible substate; the actor supplies
+its epistemic profile and questions; generic LLM mediation records a subjective
+percept and evaluates the actor-owned questions in one request while retaining
+each answer and its percept evidence separately; and the simulation core
+resolves a bounded action proposal, commits the outcome, and returns feedback
+with a replayable causal trace.
+
+The current fox [architecture](architecture.md) and completed
+[utility evidence](evidence/2026-07-26-fox-deterministic-utility.md) remain
+foundational inputs, not the product frame. The capability path and constraints
+are owned by [Strategy](strategy.md).
 
 ## Ordered future outcomes
