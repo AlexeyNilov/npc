@@ -107,3 +107,25 @@ the next action. The renderer can preserve either completed fox trace type, but
 still receives only completed presentation facts. Its observable command
 contract is owned by
 [Requirements](requirements.md#interactive-deterministic-fox-utility-turns).
+
+## Fox language-mediated causal turn
+
+`npc.experiments.fox_causal_turn` is a separate, fox-local causal-closure
+slice. Its simulation core starts from the accepted blocked clearing state and
+derives the fixed natural-language clearing, smell, and rustling substate
+before its sole injected mediation request. That request receives only the
+derived substate, the hungry/cautious epistemic profile, and the two ordered
+fox questions; the canonical blocked-path fact is withheld.
+
+The recorded mediation response contains one subjective percept and an
+evidence-grounded answer for each question. Invalid output fails closed to the
+fox's `wait` proposal. Otherwise, the fox-local intent rule submits either
+`approach_food` or `wait`; only the simulation-core resolver commits the
+resulting state and feedback. An `approach_food` proposal meets the canonical
+blocked path and therefore resolves as `food_path_blocked`, even when the
+actor's recorded belief says the food is reachable. `replay` verifies that the
+recorded proposal, resolution, state, and feedback agree without calling
+mediation again. The module and its YAML fixture are disposable experiment
+scaffolding, not a general actor, world, or mediation framework. Its observable
+contract is owned by
+[Requirements](requirements.md#fox-language-mediated-causal-turn).

@@ -1,0 +1,4 @@
+cases:
+  - id: blocked-food-path
+    mediation_response: >-
+      {"percept":"The clearing seems quiet and food seems close.","answers":[{"question":"Do I believe an immediate threat is present?","answer":false,"evidence":"clearing seems quiet"},{"question":"Do I believe the food is reachable by approaching?","answer":true,"evidence":"food seems close"}]}
