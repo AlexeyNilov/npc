@@ -6,6 +6,10 @@ This document owns observable system behavior.
 
 ### Bounded fox distance feedback
 
+- **When** a caller starts a fox turn, **the system shall** accept its
+  authoritative distance only as a non-boolean integer greater than or equal to
+  `1`. For any other value, it shall raise `ValueError` before hearing, sensor
+  invocation, action execution, or feedback processing.
 - **When** a developer runs the checked-in fox distance-feedback corpus, **the
   system shall** print one JSON-safe trace per turn containing the player
   message, starting distance, hearing result, separate threat and food-offer

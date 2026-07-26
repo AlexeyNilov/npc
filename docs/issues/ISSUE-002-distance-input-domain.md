@@ -1,6 +1,6 @@
 # ISSUE-002: Fox distance accepts values outside a physical distance domain
 
-**Status:** Open
+**Status:** Routed
 
 **Observed:** 2026-07-25
 
@@ -33,9 +33,10 @@ domain and invalid-input behavior are explicit.
 
 ## Open question
 
-What values constitute valid authoritative distance, and how should the system
-handle invalid values before they can affect hearing, action execution, or
-feedback?
+Resolved for [TASK-006](../tasks/TASK-006-enforce-fox-distance-input-domain.md):
+valid authoritative distance is a non-boolean integer `>= 1`; invalid values
+shall raise `ValueError` before they can affect hearing, action execution, or
+feedback.
 
 ## Routing
 
@@ -43,7 +44,7 @@ feedback?
 - **Architecture:** [Bounded fox distance feedback](../architecture.md#bounded-fox-distance-feedback).
 - **Decision:** None.
 - **Roadmap:** None.
-- **Task:** None.
+- **Task:** [TASK-006](../tasks/TASK-006-enforce-fox-distance-input-domain.md).
 
 ## Resolution
 
