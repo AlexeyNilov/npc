@@ -46,6 +46,39 @@ The authority boundary is the important part:
   it does not interpret clearing facts or action meanings.
 - The **builder** chooses compatible components and writes their declaration.
 
+## How the experiment maps to the target modular composition model
+
+The [target modular composition model](strategy.md#target-modular-composition-model)
+describes four independently owned responsibilities. The table below shows the
+closest current implementation parts. It is a guide to the boundary this
+experiment tests, not a claim that these Python fixtures are the complete target
+product.
+
+| Target responsibility | Current parts | What the current boundary does—and does not—mean |
+| --- | --- | --- |
+| **Builder** | `CompositionDeclaration` in `composition.py`; the supplied `BASELINE_DECLARATION`, replacement declarations, and `TWO_STEP_DECLARATION` in `composed_clearing.py` | The declaration selects one simulation, named actors, proposal pairings, and initial state. `validate()` checks that structural pairing. The builder remains responsible for semantic compatibility; the engine does not infer whether an actor or rule set makes sense for a clearing. |
+| **Actor** | `ActorComponent` and `StatefulActorComponent` protocols in `composition.py`; `ClearingActor` in `composed_clearing.py` | An actor declares its proposal vocabulary and returns `ActorRun` cognition plus a bounded proposal. For the two-step fixture, it also owns initial retained context and `reduce_context()` from its own feedback. `ClearingActor` is deterministic scaffolding: it does not implement the target model's full epistemic profile, question set, or language-mediated subjective percept. |
+| **Simulation** | `SimulationComponent` and `Resolution` in `composition.py`; `ClearingRules` and `CanonicalState` in `composed_clearing.py` | `ClearingRules.observe()` derives each actor's permitted input; `accepted_proposals` declares admissible vocabulary; and `resolve()` alone applies ordering, conflict handling, transitions, outcome, and feedback. The engine never reads a clearing field or decides what a proposal means. |
+| **Engine** | `validate()`, `run()`, `run_timeline()`, `replay()`, `replay_timeline()`, and the trace records in `composition.py` | The engine validates structural envelopes, derives all simulation-filtered inputs before mediation, sequences bounded exchanges, records them by value, and replays without mediation. `run_timeline()` is fixed to exactly two steps; it is not a general scheduler, persistence layer, or branch runtime. |
+
+The resulting exchange follows the target model's authority direction:
+
+```text
+builder declaration selects actors + clearing rules
+        │
+        ▼
+engine asks ClearingRules for actor-filtered input
+        │
+        ▼
+ClearingActor returns bounded proposal
+        │
+        ▼
+ClearingRules resolves and commits canonical state + feedback
+        │
+        ▼
+engine records the trace and verifies replay
+```
+
 ## Terms you will see
 
 | Term | In this experiment |
