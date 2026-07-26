@@ -5,6 +5,7 @@ from typing import cast
 
 import pytest
 
+import npc.experiments.autonomous_clearing as clearing
 from npc.experiments.autonomous_clearing import (
     ClearingError,
     SessionRecord,
@@ -15,8 +16,14 @@ from npc.experiments.autonomous_clearing import (
 )
 
 
-async def no_llm(_: str) -> str:
-    return '{"question": "What changed?", "sensemaking": "I will respond to what I can see."}'
+async def no_llm(prompt: str) -> str:
+    if "You are the fox" in prompt and '"food_scent": true' in prompt:
+        proposal = "approach_food"
+    elif "You are the hunter" in prompt and '"trap_materials_available": true' in prompt and '"trap_set": false' in prompt:
+        proposal = "set_trap"
+    else:
+        proposal = "wait"
+    return f'{{"answer": "I will respond to what I can see.", "proposal": "{proposal}"}}'
 
 
 async def no_narrator(_: str) -> str:
@@ -46,7 +53,14 @@ def test_turn_limit_validates_before_any_causal_or_actor_work() -> None:
 
 
 def test_event_histories_control_outcomes_and_are_json_safe_by_value() -> None:
-    fed = asyncio.run(run_session(3, selector=selector("food_scent"), cognition=no_llm, narrator=no_narrator))
+    async def fox_approaches(prompt: str) -> str:
+        return (
+            '{"answer": "Food is present.", "proposal": "approach_food"}'
+            if "You are the fox" in prompt
+            else await no_llm(prompt)
+        )
+
+    fed = asyncio.run(run_session(3, selector=selector("food_scent"), cognition=fox_approaches, narrator=no_narrator))
     caught = asyncio.run(
         run_session(3, selector=selector("trap_materials_arrive", "food_scent"), cognition=no_llm, narrator=no_narrator)
     )
@@ -72,7 +86,7 @@ def test_event_histories_control_outcomes_and_are_json_safe_by_value() -> None:
     json.dumps(quiet.as_json(), sort_keys=True)
 
 
-@pytest.mark.parametrize("kind", ("blank", "malformed", "unavailable", "exceptional"))
+@pytest.mark.parametrize("kind", ("blank", "malformed", "unavailable", "exceptional", "out_of_vocabulary"))
 def test_cognition_and_narration_fallbacks_leave_authority_unchanged(kind: str) -> None:
     async def broken(_: str) -> str:
         return "{malformed"
@@ -86,16 +100,49 @@ def test_cognition_and_narration_fallbacks_leave_authority_unchanged(kind: str) 
     async def exceptional(_: str) -> str:
         raise OSError("LLM unavailable")
 
-    call = {"blank": blank, "malformed": broken, "unavailable": unavailable, "exceptional": exceptional}[kind]
+    async def out_of_vocabulary(_: str) -> str:
+        return '{"answer": "I choose an invalid action.", "proposal": "escape"}'
+
+    call = {
+        "blank": blank,
+        "malformed": broken,
+        "unavailable": unavailable,
+        "exceptional": exceptional,
+        "out_of_vocabulary": out_of_vocabulary,
+    }[kind]
     session = asyncio.run(run_session(1, selector=selector("food_scent"), cognition=call, narrator=call))
     fox = session.turns[0].actors["fox"].cognition
     assert fox.valid is False
+    assert fox.answer == "The fox has no valid answer and uses only its supplied observation."
     assert session.turns[0].actors["fox"].proposal == "approach_food"
     assert session.turns[0].narration.valid is False
     assert session.ending == "fed"
 
 
-def test_replay_uses_retained_history_and_rejects_changed_authority() -> None:
+def test_fixed_questions_and_valid_llm_proposals_control_outcomes_without_crossing_channels() -> None:
+    async def fox_waits(prompt: str) -> str:
+        return '{"answer": "I decline.", "proposal": "wait"}' if "You are the fox" in prompt else await no_llm(prompt)
+
+    async def fox_approaches(prompt: str) -> str:
+        return '{"answer": "I approach.", "proposal": "approach_food"}' if "You are the fox" in prompt else await no_llm(prompt)
+
+    waiting = asyncio.run(run_session(1, selector=selector("food_scent"), cognition=fox_waits, narrator=no_narrator))
+    approaching = asyncio.run(run_session(1, selector=selector("food_scent"), cognition=fox_approaches, narrator=no_narrator))
+    fox = approaching.turns[0].actors["fox"]
+    hunter = approaching.turns[0].actors["hunter"]
+
+    assert waiting.ending == "clearing_quiet"
+    assert approaching.ending == "fed"
+    assert fox.question == "Do I perceive food that is worth approaching?"
+    assert hunter.question == "Can I prepare or use a trap based on what I perceive?"
+    assert fox.cognition.valid is True and fox.proposal == "approach_food"
+    assert hunter.cognition.valid is True
+    assert "trap_materials_available" not in fox.cognition.prompt and "trap_set" not in fox.cognition.prompt
+    assert "food_available" not in hunter.cognition.prompt and "food_scent" not in hunter.cognition.prompt
+    assert "food_scent" not in hunter.cognition.prompt and "food_scent" not in fox.cognition.prompt.split("observation:", 1)[0]
+
+
+def test_replay_uses_retained_history_and_rejects_changed_authority(monkeypatch: pytest.MonkeyPatch) -> None:
     calls: list[str] = []
 
     events = iter(("trap_materials_arrive", "food_scent"))
@@ -114,6 +161,7 @@ def test_replay_uses_retained_history_and_rejects_changed_authority() -> None:
 
     session = asyncio.run(run_session(2, selector=selected, cognition=cognition, narrator=narration))
     calls_before_replay = list(calls)
+    monkeypatch.setattr(clearing, "_fallback_proposal", lambda *_: (_ for _ in ()).throw(AssertionError("fallback called")))
     assert asyncio.run(session.replay()) == session
     assert calls == calls_before_replay
 

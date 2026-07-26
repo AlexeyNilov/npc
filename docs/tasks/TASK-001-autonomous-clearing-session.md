@@ -45,7 +45,8 @@ accepted scenario rules.
 | Turn limit `N` | [Autonomous observer clearing session requirement](../requirements.md#autonomous-observer-clearing-session) | Non-boolean integer 1–10, supplied at start and retained by value | Launcher input becomes authoritative initial configuration; observer controls cannot change it | Validated before selection; retained in each session record; replay verifies it | Accepted in [autonomous-observer decision](../decisions.md#2026-07-26-run-the-clearing-as-an-autonomous-observer-simulation) |
 | `food_scent` / `trap_materials_arrive` | [Autonomous observer clearing session requirement](../requirements.md#autonomous-observer-clearing-session) | Uniform selection with replacement; each applies only its specified canonical effect and visibility | Simulation | Selected and recorded before effect; replay consumes recorded selection | Accepted requirement |
 | `fed`, `caught`, `clearing_quiet` | [Autonomous observer clearing session requirement](../requirements.md#autonomous-observer-clearing-session) | The only session endings, selected by resolution or after `N` resolved turns | Simulation | Terminal; prohibits later event selection | Accepted requirement |
-| Actor-local cognition and observer narration | [Autonomous observer clearing session requirement](../requirements.md#autonomous-observer-clearing-session) | One real-LLM cognition call per actor turn and one post-completion narration call; outputs are recorded presentation only | No authority; deterministic policy and simulation retain authority | Fresh run calls the configured LLM; replay consumes its retained records | Accepted in [autonomous-observer decision](../decisions.md#2026-07-26-run-the-clearing-as-an-autonomous-observer-simulation) |
+| Actor-local question, answer, and proposal | [Autonomous observer clearing session requirement](../requirements.md#autonomous-observer-clearing-session) | One fixed identity question per actor; real LLM returns an answer and bounded proposal, or the specified deterministic fallback applies | Validator accepts a candidate proposal; simulation alone resolves it and commits state | Fresh run calls the configured LLM; replay consumes retained accepted/fallback proposal | Accepted in [autonomous-observer decision](../decisions.md#2026-07-26-run-the-clearing-as-an-autonomous-observer-simulation) |
+| Observer narration | [Autonomous observer clearing session requirement](../requirements.md#autonomous-observer-clearing-session) | One post-completion real-LLM narration call; output is presentation only | No authority | Fresh run calls the configured LLM; replay consumes its retained record | Accepted in [autonomous-observer decision](../decisions.md#2026-07-26-run-the-clearing-as-an-autonomous-observer-simulation) |
 
 ## Terminology
 
@@ -90,11 +91,12 @@ a reusable system boundary.
   or unavailable marker with each readable causal account. After completion,
   offer inspection, exact replay, and fresh-run controls. A launcher may
   configure `N`; the observer cannot.
-- Make one configured real-LLM cognition call per actor turn with only that
-  actor's filtered observation and own feedback context, then retain its prompt,
-  raw output or null, validation status, and accepted JSON `question` and
-  `sensemaking` values or actor-local fallback. The cognition cannot alter
-  deterministic proposal selection.
+- Define each actor's accepted fixed identity question and bounded proposal
+  vocabulary locally. Make one configured real-LLM call per actor turn with
+  only that actor's filtered observation and own feedback context; retain its
+  fixed question, prompt, raw output or null, validation status, accepted JSON
+  answer and proposal, or actor-local fallback answer/proposal. Pass only the
+  accepted or fallback proposal to simulation resolution.
 - Make one configured real-LLM narration call after each completed turn, using
   only retained causal facts. Validate it as non-authoritative and fall back to
   a fixed, readable account derived only from the retained turn record.
@@ -113,19 +115,21 @@ a reusable system boundary.
   `caught`; and no `food_scent` through `N` ends `clearing_quiet`. Verify
   replacement selection by covering repeated `trap_materials_arrive`.
 - For every recorded turn, assert causal ordering, by-value JSON safety,
-  filtered observations, actor-local retained feedback, one actor-local LLM
-  cognition call per actor, deterministic policy proposals, hunter-before-fox
-  resolution, and simulation-only state changes.
+  filtered observations, actor-local retained feedback, the correct fixed
+  actor question, one actor-local LLM answer/proposal call per actor, validator
+  behavior and deterministic fallback, hunter-before-fox resolution, and
+  simulation-only state changes.
   Include source-variation tests that change recorded event histories and show
   corresponding proposal/outcome changes, plus withheld-fact tests for each
   actor boundary.
-- Replay a session without invoking the selector, actor LLM, or narrator, and
-  assert it preserves the retained cognition and narration. It may
-  deterministically re-derive the accepted proposal from the recorded filtered
-  observation; this is validation, not actor mediation. Mutate each required
-  authoritative fact class — including missing/reordered event, event
-  ordinal/name/effect, `N`, observation/context, proposal, resolution/feedback,
-  state, and ending — and assert rejection.
+- Replay a session without invoking the selector, actor LLM, actor fallback
+  policy, or narrator, and assert it preserves the retained question, answer,
+  accepted/fallback proposal, and narration. It shall validate only the
+  recorded proposal's vocabulary and re-derive simulation resolution; it does
+  not generate a replacement proposal. Mutate each required authoritative fact
+  class — including missing/reordered event, event ordinal/name/effect, `N`,
+  observation/context, proposal, resolution/feedback, state, and ending — and
+  assert rejection.
 - Exercise the terminal path through injected input/output: launch advances to
   an ending without observer input; each turn exposes both actor and narration
   prompts/raw outputs; inspection is read-only; replay is exact; and fresh run
@@ -153,23 +157,23 @@ a reusable system boundary.
 
 ## Handoff
 
-**Status and outcome:** Review; the terminal now runs each launched session to
-its ending without observer input, prints retained causal and LLM-exchange
-facts for every completed turn, and exposes only post-ending noncausal controls.
+**Status and outcome:** Review; actor identities now retain their accepted fixed
+questions, validated LLM answer/proposal candidates drive simulation resolution,
+and invalid candidates use the accepted observation-derived fallback.
 
 **Changed files and ownership impact:** Added the scenario runtime, terminal
 launcher, and behavioral tests; README owns the observer entry point and
 Architecture owns the verified scenario boundary. Requirements and Decisions
 remain user-owned context.
 
-**Verification:** `.venv/bin/pytest tests/test_autonomous_clearing.py` (11
-passed); `make check` (60 passed); `git diff --check` passed. Focused tests
-cover automatic no-input launch, retained prompt/raw-output visibility,
-unavailable markers, inspection/replay isolation from LLM calls, automatic
-fresh runs, causal ordering, replay authority validation, and fallbacks.
+**Verification:** `.venv/bin/pytest tests/test_autonomous_clearing.py` (13
+passed); `make check` (62 passed); `git diff --check` passed. Focused tests
+cover fixed questions, valid proposal-driven outcome differences, filtered
+channels, fallback categories including out-of-vocabulary output, replay
+isolation from selector/LLM/narrator/fallback policy, and automatic terminal
+presentation and fresh runs.
 
 **Assumptions, risks, and next action:** The configured LLM adapter still uses
 the existing local `complete_text` client; no arbitrary timeout threshold was
 introduced after the reported live-path stall, because such a threshold would
-be a new contract choice. Unavailable or invalid output visibly falls back
-without changing authority. Request the required Simplifier review.
+be a new contract choice. Request the required Simplifier review.

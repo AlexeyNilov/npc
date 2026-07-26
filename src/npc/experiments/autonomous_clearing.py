@@ -13,6 +13,11 @@ from npc.infrastructure.language_model import complete_text
 EventSelector = Callable[[], str]
 TextCall = Callable[[str], Awaitable[str]]
 EVENT_NAMES = ("food_scent", "trap_materials_arrive")
+ACTOR_QUESTIONS = {
+    "fox": "Do I perceive food that is worth approaching?",
+    "hunter": "Can I prepare or use a trap based on what I perceive?",
+}
+ACTOR_PROPOSALS = {"fox": ("approach_food", "wait"), "hunter": ("set_trap", "wait")}
 
 
 class ClearingError(ValueError):
@@ -21,7 +26,7 @@ class ClearingError(ValueError):
 
 async def _configured_call(prompt: str) -> str:
     """The scenario's configured real-LLM adapter, kept outside simulation authority."""
-    return await complete_text(prompt, "Return a best-effort response. It is non-authoritative presentation only.")
+    return await complete_text(prompt, "Follow the requested format. Your response cannot directly mutate simulation state.")
 
 
 @dataclass(frozen=True)
@@ -45,12 +50,12 @@ class CognitionRecord:
     prompt: str
     raw_output: str | None
     valid: bool
-    question: str
-    sensemaking: str
+    answer: str
 
 
 @dataclass(frozen=True)
 class ActorRecord:
+    question: str
     observation: dict[str, bool]
     retained_context: str
     cognition: CognitionRecord
@@ -150,15 +155,24 @@ def _cognition_prompt(actor: str, observation: Mapping[str, bool], context: str)
     facts = json.dumps(dict(observation), sort_keys=True)
     return (
         f"You are the {actor}. Use only this observation: {facts}. Your own prior feedback is: {context!r}. "
-        'Return JSON only with nonblank string fields "question" and "sensemaking".'
+        f"Your fixed question is: {ACTOR_QUESTIONS[actor]} "
+        f'Return JSON only with nonblank string field "answer" and "proposal" as one of {ACTOR_PROPOSALS[actor]!r}.'
     )
 
 
-def _fallback_cognition(actor: str) -> tuple[str, str]:
-    return (f"What can the {actor} establish from this turn?", "I will act only on my supplied observation.")
+def _fallback_answer(actor: str) -> str:
+    return f"The {actor} has no valid answer and uses only its supplied observation."
 
 
-async def _record_cognition(actor: str, observation: dict[str, bool], context: str, call: TextCall) -> CognitionRecord:
+def _fallback_proposal(actor: str, observation: Mapping[str, bool]) -> str:
+    if actor == "fox":
+        return "approach_food" if observation["food_scent"] else "wait"
+    return "set_trap" if observation["trap_materials_available"] and not observation["trap_set"] else "wait"
+
+
+async def _record_cognition(
+    actor: str, observation: dict[str, bool], context: str, call: TextCall
+) -> tuple[CognitionRecord, str]:
     prompt = _cognition_prompt(actor, observation, context)
     raw: str | None
     try:
@@ -167,23 +181,18 @@ async def _record_cognition(actor: str, observation: dict[str, bool], context: s
         raw = None
     try:
         parsed = json.loads(raw) if isinstance(raw, str) and raw.strip() else None
-        question = parsed["question"] if isinstance(parsed, dict) else None
-        sensemaking = parsed["sensemaking"] if isinstance(parsed, dict) else None
-        if not isinstance(question, str) or not question.strip() or not isinstance(sensemaking, str) or not sensemaking.strip():
+        answer = parsed["answer"] if isinstance(parsed, dict) and set(parsed) == {"answer", "proposal"} else None
+        proposal = parsed["proposal"] if isinstance(parsed, dict) and set(parsed) == {"answer", "proposal"} else None
+        if not isinstance(answer, str) or not answer.strip() or proposal not in ACTOR_PROPOSALS[actor]:
             raise ValueError
-        return CognitionRecord(prompt, raw, True, question, sensemaking)
+        return CognitionRecord(
+            prompt,
+            raw,
+            True,
+            answer,
+        ), proposal
     except (ValueError, TypeError, json.JSONDecodeError, KeyError):
-        question, sensemaking = _fallback_cognition(actor)
-        return CognitionRecord(prompt, raw, False, question, sensemaking)
-
-
-def _proposals(observations: Mapping[str, Mapping[str, bool]]) -> dict[str, str]:
-    return {
-        "fox": "approach_food" if observations["fox"]["food_scent"] else "wait",
-        "hunter": "set_trap"
-        if observations["hunter"]["trap_materials_available"] and not observations["hunter"]["trap_set"]
-        else "wait",
-    }
+        return CognitionRecord(prompt, raw, False, _fallback_answer(actor)), _fallback_proposal(actor, observation)
 
 
 def _resolve(state: ClearingState, proposals: Mapping[str, str]) -> tuple[ClearingState, ResolutionRecord, str | None]:
@@ -276,17 +285,15 @@ async def _advance(active: _ActiveSession) -> str | None:
     event = EventRecord(ordinal, name, dict(effect))
     state_after_event = _apply_event(active.state, effect)
     observations = _observations(state_after_event, effect)
-    cognition = {
-        actor: ActorRecord(
-            dict(observations[actor]),
-            active.contexts[actor],
-            await _record_cognition(actor, dict(observations[actor]), active.contexts[actor], active.cognition),
-            "",
+    actors: dict[str, ActorRecord] = {}
+    for actor in ("fox", "hunter"):
+        cognition, proposal = await _record_cognition(
+            actor, dict(observations[actor]), active.contexts[actor], active.cognition
         )
-        for actor in ("fox", "hunter")
-    }
-    proposals = _proposals(observations)
-    actors = {actor: replace(record, proposal=proposals[actor]) for actor, record in cognition.items()}
+        actors[actor] = ActorRecord(
+            ACTOR_QUESTIONS[actor], dict(observations[actor]), active.contexts[actor], cognition, proposal
+        )
+    proposals = {actor: record.proposal for actor, record in actors.items()}
     active.state, resolution, ending = _resolve(state_after_event, proposals)
     if ending is None and ordinal == active.turn_limit:
         ending = "clearing_quiet"
@@ -314,17 +321,22 @@ async def replay(record: SessionRecord) -> SessionRecord:
         observations = _observations(state_after_event, effect)
         if set(turn.actors) != {"fox", "hunter"}:
             raise ClearingError("invalid actor record")
-        proposals = _proposals(observations)
+        proposals: dict[str, str] = {}
         for actor in ("fox", "hunter"):
             saved = turn.actors[actor]
             if (
-                saved.observation != observations[actor]
+                saved.question != ACTOR_QUESTIONS[actor]
+                or saved.observation != observations[actor]
                 or saved.retained_context != contexts[actor]
-                or saved.proposal != proposals[actor]
             ):
                 raise ClearingError("actor record does not match causal history")
-            if not saved.cognition.prompt or not saved.cognition.question or not saved.cognition.sensemaking:
+            if (
+                saved.proposal not in ACTOR_PROPOSALS[actor]
+                or saved.cognition.prompt != _cognition_prompt(actor, observations[actor], contexts[actor])
+                or not saved.cognition.answer
+            ):
                 raise ClearingError("incomplete retained cognition")
+            proposals[actor] = saved.proposal
         state, resolution, terminal = _resolve(state_after_event, proposals)
         expected_ending = terminal or ("clearing_quiet" if expected_ordinal == record.turn_limit else None)
         expected = TurnRecord(turn.event, turn.actors, resolution, state, expected_ending, turn.narration)
@@ -350,8 +362,8 @@ def format_causal_account(turns: Sequence[TurnRecord]) -> str:
         for actor in ("fox", "hunter"):
             record = turn.actors[actor]
             actor_accounts.append(
-                f"{actor.title()}: question={record.cognition.question}; "
-                f"sensemaking={record.cognition.sensemaking}; proposal={record.proposal}"
+                f"{actor.title()}: question={record.question}; answer={record.cognition.answer}; "
+                f"validation={'accepted' if record.cognition.valid else 'fallback'}; proposal={record.proposal}"
             )
         feedback = ", ".join(f"{actor}={message}" for actor, message in sorted(turn.resolution.feedback.items()))
         state = ", ".join(f"{name}={str(value).lower()}" for name, value in asdict(turn.resulting_state).items())

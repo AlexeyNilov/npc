@@ -156,11 +156,13 @@ ending, the observer can inspect completed causal records, replay a completed
 session, or begin a fresh one. The observer supplies no causal input.
 
 Each turn records the selected event before its effect, actor-filtered
-observations and actor-local feedback, non-authoritative LLM cognition,
-deterministic proposals, hunter-first resolution, state, ending, and
-non-authoritative narration. The scenario owns both event selection and
-resolution. Replay re-derives authoritative history from retained event values
-and does not invoke event selection, actor cognition, or narration. This is a
-disposable clearing session, not a general event, scheduling, persistence, or
-presentation framework. Its observable contract is owned by
+observations and actor-local feedback, each identity's fixed question, and a
+validated LLM answer/proposal candidate. Invalid candidates use the
+observation-derived fallback proposal; accepted and fallback proposals both go
+to hunter-first simulation resolution, which alone changes state and feedback.
+The record also includes ending and non-authoritative narration. The scenario
+owns both event selection and resolution. Replay consumes retained proposals
+and does not invoke event selection, actor cognition, fallback policy, or
+narration. This is a disposable clearing session, not a general event,
+scheduling, persistence, or presentation framework. Its observable contract is owned by
 [Requirements](requirements.md#autonomous-observer-clearing-session).

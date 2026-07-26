@@ -33,19 +33,23 @@ This document owns observable system behavior.
   presentation data.
 - **When** the supplied actors react to an event, **the system shall** make one
   real-LLM, actor-local cognition call for each actor using only that actor's
-  filtered observation and own retained feedback context. Its fixed prompt
-  shall require a JSON object with nonblank `question` and `sensemaking`
-  strings based only on those supplied facts. The returned cognition is untrusted,
-  non-authoritative, and shall not select or alter a proposal, state,
-  resolution, event, or feedback. The system shall retain the prompt, raw
-  response or null, validation status, and accepted cognition or fixed
-  actor-local fallback in the causal record. Blank, malformed, unavailable, or
-  exceptional output shall use that fallback without preventing the turn.
-  The system shall then use deterministic scenario-local policies. The fox shall propose
-  `approach_food` when its observation contains a food scent and otherwise
-  `wait`. The hunter shall propose `set_trap` when its observation says trap
-  materials are available and no trap is set, and otherwise `wait`. No model,
-  network service, or observer message shall select or alter either proposal.
+  filtered observation and own retained feedback context. Actor identity owns
+  the fixed question in the prompt: the fox asks `Do I perceive food that is
+  worth approaching?`; the hunter asks `Can I prepare or use a trap based on
+  what I perceive?` The prompt shall require a JSON object with nonblank
+  `answer` and a `proposal` from that actor's bounded vocabulary. The fox
+  vocabulary is `approach_food` or `wait`; the hunter vocabulary is `set_trap`
+  or `wait`. The returned answer and proposal are untrusted candidates. A
+  deterministic validator shall accept only the specified JSON shape and
+  vocabulary, record its status, and pass an accepted proposal to simulation
+  resolution; it shall not commit state, alter an event, or select feedback.
+  The system shall retain the fixed question, prompt, raw response or null,
+  validation status, accepted answer, and accepted or fallback proposal in the
+  causal record. Blank, malformed, unavailable, exceptional, or out-of-
+  vocabulary output shall use the deterministic fallback proposal: the fox
+  approaches when it observes a food scent and otherwise waits; the hunter
+  sets a trap when it observes available materials and no trap is set and
+  otherwise waits.
 - **When** an actor is asked to react, **the system shall** provide only that
   actor's filtered observation and its own retained feedback context. The fox
   may receive its food-scent observation and its own previous feedback, but
@@ -70,9 +74,9 @@ This document owns observable system behavior.
   selected after an ending.
 - **When** a turn completes, **the system shall** append a JSON-safe,
   by-value causal record in this order: selected event and ordinal, event
-  effect, each actor's filtered observation and retained context, its LLM
-  cognition record, each deterministic policy result and proposal, resolution
-  and feedback, resulting canonical state, and, where applicable, ending. The
+  effect, each actor's filtered observation and retained context, its fixed
+  question and LLM answer/proposal record, resolution and feedback, resulting
+  canonical state, and, where applicable, ending. The
   normal terminal surface shall make one real-LLM observer-narration call after
   each completed turn using only the completed causal record. Narration is
   untrusted, non-authoritative presentation; the surface shall print a concise
@@ -93,11 +97,11 @@ This document owns observable system behavior.
   initial `N` is changed, missing, or reordered, **the system shall** reject
   it rather than choose a replacement event, mediate an actor again, or
   continue from an altered state.
-- **When** actor cognition is unavailable, malformed, blank, or exceptional,
-  **the system shall** retain and display a fixed, readable actor-local
-  fallback. The fallback shall not prevent the deterministic policy from
-  proposing its action or alter canonical state, event selection, actor policy,
-  or replay. **When** observer prose rendering is unavailable, malformed,
+- **When** actor cognition is unavailable, malformed, blank, exceptional, or
+  proposes an out-of-vocabulary action, **the system shall** retain and display
+  a fixed, readable actor-local fallback answer and its deterministic fallback
+  proposal. The fallback shall not itself commit canonical state, select an
+  event, select feedback, or alter replay. **When** observer prose rendering is unavailable, malformed,
   blank, or exceptional, **the system shall** display a fixed, readable
   structured fallback composed only from the already-recorded event, proposals,
   resolution, state, and ending. It shall not alter canonical state, event
