@@ -65,10 +65,6 @@ household information.
 
 ## Result
 
-At task Review, complete every field and set the evidence status to `Review`.
-The Technical Lead sets the final status after required review and roadmap
-closure.
-
 - **Observed result:** Supported. The checked-in corpus records accepted 4/2
   and 4/0 priority allocations for six- and four-unit canonical reserves,
   respectively, and rejects the over-reserve 4/4 proposal with unchanged

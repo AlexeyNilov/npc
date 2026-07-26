@@ -13,13 +13,17 @@ simulations and heterogeneous actors with flexible behaviour, while retaining
 causal inspection, replay, and eventual branching. The canonical target and
 value are in the [Vision](../README.md#vision).
 
-**Current roadmap focus:** test whether the established semantic and causal
-contracts survive a materially different scale, world schema, or system
-context. The completed fox causal-closure and actor-description slices
-established actor-owned inputs separately from simulation-owned reality and
-resolution. The completed fox-and-hunter slice then demonstrated those
-boundaries in one shared canonical world. None of that evidence establishes
-portability beyond this bounded clearing-and-trap scenario.
+**Current roadmap state:** The completed fox causal-closure, actor-description,
+and shared-world slices established the actor/core boundary in one clearing-and-
+trap world. The completed village-rationing portability experiment then tested
+that boundary in a materially different organisational allocation context. Its
+[evidence record](evidence/2026-07-26-village-rationing-portability.md) supports
+retaining natural language as the default semantic interface through that
+contrasting slice, within its recorded limits.
+
+No incomplete outcome is currently ordered. A later Product Manager decision
+must add the next evidence-bearing outcome; this roadmap does not infer one
+from the completed experiment.
 
 The current fox [architecture](architecture.md) and completed
 [utility evidence](evidence/2026-07-26-fox-deterministic-utility.md) remain
