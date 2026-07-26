@@ -37,8 +37,6 @@ The developer creates a readable baseline declaration for supplied fox, hunter, 
 
 ## Result
 
-At task Review, complete every field and set the evidence status to `Review`. The Technical Lead sets the final status after required review and roadmap closure.
-
 - **Observed result:** The baseline declaration recorded the named
   hunter-first clearing rules and supplied fox and hunter components, their
   separate shown inputs and proposals, authoritative capture resolution,
