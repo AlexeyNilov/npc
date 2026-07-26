@@ -129,6 +129,14 @@ The engine gives the reducer only that actor's prior context and own selected
 feedback, then carries its result into the next actor exchange. `replay_timeline`
 re-derives inputs and resolutions and applies those reducers without mediation.
 
+The same clearing experiment adds a disposable `BoundedCausalComparison`
+record around two invocations of that existing fixed-two-step path. Its parent
+uses `TWO_STEP_DECLARATION`; its separately declared alternative changes only
+the initial `trap_materials_ready` value to `false`. The comparison replayer
+checks the fixed parent label and variation, then delegates each history to
+`replay_timeline`, preserving actor-free verification without adding branch
+semantics to `npc.composition`.
+
 `npc.experiments.composed_clearing` supplies the experiment's clearing actors
 and hunter-first or fox-first rule components. The supplied rules alone derive
 observations, own accepted proposal vocabularies, and apply canonical

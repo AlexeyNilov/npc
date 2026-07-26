@@ -3,10 +3,18 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass, replace
+from dataclasses import asdict, dataclass, replace
 from typing import Literal
 
-from npc.composition import ActorRun, CompositionDeclaration, Resolution
+from npc.composition import (
+    ActorRun,
+    CompositionDeclaration,
+    CompositionError,
+    CompositionTimeline,
+    Resolution,
+    replay_timeline,
+    run_timeline,
+)
 
 Actor = Literal["fox", "hunter"]
 
@@ -22,6 +30,19 @@ class CanonicalState:
     trap_materials_ready: bool = True
     fox_caught: bool = False
     food_consumed: bool = False
+
+
+@dataclass(frozen=True)
+class BoundedCausalComparison:
+    """Disposable record for the fixed initial-source clearing comparison."""
+
+    parent_point: str
+    source_variation: dict[str, tuple[bool, bool]]
+    parent_timeline: CompositionTimeline
+    alternative_timeline: CompositionTimeline
+
+    def as_json(self) -> dict[str, object]:
+        return asdict(self)
 
 
 @dataclass
@@ -204,3 +225,32 @@ TWO_STEP_DECLARATION = CompositionDeclaration(
     PAIRINGS,
     CanonicalState(),
 )
+
+
+def _unready_materials_declaration() -> CompositionDeclaration:
+    return replace(
+        TWO_STEP_DECLARATION,
+        name="two-step-clearing-without-trap-materials",
+        initial_state=replace(TWO_STEP_DECLARATION.initial_state, trap_materials_ready=False),
+    )
+
+
+async def run_bounded_causal_comparison() -> BoundedCausalComparison:
+    """Run the fixed initial-source readiness comparison without branch semantics."""
+    return BoundedCausalComparison(
+        "initial_source_state",
+        {"trap_materials_ready": (True, False)},
+        await run_timeline(TWO_STEP_DECLARATION),
+        await run_timeline(_unready_materials_declaration()),
+    )
+
+
+def replay_bounded_causal_comparison(comparison: BoundedCausalComparison) -> BoundedCausalComparison:
+    """Verify each fixed timeline independently without actor mediation."""
+    if comparison.parent_point != "initial_source_state" or comparison.source_variation != {
+        "trap_materials_ready": (True, False)
+    }:
+        raise CompositionError("comparison does not match its fixed parent point or source variation")
+    replay_timeline(TWO_STEP_DECLARATION, comparison.parent_timeline)
+    replay_timeline(_unready_materials_declaration(), comparison.alternative_timeline)
+    return comparison

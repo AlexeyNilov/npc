@@ -51,6 +51,15 @@ This document owns observable system behavior.
   and reject a changed ordinal, source or resulting state, retained context,
   actor-visible input, proposal, resolution order, decision, transition,
   outcome, or feedback.
+- **When** a builder compares the supplied two-step clearing declaration with
+  its fixed alternative, **the system shall** retain one JSON-safe record by
+  value naming the initial-source parent point, the sole
+  `trap_materials_ready: true -> false` variation, and both two-step
+  authoritative timelines. The parent shall catch the fox; the alternative
+  shall show unavailable materials only to the hunter, not set a trap, and let
+  the fox reach food. Each timeline shall replay independently without actor
+  mediation, and replay shall reject a changed parent point, source variation,
+  parent timeline, or alternative timeline.
 
 ### Bounded fox distance feedback
 

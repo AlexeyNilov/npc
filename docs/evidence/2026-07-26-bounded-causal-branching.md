@@ -1,10 +1,10 @@
 # Experiment: Bounded causal branching of the clearing timeline
 
-**Status:** Planned
+**Status:** Complete
 
 **Date:** 2026-07-26
 
-**Roadmap outcome:** [Bounded causal branching of a recorded shared-world scenario](../roadmap.md#1-bounded-causal-branching-of-a-recorded-shared-world-scenario)
+**Roadmap outcome:** Completed; see the [current roadmap](../roadmap.md).
 
 ## Decision unlocked
 
@@ -69,8 +69,23 @@ mediation.
 
 ## Result
 
-- **Observed result:** Pending.
-- **Reproducibility evidence:** Pending.
-- **Interpretation and limits:** Pending.
-- **Decision or unresolved question created:** Pending.
-- **Canonical follow-up:** Pending.
+- **Observed result:** Supported. The comparison records the fixed
+  initial-source parent point, the sole `trap_materials_ready: true -> false`
+  variation, and two separate two-step timelines. The parent sets a trap and
+  catches the fox; the alternative shows the hunter unavailable materials,
+  does not set a trap, and lets the fox reach food.
+- **Reproducibility evidence:** `.venv/bin/pytest tests/test_composition.py`
+  passed 11 tests. The focused tests serialize the comparison, prove that
+  readiness is its only source difference, preserve hunter-only readiness and
+  actor-local context, replay both histories without additional mediation, and
+  reject one-field parent-point, variation, parent-history, and
+  alternative-history mutations.
+- **Interpretation and limits:** The fixed comparison demonstrates one
+  independently authoritative initial-source alternative without changing the
+  engine or establishing branch semantics. It does not establish an after-step
+  branch, generic variation API, scheduler, persistence, universal temporal
+  model, or clearing lifecycle policy.
+- **Decision or unresolved question created:** The bounded comparison supports
+  evaluating whether further causal alternatives merit design work; generic
+  temporal or branch semantics remain untested.
+- **Canonical follow-up:** None.

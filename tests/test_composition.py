@@ -15,6 +15,8 @@ from npc.experiments.composed_clearing import (
     CanonicalState,
     ClearingActor,
     ClearingRules,
+    replay_bounded_causal_comparison,
+    run_bounded_causal_comparison,
 )
 
 
@@ -205,3 +207,74 @@ def test_timeline_replay_rejects_each_recorded_authority_fact_without_mediation(
         with pytest.raises(CompositionError):
             replay_timeline(TWO_STEP_DECLARATION, cast(Any, mutated))
     assert sum(getattr(actor, "mediation_calls", 0) for actor in TWO_STEP_DECLARATION.actors.values()) == calls_before
+
+
+def test_bounded_causal_comparison_records_one_initial_source_variation_and_replays_independently() -> None:
+    comparison = asyncio.run(run_bounded_causal_comparison())
+
+    assert comparison.parent_point == "initial_source_state"
+    assert comparison.source_variation == {"trap_materials_ready": (True, False)}
+    assert comparison.parent_timeline.initial_state.trap_materials_ready is True
+    assert comparison.alternative_timeline.initial_state.trap_materials_ready is False
+    assert {
+        field: (
+            getattr(comparison.parent_timeline.initial_state, field),
+            getattr(comparison.alternative_timeline.initial_state, field),
+        )
+        for field in CanonicalState.__dataclass_fields__
+        if getattr(comparison.parent_timeline.initial_state, field)
+        != getattr(comparison.alternative_timeline.initial_state, field)
+    } == {"trap_materials_ready": (True, False)}
+    assert len(comparison.parent_timeline.steps) == len(comparison.alternative_timeline.steps) == 2
+    assert comparison.parent_timeline.steps[-1].resolution.outcome == "fox_caught_by_trap"
+    assert comparison.alternative_timeline.steps[-1].resolution.outcome == "fox_reaches_food"
+    json.dumps(comparison.as_json(), sort_keys=True)
+
+    calls_before = sum(getattr(actor, "mediation_calls", 0) for actor in TWO_STEP_DECLARATION.actors.values())
+    assert replay_bounded_causal_comparison(comparison) == comparison
+    assert sum(getattr(actor, "mediation_calls", 0) for actor in TWO_STEP_DECLARATION.actors.values()) == calls_before
+
+
+def test_bounded_causal_comparison_rejects_one_field_lineage_and_history_mutations_without_mediation() -> None:
+    comparison = asyncio.run(run_bounded_causal_comparison())
+    parent = comparison.parent_timeline
+    alternative = comparison.alternative_timeline
+    changed_parent = replace(
+        parent,
+        steps=(replace(parent.steps[0], ordinal=3), parent.steps[1]),
+    )
+    changed_alternative = replace(
+        alternative,
+        steps=(replace(alternative.steps[0], ordinal=3), alternative.steps[1]),
+    )
+    mutations = (
+        replace(comparison, parent_point="changed"),
+        replace(comparison, source_variation={"trap_materials_ready": (False, True)}),
+        replace(comparison, parent_timeline=changed_parent),
+        replace(comparison, alternative_timeline=changed_alternative),
+    )
+
+    calls_before = sum(getattr(actor, "mediation_calls", 0) for actor in TWO_STEP_DECLARATION.actors.values())
+    for mutated in mutations:
+        with pytest.raises(CompositionError):
+            replay_bounded_causal_comparison(mutated)
+    assert sum(getattr(actor, "mediation_calls", 0) for actor in TWO_STEP_DECLARATION.actors.values()) == calls_before
+
+
+def test_bounded_causal_comparison_keeps_readiness_and_context_hunter_local() -> None:
+    comparison = asyncio.run(run_bounded_causal_comparison())
+    parent_first = comparison.parent_timeline.steps[0]
+    alternative_first, alternative_second = comparison.alternative_timeline.steps
+
+    assert parent_first.actors["hunter"].shown_input.endswith("ready.")
+    assert alternative_first.actors["hunter"].shown_input.endswith("not ready.")
+    assert alternative_first.actors["hunter"].proposal == "wait"
+    assert alternative_first.resulting_state.trap_set is False
+    assert all(not step.resulting_state.trap_set for step in comparison.alternative_timeline.steps)
+    assert alternative_second.resolution.outcome == "fox_reaches_food"
+    for step in comparison.alternative_timeline.steps:
+        fox = step.actors["fox"]
+        hunter = step.actors["hunter"]
+        assert "trap materials" not in fox.shown_input.lower()
+        assert "hunter:" not in fox.retained_context
+        assert "fox:" not in hunter.retained_context
