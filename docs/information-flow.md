@@ -49,6 +49,7 @@ flowchart TB
 
   subgraph Owners[Canonical durable-information owners]
     Vision[README\nvision and use]
+    Glossary[Glossary\nproject-specific term meanings]
     StrategyOwner[Strategy\ncapability path and constraints]
     Requirements[Requirements\naccepted behavior]
     Architecture[Architecture\ncurrent mechanism]
@@ -84,6 +85,7 @@ flowchart TB
   Route --> Evidence
   Route --> Issues
   Route --> Vision
+  Route --> Glossary
   Route --> StrategyOwner
   Route --> Roadmap
 ```

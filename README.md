@@ -57,6 +57,7 @@ for the command's behavior and state boundaries.
 
 - [Requirements](docs/requirements.md)
 - [Architecture](docs/architecture.md)
+- [Glossary](docs/glossary.md)
 - [Decisions](docs/decisions.md)
 - [Strategy](docs/strategy.md)
 - [Roadmap](docs/roadmap.md)

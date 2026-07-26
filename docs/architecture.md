@@ -2,6 +2,8 @@
 
 This document owns the current verified system design.
 
+For the project-specific vocabulary used below, see the [Glossary](glossary.md).
+
 ## Binary perception pattern
 
 LLM-backed perception is modeled as a sequence of small, independent binary

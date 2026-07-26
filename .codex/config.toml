@@ -1,6 +1,6 @@
 approval_policy = "on-request"
-model = "gpt-5.6-terra"
-model_reasoning_effort = "medium"
+#model = "gpt-5.6-terra"
+#model_reasoning_effort = "medium"
 
 [features]
 memories = false
