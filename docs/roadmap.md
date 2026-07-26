@@ -13,15 +13,13 @@ simulations and heterogeneous actors with flexible behaviour, while retaining
 causal inspection, replay, and eventual branching. The canonical target and
 value are in the [Vision](../README.md#vision).
 
-**Current roadmap focus:** compose a shared authoritative world from the
-completed causal-closure slice and its now-explicit actor-description seam.
-The fox slice established simulation-filtered observation, actor-owned
-epistemic profile and questions, one recorded subjective percept with separate
-answers and evidence, bounded proposal, authoritative resolution, feedback,
-and replayable causal trace. The actor-description outcome then separated
-those actor-owned inputs from the fox scenario and simulation core. The next
-outcome tests whether those boundaries remain clear when distinct actors affect
-one shared canonical reality.
+**Current roadmap focus:** test whether the established semantic and causal
+contracts survive a materially different scale, world schema, or system
+context. The completed fox causal-closure and actor-description slices
+established actor-owned inputs separately from simulation-owned reality and
+resolution. The completed fox-and-hunter slice then demonstrated those
+boundaries in one shared canonical world. None of that evidence establishes
+portability beyond this bounded clearing-and-trap scenario.
 
 The current fox [architecture](architecture.md) and completed
 [utility evidence](evidence/2026-07-26-fox-deterministic-utility.md) remain
@@ -30,10 +28,10 @@ are owned by [Strategy](strategy.md).
 
 ## Ordered future outcomes
 
-### 2. Test cross-scale portability of the semantic and causal contracts
+### 1. Test cross-scale portability of the semantic and causal contracts
 
-**Strategic horizon:** 3 — cross-scale portability. **Depends on:** outcome
-1.
+**Strategic horizon:** 3 — cross-scale portability. **Depends on:** the
+completed causal-closure, actor-description, and shared-world outcomes.
 
 **Plain-language goal:** Check that the same actor/world approach works for a
 meaningfully different kind of simulation—not just a larger fox scenario.
