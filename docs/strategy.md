@@ -27,3 +27,10 @@ accepted consequential strategic choice in [decisions](decisions.md), and route
 specific next outcomes to the [roadmap](roadmap.md). Do not use this document
 for routine priority changes, task detail, implementation mechanism, or
 experiment results.
+
+A strategy update must state a recommended direction, its causal rationale, the
+dependency-ordered capability sequence it creates, the strategic constraints it
+preserves, and the evidence that would cause reconsideration. It must also name
+the plausible alternative not chosen now and its trigger for reconsideration.
+Do not replace these with a recap of existing documents, a generic research
+sequence, or an unranked question that defers the strategic choice.
