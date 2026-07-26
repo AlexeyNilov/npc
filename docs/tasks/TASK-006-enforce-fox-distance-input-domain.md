@@ -8,7 +8,7 @@
 
 **Agent profile:** `implementer`
 
-**Base commit:** `2ab6804`
+**Base commit:** `c0e8d49`
 
 **Depends on:** None
 
