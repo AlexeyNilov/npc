@@ -4,7 +4,7 @@
 
 **Date:** 2026-07-25
 
-**Roadmap outcome:** Completed; see the [current roadmap](../roadmap.md).
+**Roadmap outcome:** Completed; see the [current roadmap](../../roadmap.md).
 
 ## Decision unlocked
 
@@ -105,5 +105,5 @@ and the deterministic action.
   introducing a general actor or perception abstraction. Any broader reuse
   requires separate evidence.
 - **Canonical follow-up:** The accepted observable behavior and verified
-  mechanism are recorded in [Requirements](../requirements.md) and
-  [Architecture](../architecture.md), respectively.
+  mechanism are recorded in [Requirements](../../requirements.md) and
+  [Architecture](../../architecture.md), respectively.

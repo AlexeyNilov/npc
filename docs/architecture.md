@@ -16,31 +16,29 @@ answer is usable only when deterministic validation accepts its exact evidence;
 `false`, ambiguity, malformed output, ungrounded evidence, and invalid
 certainty all fail closed. Certainty is trace-only and does not change action.
 
-The question and validation capability are reusable. Each creature retains an
-explicit deterministic policy that maps an accepted answer to its own action:
-the wolf attacks, the fox flees, and all other results do nothing. Future
-perceptions should follow this pattern unless a documented decision and evidence
-justify a different contract.
+The current fox policy maps accepted threat to `flee`; all other threat results
+do nothing. Future perceptions should follow this pattern unless a documented
+decision and evidence justify a different contract.
 
-## Shared target-aware threat detection
+## Current fox actor-loop mapping
 
-`npc.experiments.threat_detection` builds the one target-aware threat prompt,
-makes the configured completion call, and parses and validates the common JSON
-candidate. Its `perceive_threat` result contains only the raw candidate, parsed
-candidate, and validation result; it never selects an action. The exact object
-has `threat`, `certainty`, and `evidence`: threat is boolean, certainty is a
-finite in-range number, and true evidence is a non-empty verbatim substring of
-the player message while false evidence is null.
+The following maps the intended actor-loop model to the current verified fox
+delivery. It identifies the current boundary rather than implying that every
+stage is a general engine abstraction.
 
-`python -m npc.experiments.wolf_threat` and
-`python -m npc.experiments.fox_threat` load independent cases from
-`scenarios/wolf_threat.yaml` and `scenarios/fox_threat.yaml` respectively. Both
-call the shared perception module once per case and print a trace with their
-target and expected threat/action pair. Their explicit local policies consume
-only accepted threat: wolf maps true to `attack`, fox maps true to `flee`, and
-false or invalid perception maps to `do_nothing` for both. Certainty is traced
-but has no policy threshold or branch. The delivery has no creature state,
-dialogue, world model, registry, or shared actor framework.
+| Actor-loop stage | What exists now |
+| --- | --- |
+| Reality | One player-message string and the authoritative distance from the fox. |
+| Perception | When the player is within hearing range, two independent LLM-proposed, evidence-grounded sensors assess threat and an explicit food offer. |
+| Sensemaking | Deterministic validation accepts or rejects each sensor result, then applies the fixed `threat_over_food_offer` priority. |
+| Intent | Not separate yet; the fixed priority policy selects the action directly. |
+| Action | The fox deterministically selects and executes `flee`, `approach`, or `do_nothing`. |
+| Outcome | Execution produces the resulting authoritative distance. |
+| Feedback | That distance becomes the next turn's starting distance. |
+
+Completed outcomes may also receive LLM narration. This is presentation only:
+it is outside the authoritative loop and cannot affect action, outcome, or
+feedback.
 
 ## Bounded fox distance feedback
 
@@ -49,7 +47,7 @@ local `TurnTrace`, turn execution, and fixture helpers. Before each turn calls
 `perceive_threat` and `perceive_food_offer`, its authoritative integer starting
 distance is checked against the fixed hearing range of `10`. An inaudible turn
 records no sensor calls and null perception fields; an audible turn calls each
-shared detector once and retains its raw candidate, parsed candidate, and
+sensor once and retains its raw candidate, parsed candidate, and
 validation result independently.
 
 The fox-local policy gives accepted grounded threat priority: threat selects
@@ -91,22 +89,3 @@ the existing `run_turn`, then `render_completed_turn`, prints the resulting
 non-authoritative narration, and carries only the canonical feedback distance
 to the next iteration. The loop has no conversation history, fox persona, or
 path from narration back to the next action.
-
-## Two-perception wolf sensemaking
-
-`npc.experiments.food_offer_detection` is a separate binary sensor for whether
-a player message explicitly offers food to the wolf. Its candidate and
-validation contract mirrors the threat sensor with `food_offer`, `certainty`,
-and `evidence`: true evidence must be a non-empty verbatim substring of the
-player message, false evidence must be null, and malformed or invalid
-candidates fail closed.
-
-`npc.experiments.wolf_sensemaking` invokes the established threat sensor and
-the separate food-offer sensor exactly once each for a turn. Its trace retains
-each sensor's raw candidate, parsed candidate, and validation result
-independently. Only accepted booleans enter the explicit policy: accepted
-threat selects `attack`; otherwise accepted food offer selects `approach`;
-otherwise it selects `do_nothing`. The `threat_over_food_offer` priority is
-fixed and certainty remains trace-only. `python -m npc.experiments.wolf_sensemaking`
-loads `scenarios/wolf_sensemaking.yaml`; this bounded wrapper adds no state,
-dialogue, world model, registry, or general actor/perception abstraction.

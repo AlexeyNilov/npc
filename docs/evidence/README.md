@@ -23,5 +23,6 @@ removed.
   [requirements](../requirements.md).
 
 Use a stable, descriptive filename such as
-`YYYY-MM-DD-trader-grounded-primary-intent.md`. Do not create a record for ordinary
-bug fixes or routine delivery work.
+`YYYY-MM-DD-fox-distance-feedback.md`. Do not create a record for ordinary bug
+fixes or routine delivery work. Retired experiments remain in
+[the archive](archive/README.md).

@@ -43,8 +43,8 @@ def test_target_specific_prompt_is_a_single_player_text_question_without_action_
 
 
 def test_shared_detector_rejects_malformed_and_ungrounded_true_candidates() -> None:
-    malformed = asyncio.run(perceive_threat("I will hurt you.", "wolf", completion("not json")))
-    ungrounded = asyncio.run(perceive_threat("I will hurt you.", "wolf", completion(candidate(True, 0.7, "I own this forest"))))
+    malformed = asyncio.run(perceive_threat("I will hurt you.", "fox", completion("not json")))
+    ungrounded = asyncio.run(perceive_threat("I will hurt you.", "fox", completion(candidate(True, 0.7, "I own this forest"))))
 
     assert malformed.validation_result == "invalid_candidate"
     assert ungrounded.validation_result == "evidence_not_in_player_message"

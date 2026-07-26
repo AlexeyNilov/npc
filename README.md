@@ -35,17 +35,17 @@ This is the project's target model, not a claim about the current
 implementation. Experiments should reveal which parts of it must become durable
 system structure.
 
-The first audience is the project's developer. The current demonstrations use a
-shared, bounded threat-detection capability: a territorial wolf deterministically
-attacks an accepted threat, while a fox deterministically flees one. The fox
-also approaches an accepted explicit food offer when no accepted threat is
-present. Its authoritative distance gates hearing, executes `flee` as `+5` and
+The first audience is the project's developer. The current demonstration is a
+bounded fox loop. When within hearing range, the fox receives two independent,
+evidence-grounded LLM perceptions: threat and explicit food offer. Deterministic
+validation and a fixed threat-first policy select `flee`, `approach`, or
+`do_nothing`. Authoritative distance gates hearing, executes `flee` as `+5` and
 `approach` as `-3` with a minimum distance of `1`, and feeds the resulting
-distance into the next turn. A completed fox action can then be rendered once by the
-configured LLM as arbitrary concise, non-authoritative presentation, or by a
-deterministic fallback when narration is unavailable or unusable. The LLM
-supplies only an evidence-grounded perception or bounded presentation; it
-never chooses an action, determines reachability, or changes distance.
+distance into the next turn. A completed fox action can then be rendered once by
+the configured LLM as arbitrary concise, non-authoritative presentation, or by
+a deterministic fallback when narration is unavailable or unusable. The LLM
+supplies only an evidence-grounded perception or bounded presentation; it never
+chooses an action, determines reachability, or changes distance.
 
 The central learning hypothesis is that small, deterministic decision scenarios
 can reveal which model elements survive a second, contrasting decision. Both

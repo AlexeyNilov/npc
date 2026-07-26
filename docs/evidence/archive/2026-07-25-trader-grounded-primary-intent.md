@@ -4,7 +4,7 @@
 
 **Date:** 2026-07-25
 
-**Roadmap outcome:** Historical scope retired; see the [current roadmap](../roadmap.md).
+**Roadmap outcome:** Historical scope retired; see the [current roadmap](../../roadmap.md).
 
 ## Decision unlocked
 

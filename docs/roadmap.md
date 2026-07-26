@@ -9,16 +9,15 @@ outcomes, not coding activities or speculative engine abstractions.
 can use an LLM as a narrow perception sensor without granting it authority over
 the actor's actions.
 
-**Current learning boundary:** the verified scope is intentionally small:
-stateless wolf and fox policies consume independently validated,
-evidence-grounded threat perceptions; the wolf also combines an explicit
-food-offer perception with a fixed threat-first choice to produce `attack`,
-`approach`, or `do_nothing`. One fixed two-turn fox experiment applies
-authoritative distance to hearing, executes `flee` as a fixed distance increase,
-and feeds that distance into the following turn. A completed fox action can then
-receive one arbitrary concise player-facing narration from the configured LLM
-or a deterministic fallback; this rendering is non-authoritative. The verified
-scope has no dialogue, inferred world facts, open-ended memory, certainty
-authority, model-selected state transitions, registry, or actor framework.
+**Current learning boundary:** the verified scope is intentionally small: one
+fox turn consumes independently validated, evidence-grounded threat and
+explicit-food-offer perceptions, then applies a fixed threat-first choice to
+produce `flee`, `approach`, or `do_nothing`. Authoritative distance gates
+hearing, records execution, and becomes the following turn's feedback. A
+completed fox action can then receive one arbitrary concise player-facing
+narration from the configured LLM or a deterministic fallback; this rendering
+is non-authoritative. The verified scope has no dialogue, inferred world facts,
+open-ended memory, certainty authority, model-selected state transitions,
+registry, or actor framework.
 
 ## Ordered future outcomes

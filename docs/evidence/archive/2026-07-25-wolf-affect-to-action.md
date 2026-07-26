@@ -5,7 +5,7 @@
 **Date:** 2026-07-25
 
 **Roadmap outcome:** Historical scope superseded by binary threat detection;
-see the [current roadmap](../roadmap.md).
+see the [current roadmap](../../roadmap.md).
 
 ## Decision unlocked
 

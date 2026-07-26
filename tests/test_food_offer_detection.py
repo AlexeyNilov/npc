@@ -23,8 +23,8 @@ def completion(response: str) -> Callable[[str, str], Awaitable[str]]:
 def test_food_offer_detector_parses_and_validates_an_explicit_grounded_offer() -> None:
     result = asyncio.run(
         perceive_food_offer(
-            "Wolf, I offer you this fresh meat.",
-            "wolf",
+            "Fox, I offer you this fresh meat.",
+            "fox",
             completion(candidate(True, 0.7, "I offer you this fresh meat")),
         )
     )
@@ -34,9 +34,9 @@ def test_food_offer_detector_parses_and_validates_an_explicit_grounded_offer() -
 
 
 def test_food_offer_prompt_is_one_player_text_question_without_action_world_or_dialogue() -> None:
-    prompt = build_food_offer_sensor_prompt("wolf")
+    prompt = build_food_offer_sensor_prompt("fox")
 
-    assert "explicitly offer food to the wolf" in prompt
+    assert "explicitly offer food to the fox" in prompt
     assert "exactly `food_offer`, `certainty`, and `evidence`" in prompt
     assert "action" not in prompt.lower()
     assert "world" not in prompt.lower()
@@ -44,7 +44,7 @@ def test_food_offer_prompt_is_one_player_text_question_without_action_world_or_d
 
 
 def test_food_offer_detector_rejects_malformed_invalid_certainty_empty_and_ungrounded_candidates() -> None:
-    player_message = "Wolf, I offer you this fresh meat."
+    player_message = "Fox, I offer you this fresh meat."
     cases = (
         ("not json", "invalid_candidate"),
         (candidate(True, 1.1, "I offer you this fresh meat"), "certainty_out_of_range"),
@@ -53,5 +53,5 @@ def test_food_offer_detector_rejects_malformed_invalid_certainty_empty_and_ungro
     )
 
     for raw_candidate, expected_validation in cases:
-        result = asyncio.run(perceive_food_offer(player_message, "wolf", completion(raw_candidate)))
+        result = asyncio.run(perceive_food_offer(player_message, "fox", completion(raw_candidate)))
         assert result.validation_result == expected_validation
