@@ -111,11 +111,12 @@ contract is owned by
 ## Fox language-mediated causal turn
 
 `npc.experiments.fox_causal_turn` is a separate, fox-local causal-closure
-slice. Its simulation core starts from the accepted blocked clearing state and
-derives the fixed natural-language clearing, smell, and rustling substate
-before its sole injected mediation request. That request receives only the
-derived substate, the hungry/cautious epistemic profile, and the two ordered
-fox questions; the canonical blocked-path fact is withheld.
+slice. Its simulation core records the accepted blocked clearing state together
+with fox-local `food_scent_nearby` and `leaves_rustling` facts. It
+deterministically renders the clearing, smell, and rustling substate from those
+facts before its sole injected mediation request. That request receives only
+the derived substate, the hungry/cautious epistemic profile, and the two
+ordered fox questions; the canonical blocked-path fact is withheld.
 
 The recorded mediation response contains one subjective percept and an
 evidence-grounded answer for each question. Invalid output fails closed to the

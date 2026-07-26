@@ -6,7 +6,6 @@ from pathlib import Path
 import pytest
 
 from npc.experiments.fox_causal_turn import (
-    ACCESSIBLE_SUBSTATE,
     EPISTEMIC_PROFILE,
     QUESTIONS,
     CanonicalState,
@@ -41,13 +40,22 @@ def test_actor_can_mention_blocked_while_canonical_path_stays_withheld_until_res
 
     trace = asyncio.run(run_turn(complete))
 
-    assert calls == [(ACCESSIBLE_SUBSTATE, EPISTEMIC_PROFILE, QUESTIONS)]
+    assert calls == [("You are in a clearing. You smell food nearby. You hear leaves rustling.", EPISTEMIC_PROFILE, QUESTIONS)]
     assert "blocked" not in repr(calls[0]).lower()
     assert trace.subjective_percept is not None
     assert "blocked" in trace.subjective_percept
     assert trace.proposal == "approach_food"
     assert trace.resolution == "food_path_blocked"
-    assert trace.resulting_canonical_state == CanonicalState(location="clearing", food_path_blocked=True)
+    assert (
+        trace.initial_canonical_state
+        == trace.resulting_canonical_state
+        == CanonicalState(
+            location="clearing",
+            food_scent_nearby=True,
+            leaves_rustling=True,
+            food_path_blocked=True,
+        )
+    )
     assert trace.feedback == "The path to the food is blocked."
     assert [answer.question for answer in trace.answers] == list(QUESTIONS)
     assert all(answer.evidence in trace.subjective_percept for answer in trace.answers)
@@ -94,12 +102,56 @@ def test_malformed_or_rejected_mediation_fails_closed_without_an_unauthorized_tr
 
 
 def test_only_core_resolution_commits_and_unsupported_proposals_fail_closed() -> None:
-    initial = CanonicalState(location="clearing", food_path_blocked=True)
+    initial = CanonicalState(
+        location="clearing",
+        food_scent_nearby=True,
+        leaves_rustling=True,
+        food_path_blocked=True,
+    )
 
     resolution, resulting, feedback = resolve_proposal(initial, "not_an_action")
 
     assert (resolution, resulting, feedback) == ("waited", initial, "The fox waited.")
     assert resolve_proposal(initial, "approach_food")[0] == "food_path_blocked"
+
+
+@pytest.mark.parametrize(
+    ("canonical_state", "expected_accessible"),
+    [
+        (
+            CanonicalState(
+                location="clearing",
+                food_scent_nearby=False,
+                leaves_rustling=True,
+                food_path_blocked=True,
+            ),
+            "You are in a clearing. You hear leaves rustling.",
+        ),
+        (
+            CanonicalState(
+                location="clearing",
+                food_scent_nearby=True,
+                leaves_rustling=False,
+                food_path_blocked=True,
+            ),
+            "You are in a clearing. You smell food nearby.",
+        ),
+    ],
+)
+def test_accessible_substate_is_derived_from_canonical_observations(
+    canonical_state: CanonicalState, expected_accessible: str
+) -> None:
+    calls: list[tuple[str, str, tuple[str, ...]]] = []
+
+    async def complete(accessible: str, profile: str, questions: tuple[str, ...]) -> str:
+        calls.append((accessible, profile, questions))
+        return mediation("I will wait.", True, False, evidence="wait")
+
+    trace = asyncio.run(run_turn(complete, canonical_state))
+
+    assert calls == [(expected_accessible, EPISTEMIC_PROFILE, QUESTIONS)]
+    assert trace.accessible_substate == expected_accessible
+    assert "blocked" not in repr(calls[0]).lower()
 
 
 def test_fixture_trace_is_json_safe_and_reproducible() -> None:
@@ -111,6 +163,13 @@ def test_fixture_trace_is_json_safe_and_reproducible() -> None:
 
     assert first == second
     assert first[0]["resolution"] == "food_path_blocked"
+    assert first[0]["initial_canonical_state"] == {
+        "location": "clearing",
+        "food_scent_nearby": True,
+        "leaves_rustling": True,
+        "food_path_blocked": True,
+    }
+    assert first[0]["resulting_canonical_state"] == first[0]["initial_canonical_state"]
     json.dumps(first, sort_keys=True)
 
 

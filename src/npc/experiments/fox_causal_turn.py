@@ -7,7 +7,6 @@ from typing import Any, Literal, cast
 
 import yaml  # type: ignore[import-untyped]
 
-ACCESSIBLE_SUBSTATE = "You are in a clearing. You smell food nearby. You hear leaves rustling."
 EPISTEMIC_PROFILE = (
     "You are hungry and cautious. You cannot see beyond the clearing or through obstacles. "
     "Treat smells and sounds as clues, not facts."
@@ -24,6 +23,8 @@ Mediation = Callable[[str, str, tuple[str, ...]], Awaitable[str]]
 @dataclass(frozen=True)
 class CanonicalState:
     location: Literal["clearing"]
+    food_scent_nearby: bool
+    leaves_rustling: bool
     food_path_blocked: bool
 
 
@@ -49,7 +50,12 @@ class TurnTrace:
 
 
 def initial_state() -> CanonicalState:
-    return CanonicalState(location="clearing", food_path_blocked=True)
+    return CanonicalState(
+        location="clearing",
+        food_scent_nearby=True,
+        leaves_rustling=True,
+        food_path_blocked=True,
+    )
 
 
 async def run_turn(mediate: Mediation, canonical_state: CanonicalState | None = None) -> TurnTrace:
@@ -57,13 +63,14 @@ async def run_turn(mediate: Mediation, canonical_state: CanonicalState | None = 
     if initial.location != "clearing" or not initial.food_path_blocked:
         raise ValueError("fox causal turn requires the accepted blocked clearing state")
 
-    raw_response = await mediate(ACCESSIBLE_SUBSTATE, EPISTEMIC_PROFILE, QUESTIONS)
+    accessible_substate = _derive_accessible_substate(initial)
+    raw_response = await mediate(accessible_substate, EPISTEMIC_PROFILE, QUESTIONS)
     percept, answers = _validate_mediation(raw_response)
     proposal = _propose(answers) if percept is not None else "wait"
     resolution, resulting, feedback = resolve_proposal(initial, proposal)
     return TurnTrace(
         initial_canonical_state=initial,
-        accessible_substate=ACCESSIBLE_SUBSTATE,
+        accessible_substate=accessible_substate,
         epistemic_profile=EPISTEMIC_PROFILE,
         subjective_percept=percept,
         questions=QUESTIONS,
@@ -83,7 +90,7 @@ def resolve_proposal(canonical_state: CanonicalState, proposal: object) -> tuple
 
 def replay(trace: TurnTrace) -> TurnTrace:
     if (
-        trace.accessible_substate != ACCESSIBLE_SUBSTATE
+        trace.accessible_substate != _derive_accessible_substate(trace.initial_canonical_state)
         or trace.epistemic_profile != EPISTEMIC_PROFILE
         or trace.questions != QUESTIONS
     ):
@@ -100,11 +107,18 @@ def replay(trace: TurnTrace) -> TurnTrace:
 
 async def run_fixture(case: Mapping[str, object]) -> list[TurnTrace]:
     response = cast(str, case["mediation_response"])
+    state = cast(Mapping[str, object], case["canonical_state"])
+    canonical_state = CanonicalState(
+        location=cast(Literal["clearing"], state["location"]),
+        food_scent_nearby=cast(bool, state["food_scent_nearby"]),
+        leaves_rustling=cast(bool, state["leaves_rustling"]),
+        food_path_blocked=cast(bool, state["food_path_blocked"]),
+    )
 
     async def mediate(_: str, __: str, ___: tuple[str, ...]) -> str:
         return response
 
-    return [await run_turn(mediate)]
+    return [await run_turn(mediate, canonical_state)]
 
 
 def load_corpus(path: Path) -> list[dict[str, object]]:
@@ -147,6 +161,15 @@ def _propose(answers: tuple[Answer, ...]) -> Proposal:
     if answers[0].answer is False and answers[1].answer is True:
         return "approach_food"
     return "wait"
+
+
+def _derive_accessible_substate(canonical_state: CanonicalState) -> str:
+    observations = ["You are in a clearing."]
+    if canonical_state.food_scent_nearby:
+        observations.append("You smell food nearby.")
+    if canonical_state.leaves_rustling:
+        observations.append("You hear leaves rustling.")
+    return " ".join(observations)
 
 
 async def main_async() -> None:
