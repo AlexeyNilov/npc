@@ -1,8 +1,8 @@
 # TASK-001: Run, inspect, and replay one autonomous clearing session
 
-**Status:** Ready
+**Status:** In progress
 
-**Owner:** Unassigned
+**Owner:** autonomous_clearing
 
 **Delivery role:** [Implementer](../agent_roles/implementer.md)
 
@@ -30,11 +30,13 @@ point, and cross-module changes.
 
 ## Outcome
 
-An observer can run the supplied terminal clearing session, pause only between
-turns, inspect its causal history, exactly replay it, and start another run
-without providing a causal choice. The session records a launcher-supplied
-turn limit and selected events, and reaches `fed`, `caught`, or
-`clearing_quiet` under the accepted scenario rules.
+An observer can launch the supplied terminal clearing session and watch it run
+to an ending without providing any input. Each turn exposes its retained LLM
+prompts and raw responses alongside a readable causal account; after the
+ending, the observer can inspect, exactly replay, or start another run without
+providing a causal choice. The session records a launcher-supplied turn limit
+and selected events, and reaches `fed`, `caught`, or `clearing_quiet` under the
+accepted scenario rules.
 
 ## Concept provenance
 
@@ -83,9 +85,11 @@ a reusable system boundary.
 - Make `N` a launcher argument to the runtime, validate it before any event or
   actor work, retain it in the session record, and do not expose it as an
   interactive observer control.
-- Provide a standard-library terminal loop with start, pause/resume between
-  completed turns, inspection, exact replay, and fresh-run controls. A
-  launcher may configure `N`; the observer loop cannot.
+- Provide a standard-library terminal path that starts and completes the
+  session automatically, printing every retained LLM prompt and raw response
+  or unavailable marker with each readable causal account. After completion,
+  offer inspection, exact replay, and fresh-run controls. A launcher may
+  configure `N`; the observer cannot.
 - Make one configured real-LLM cognition call per actor turn with only that
   actor's filtered observation and own feedback context, then retain its prompt,
   raw output or null, validation status, and accepted JSON `question` and
@@ -115,14 +119,17 @@ a reusable system boundary.
   Include source-variation tests that change recorded event histories and show
   corresponding proposal/outcome changes, plus withheld-fact tests for each
   actor boundary.
-- Replay a session without invoking the selector, actor policy, actor LLM, or
-  narrator, and assert it preserves the retained cognition and narration.
-  Mutate each required authoritative fact class — including missing/reordered
-  event, event ordinal/name/effect, `N`, observation/context, proposal,
-  resolution/feedback, state, and ending — and assert rejection.
-- Exercise terminal controls through injected input/output: pause does not add
-  a turn, inspection is read-only, resume advances one pending turn, replay is
-  exact, and fresh run creates a new record without an observer causal choice.
+- Replay a session without invoking the selector, actor LLM, or narrator, and
+  assert it preserves the retained cognition and narration. It may
+  deterministically re-derive the accepted proposal from the recorded filtered
+  observation; this is validation, not actor mediation. Mutate each required
+  authoritative fact class — including missing/reordered event, event
+  ordinal/name/effect, `N`, observation/context, proposal, resolution/feedback,
+  state, and ending — and assert rejection.
+- Exercise the terminal path through injected input/output: launch advances to
+  an ending without observer input; each turn exposes both actor and narration
+  prompts/raw outputs; inspection is read-only; replay is exact; and fresh run
+  creates a new record without an observer causal choice.
 - Exercise blank, malformed, unavailable, and exceptional actor-cognition and
   narration paths and assert their fixed fallbacks leave authoritative facts
   unchanged.
@@ -146,18 +153,24 @@ a reusable system boundary.
 
 ## Handoff
 
-**Status and outcome:** Ready; the accepted actor-LLM cognition and narration
-contract preserves deterministic proposals and exact replay.
+**Status and outcome:** In progress; the accepted terminal interaction changed
+from observer-driven turn stepping to automatic session progression with
+visible retained LLM exchanges.
 
-**Changed files and ownership impact:** This packet and the technical-lead task
-registry only. The accepted Requirements and Decisions changes remain
-user-owned context.
+**Changed files and ownership impact:** Added the scenario runtime, terminal
+launcher, and behavioral tests; README owns the observer entry point and
+Architecture owns the verified scenario boundary. Requirements and Decisions
+remain user-owned context.
 
-**Verification:** Planning audit traced the existing exact-two-step execution
-and replay boundary. No application behavior changed.
+**Verification:** Review revisions: `.venv/bin/pytest
+tests/test_autonomous_clearing.py` (10 passed); `make check` (59 passed); `git
+diff --check` passed. Focused tests cover causal ordering, final-turn narration
+facts, replay isolation, required authority mutations, all required fallback
+categories, exact replay of a three-turn `clearing_quiet` session, readable
+retained-record inspection, a nonterminal pause, and clean fresh-run history.
 
-**Assumptions, risks, and next action:** Use a scenario-local standard-library
-terminal surface and retain selected events directly rather than build a seed
-or reusable random API. Assign one Implementer, then request Simplifier review
-at Review. Exact replay consumes retained actor-cognition and narration records
-without another model call.
+**Assumptions, risks, and next action:** The configured LLM adapter uses the
+existing local `complete_text` client; unavailable or invalid output visibly
+falls back without changing authority. Revise the terminal surface and its
+behavioral tests for automatic progression and visible retained exchanges, then
+return to Simplifier review.

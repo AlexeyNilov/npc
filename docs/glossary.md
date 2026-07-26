@@ -29,11 +29,12 @@ owners, then link to them here.
   developer. The project developer currently fills this role. See the
   [vision](../README.md#vision) and [strategy](strategy.md#strategic-horizons).
 
-**Observer.** The immediate user of an autonomous simulation application. An
-  observer may start, pause, inspect, replay, or restart a session, but supplies
-  no simulation event, actor proposal, rule, or other input that changes the
-  canonical history of a run. Presentation controls are noncausal. The observer
-  is distinct from the simulation builder and from actors inside the
+**Observer.** The immediate user of an autonomous simulation application. A
+  launched observer session advances without observer input; an observer may
+  inspect, replay, or restart it without supplying a simulation event, actor
+  proposal, rule, or other input that changes the canonical history of a run.
+  Presentation controls are noncausal. The observer is distinct from the
+  simulation builder and from actors inside the
   simulation. See the [current strategic focus](strategy.md#current-focus).
 
 **Simulation description.** The builder-supplied definition that provides or

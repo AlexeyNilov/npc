@@ -459,9 +459,10 @@ scripted history, build a general event framework, or introduce only the
 scenario-owned random events needed for one autonomous clearing session.
 
 **Decision:** The immediate application user is an observer, not a causal
-participant. The observer may start, pause, inspect, replay, or restart a
-session, but supplies no simulation event, actor proposal, rule, random source,
-or other input that changes canonical history.
+participant. A launched session advances to its ending without observer input.
+After it ends, the observer may inspect, replay, or restart it, but supplies no
+simulation event, actor proposal, rule, random source, or other input that
+changes canonical history.
 
 The clearing simulation owns a bounded event vocabulary, the meaning and
 effects of each event, and the policy under which an event may occur. Random

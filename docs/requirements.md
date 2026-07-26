@@ -6,15 +6,16 @@ This document owns observable system behavior.
 
 ### Autonomous observer clearing session
 
-- **When** an observer starts the supplied autonomous clearing session from its
-  normal terminal entry point, **the system shall** present the premise that a
-  fox is looking for food while a hunter may prepare a trap, then begin from a
-  canonical state in which food is unavailable, the hunter has no trap
+- **When** an observer launches the supplied autonomous clearing session from
+  its normal terminal entry point, **the system shall** present the premise
+  that a fox is looking for food while a hunter may prepare a trap, then begin
+  from a canonical state in which food is unavailable, the hunter has no trap
   materials, no trap is set, and the fox has neither reached food nor been
   caught. A developer or launcher shall supply the session turn limit `N` at
   start as a non-boolean integer from `1` through `10`; the system shall record
   it by value as an authoritative initial input. For any other value, it shall
-  raise `ValueError` before event selection or actor reaction. The observer
+  raise `ValueError` before event selection or actor reaction. The session
+  shall advance to its ending without waiting for observer input; the observer
   shall supply no causal input.
 - **When** a nonterminal clearing turn begins, **the simulation shall** select
   exactly one event uniformly from this scenario's event vocabulary and record
@@ -74,18 +75,19 @@ This document owns observable system behavior.
   and feedback, resulting canonical state, and, where applicable, ending. The
   normal terminal surface shall make one real-LLM observer-narration call after
   each completed turn using only the completed causal record. Narration is
-  untrusted, non-authoritative presentation; the surface shall present it as a
-  concise current-turn account and allow an observer to inspect a readable
-  account that distinguishes the recorded causal stages.
-- **When** an observer pauses a session, inspects its history, resumes it,
-  replays it, or starts a fresh run, **the system shall** treat the control as
-  noncausal. Pause shall occur between completed turns; inspection shall not
-  modify history; resume shall execute only the next pending turn; exact replay
-  shall consume the recorded event history without random selection, actor
-  mediation, or model call; and a fresh run shall start a new history from the specified
+  untrusted, non-authoritative presentation; the surface shall print a concise
+  current-turn account and every actor-cognition and narration prompt with its
+  raw LLM response or explicit unavailable marker. It shall also allow an
+  observer to inspect a readable account that distinguishes the recorded causal
+  stages.
+- **When** an observer inspects a completed session, replays it, or starts a
+  fresh run after its ending, **the system shall** treat the control as
+  noncausal. Inspection shall not modify history; exact replay shall consume
+  the recorded event history without random selection, actor mediation, or
+  model call; and a fresh run shall start a new history from the specified
   initial state and may select a different event sequence. The normal terminal
-  surface shall make start, pause, causal inspection, exact replay, and fresh
-  run available without source edits or observer-supplied causal choices.
+  surface shall make causal inspection, exact replay, and fresh run available
+  without source edits or observer-supplied causal choices.
 - **When** replay receives a history whose event name, ordinal, event effect,
   observation, proposal, resolution, feedback, resulting state, ending, or
   initial `N` is changed, missing, or reordered, **the system shall** reject

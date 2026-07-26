@@ -77,6 +77,20 @@ Each input is an independent player turn. Type `/exit` to quit. Use
 hunger value. See [the interactive-turn requirements](docs/requirements.md#interactive-deterministic-fox-utility-turns)
 for the command's behavior and state boundaries.
 
+## Observe an autonomous clearing session
+
+Run the supplied observer-only clearing scenario with a launcher-selected turn
+limit:
+
+```bash
+python sample/autonomous_clearing.py --turn-limit 3
+```
+
+Use `start`, `pause`, `inspect`, `resume`, `replay`, `fresh`, or `exit` at the
+terminal prompt. These controls do not select simulation events or actor
+actions. The session records each selected event and its causal effects, then
+replays that retained history without selecting events or calling a model.
+
 ## Project documentation
 
 - [Builder guide: clearing composition experiment](docs/builder-guide.md)

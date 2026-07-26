@@ -145,3 +145,21 @@ continuation; it is not generic clearing lifecycle policy. This establishes
 neither temporal scheduling nor a universal world or proposal schema. Its
 observable contract is owned by
 [Requirements](requirements.md#builder-controlled-clearing-composition).
+
+## Autonomous observer clearing session
+
+`npc.experiments.autonomous_clearing` is a separate, scenario-local terminal
+runtime. A launcher supplies a validated turn limit, while the observer can
+start a paused session, inspect completed causal records, advance one pending
+turn, replay a completed session, or begin a fresh one. The observer supplies
+no causal input.
+
+Each turn records the selected event before its effect, actor-filtered
+observations and actor-local feedback, non-authoritative LLM cognition,
+deterministic proposals, hunter-first resolution, state, ending, and
+non-authoritative narration. The scenario owns both event selection and
+resolution. Replay re-derives authoritative history from retained event values
+and does not invoke event selection, actor cognition, or narration. This is a
+disposable clearing session, not a general event, scheduling, persistence, or
+presentation framework. Its observable contract is owned by
+[Requirements](requirements.md#autonomous-observer-clearing-session).
