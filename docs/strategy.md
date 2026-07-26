@@ -55,32 +55,37 @@ already be replayed.
 
 ## Current focus
 
-**Strategic bet:** Establish builder-controlled composition before designing a
-general temporal runtime or branch model.
+**Strategic bet:** Establish stateful shared-world execution on the completed
+builder-controlled composition boundary before designing a branch model or
+general temporal runtime.
 
 The outcomes in the prior discovery sequence are complete: the current
 [roadmap state](roadmap.md#product-frame) records causal closure, actor
-description, shared-world interaction, and a contrasting allocation slice, and
-the [portability evidence](evidence/2026-07-26-village-rationing-portability.md)
-supports retaining natural language as the default semantic interface within
-its stated limits. Those results are sufficient to change the capability
-sequence, not to claim general portability. The next sequence-changing
-uncertainty is whether a builder can use the boundary without the engine or
-actors absorbing one scenario's schema and policy.
+description, shared-world interaction, a contrasting allocation slice, and
+the completed [builder-controlled composition evidence](evidence/2026-07-26-builder-controlled-composition.md).
+Together they support the actor/simulation authority boundary, natural
+language as the default semantic interface within its stated limits, and one
+builder-facing composition surface. They do not establish that those contracts
+survive a committed state change and a later actor exchange. The next
+sequence-changing uncertainty is whether explicit time, ordering, conflict
+resolution, feedback, and retained context can extend that boundary without
+the engine absorbing world policy or actor cognition.
 
-The next evidence-bearing outcome should therefore demonstrate one thin,
-causally complete authoring-to-run path: independently supplied simulation and
-actor descriptions compose into a bounded shared-world run whose authoritative
-result can be inspected and replayed. It should establish only the minimum
-reusable boundary required by that builder outcome; code deduplication alone is
-not evidence of a product capability. The Product Manager owns the exact
-outcome and its ordering in the
+The next evidence-bearing outcome should therefore carry one already composed
+shared-world scenario through the smallest causally complete temporal slice:
+two authoritative steps whose second step derives from the first committed
+state. It should make the step order, conflict rule, actor-specific feedback,
+and retained context inspectable and replayable while establishing only the
+minimum reusable boundary required by that builder outcome. Code deduplication
+alone is not evidence of a product capability. The Product Manager owns the
+exact outcome and its ordering in the
 [roadmap](roadmap.md#ordered-future-outcomes).
 
-A multi-step temporal model remains deferred to Horizon 2. A Horizon-1 slice may
-declare the bounded ordering or conflict rule needed to close its run; pull
-forward reusable temporal semantics only when that builder outcome cannot be
-causally complete without them.
+A general temporal runtime and causal branching remain deferred. The Horizon-2
+slice may declare the bounded step ordering and conflict rule needed to close
+its two-step run; pull forward reusable temporal semantics only when that
+builder outcome cannot be causally complete without them. Do not introduce a
+branch representation until recorded multi-step history can itself be replayed.
 
 ### Target modular composition model
 
