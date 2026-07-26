@@ -108,74 +108,6 @@ still receives only completed presentation facts. Its observable command
 contract is owned by
 [Requirements](requirements.md#interactive-deterministic-fox-utility-turns).
 
-## Fox language-mediated causal turn
-
-`npc.experiments.fox_causal_turn` is a separate, fox-local causal-closure
-slice. It makes an immutable actor description explicit, records it in the
-causal trace, and supplies only its profile and questions to mediation. The
-ownership boundary is:
-
-| Causal-turn element | Owner |
-| --- | --- |
-| Canonical clearing state, including `food_path_blocked` | Simulation core |
-| Actor-accessible substate and the filtering that derives it | Simulation core |
-| Epistemic profile, ordered questions, declared proposal vocabulary, and retained context | Actor description |
-| Subjective percept, answers, supporting evidence, and bounded proposal | Actor-local mediation/cognition |
-| Mediation-output validation and fail-closed behavior | Simulation core |
-| Proposal acceptance, resolution, canonical transition, and feedback selection | Simulation core |
-| Recorded trace and replay verification | Simulation core |
-
-The fox description has empty retained context: it introduces no memory,
-needs, inventory, or persistent belief state. The simulation still renders the
-clearing, smell, and rustling substate from canonical facts, and withholds the
-blocked-path fact from mediation. It alone resolves the recorded proposal and
-selects feedback. `replay` verifies the recorded proposal, resolution, state,
-and feedback without calling mediation again.
-
-The following documentation-only contrast tests the actor-owned side without
-creating a crow world or changing the clearing schema:
-
-| Actor-owned field | Foraging crow description |
-| --- | --- |
-| Epistemic profile | “You are an alert crow looking for food. You may assess what you can observe from above, but you do not know what lies behind obstacles or beyond your view. Treat sounds and smells as clues, not facts.” |
-| Ordered questions | “Do I believe the clearing is safe to enter?”; then “Do I believe the food is worth investigating from here?” |
-| Bounded proposal vocabulary | `approach_food` (attempt to move toward observed food); `wait` (take no world-changing action this turn) |
-| Retained context | Empty: no crow memory, needs, inventory, or persistent belief state |
-
-The crow description contains neither `food_path_blocked` nor another clearing
-field. It does not alter observation filtering; the simulation core remains
-the sole authority that accepts and resolves either proposal. `approach_food`
-is not thereby a universal action.
-
-The module and its YAML fixture are disposable experiment scaffolding, not a
-general actor, world, or mediation framework. Its observable contract is owned by
-[Requirements](requirements.md#fox-language-mediated-causal-turn).
-
-## Fox and hunter shared-world turn
-
-`npc.experiments.fox_hunter_shared_world` is a separate, bounded
-shared-authoritative-world slice. It starts from one canonical clearing state,
-derives both actor-accessible substates before either mediation request, then
-keeps the fox and hunter mediation inputs and actor-local records separate.
-The simulation core retains both resulting proposals before it applies the
-fixed hunter-then-fox resolution order.
-
-The core alone applies the scenario's trap and food transitions. With ready
-materials, the hunter's accepted `set_trap` proposal sets the trap before the
-fox's `approach_food` proposal is resolved, yielding the caught-fox outcome.
-Changing only canonical material readiness changes the hunter's observation;
-the fixture's valid hunter response then waits, and the same fox proposal
-reaches and consumes the food. The frozen trace records both actor records,
-proposal order, resolution decisions, transitions, outcome, and actor-specific
-feedback. `replay` re-derives actor observations and re-resolves the recorded
-proposals without mediation.
-
-The module, trace types, fixture corpus, and fixed resolver are disposable
-bounded-scenario scaffolding. They do not establish a reusable actor, world,
-scheduler, conflict-resolution, or mediation framework. Its observable
-contract is owned by
-[Requirements](requirements.md#fox-and-hunter-shared-world-turn).
-
 ## Builder-controlled clearing composition
 
 `npc.composition` provides the narrow, domain-opaque execution boundary for
@@ -205,27 +137,3 @@ continuation; it is not generic clearing lifecycle policy. This establishes
 neither temporal scheduling nor a universal world or proposal schema. Its
 observable contract is owned by
 [Requirements](requirements.md#builder-controlled-clearing-composition).
-
-## Village emergency-food rationing turn
-
-`npc.experiments.village_rationing` is a separate, bounded three-actor
-scenario. It derives each household's private observation and mediates its
-bounded claim before deriving the relief organisation's observation from only
-the canonical reserve and resulting public claim ledger. The organisation's
-bounded allocation proposal remains untrusted input: the simulation core
-recomputes the fixed priority allocation and only commits an exact match.
-
-The source-state guard accepts only the two checked-in initial reserves (six
-or four units) with no committed allocations. Six units and both valid claims
-accept the 4/2 allocation; changing only the initial reserve makes the
-organisation observe four units and accepts 4/0. Malformed, unsupported, or
-rule-inconsistent actor output produces no unauthorised canonical change.
-The frozen trace retains actor records, ledger, proposal, validation decision,
-transitions, resulting state, and actor-specific feedback. `replay` re-derives
-the actor inputs and re-runs authoritative validation without mediation.
-
-The module, trace types, fixture corpus, and resolver are disposable
-bounded-scenario scaffolding. They do not establish a reusable village,
-claim, allocation, actor, world, or mediation framework. Its observable
-contract is owned by
-[Requirements](requirements.md#village-emergency-food-rationing-turn).

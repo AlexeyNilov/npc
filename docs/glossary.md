@@ -127,8 +127,8 @@ owners, then link to them here.
 profile, ordered questions, bounded proposal vocabulary, and any actor-local
 retained context. Its profile and questions inform mediation; it contains no
 canonical world facts, information-filtering rules, resolution rules, or
-feedback-selection rules. See the [current causal-turn
-boundary](architecture.md#fox-language-mediated-causal-turn).
+feedback-selection rules. See the [target modular composition
+model](strategy.md#target-modular-composition-model).
 
 **Subjective percept.** A recorded actor-local description generated from an
   actor-accessible substate and epistemic profile. It may be incomplete or

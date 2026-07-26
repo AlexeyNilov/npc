@@ -363,3 +363,30 @@ Lead may choose the minimum interface and runtime mechanics only after that
 outcome defines their required behavior. This decision does not select an API,
 schema, transport, event model, authoring syntax, scenario domain, or general
 runtime architecture.
+
+### 2026-07-26: Retire superseded boundary-discovery implementations
+
+**Status:** Accepted
+
+**Context:** The causal-turn, fixed fox-and-hunter shared-world, and
+village-rationing implementations established bounded evidence for the current
+composition and stateful-execution path. They are not runtime dependencies of
+that path, yet their code, corpora, tests, requirements, and architecture
+descriptions continue to present them as supported behavior. Keeping those
+parallel scenario implementations increases maintenance surface and obscures
+the builder-facing product boundary. The interactive fox demo remains a
+separately supported demonstration and is not part of this retirement.
+
+**Decision:** Retire the three superseded scenario implementations and their
+focused tests and YAML corpora. Remove their observable requirements and
+current-architecture descriptions. Preserve their evidence records and the
+accepted decisions that explain what they established; annotate affected
+evidence with its implementation lifecycle. Retain the fox chat, perception,
+utility, narration, configuration, and LLM-adapter path as the supported fox
+demo.
+
+**Consequences:** The active implementation surface is the builder-controlled
+clearing composition and its bounded two-step timeline, plus the interactive
+fox demo. PyYAML and the current LLM dependency remain required by that demo.
+Future use of a retired scenario requires a new bounded outcome or explicit
+restoration decision rather than treating historical code as supported.

@@ -37,6 +37,10 @@ The developer creates a readable baseline declaration for supplied fox, hunter, 
 
 ## Result
 
+- **Implementation lifecycle:** The predecessor causal-turn and fixed
+  shared-world scenario implementations that informed this composition slice
+  were retired after their evidence was consumed. Their evidence records and
+  Git history preserve that learning.
 - **Observed result:** The baseline declaration recorded the named
   hunter-first clearing rules and supplied fox and hunter components, their
   separate shown inputs and proposals, authoritative capture resolution,

@@ -65,6 +65,10 @@ household information.
 
 ## Result
 
+- **Implementation lifecycle:** The disposable scenario implementation, corpus,
+  and focused tests were retired after this evidence informed the product
+  boundary. This record remains the canonical evidence; Git history retains
+  the removed implementation.
 - **Observed result:** Supported. The checked-in corpus records accepted 4/2
   and 4/0 priority allocations for six- and four-unit canonical reserves,
   respectively, and rejects the over-reserve 4/4 proposal with unchanged
