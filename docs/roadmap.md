@@ -21,9 +21,10 @@ that boundary in a materially different organisational allocation context. Its
 retaining natural language as the default semantic interface through that
 contrasting slice, within its recorded limits.
 
-No incomplete outcome is currently ordered. A later Product Manager decision
-must add the next evidence-bearing outcome; this roadmap does not infer one
-from the completed experiment.
+The next ordered outcome is Builder-controlled composition. It turns the
+completed boundary evidence into a builder-facing capability; no later outcome
+is ordered until its result determines whether the path can proceed to
+stateful execution.
 
 The current fox [architecture](architecture.md) and completed
 [utility evidence](evidence/2026-07-26-fox-deterministic-utility.md) remain
@@ -74,13 +75,14 @@ hunter sets a trap, the fox approaches food, and the rules resolve the fox as
 caught. In the actor-variant run, the builder substitutes a more cautious fox
 while retaining the hunter, rules, and engine; that fox may wait instead. In
 the rule-variant run, the builder retains the original actors but substitutes
-rules under which a triggered trap scares the fox away rather than catching
-it. The trace for each run shows the supplied components, actor observations
-and proposals, simulation decisions, feedback, and final result; each trace
-replays to that same result. For example, if an actor declares an action the
-simulation has not paired with it, the engine identifies that structural
-mismatch and its components, rather than attempting to decide what the action
-means in the clearing.
+rules that resolve the fox's proposal before the hunter's trap-setting
+proposal; the fox can reach the food before a trap is set. The trace for each
+run shows the supplied components, actor observations and proposals,
+simulation decisions, feedback, and final result; each trace replays to that
+same result. For example, if an actor declares an action the simulation has
+not paired with it, the engine identifies that structural mismatch and its
+components, rather than attempting to decide what the action means in the
+clearing.
 
 **Why now:** Completed causal-boundary and village-rationing portability
 evidence support the independent authority and natural-language boundaries,
