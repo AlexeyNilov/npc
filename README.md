@@ -31,31 +31,16 @@ Feedback
 Perception   Sensemaking
 ```
 
-This is the project's target model, not a claim about the current
-implementation. Experiments should reveal which parts of it must become durable
-system structure.
+This is the project's target model, not a claim about the current implementation.
 
-The first audience is the project's developer. The current demonstration is a
-bounded fox utility loop. When within hearing range, the fox receives two
-independent, evidence-grounded LLM perceptions: threat and explicit food offer.
-Deterministic validation and a fixed utility policy select `flee`, `approach`,
-or `do_nothing` from those accepted perceptions and authoritative hunger.
-Authoritative distance gates hearing, executes `flee` as `+5` and `approach` as
-`-3` with a minimum distance of `1`, and feeds the resulting distance and
-hunger into the next turn. A completed fox action can then be rendered once by
-the configured LLM as arbitrary concise, non-authoritative presentation, or by
-a deterministic fallback when narration is unavailable or unusable. The LLM
-supplies only an evidence-grounded perception or bounded presentation; it never
-chooses an action, scores a utility, determines reachability, or changes
-authoritative state.
+The first audience is the project's developer. The current runnable
+demonstration is a deterministic turn loop with LLM-assisted perception and
+non-authoritative narration. Its current design is in
+[Architecture](docs/architecture.md), its observable behavior is in
+[Requirements](docs/requirements.md), and what the utility experiment
+established is in [its evidence record](docs/evidence/2026-07-26-fox-deterministic-utility.md).
 
-The central learning hypothesis is that small, deterministic decision scenarios
-can reveal which model elements survive a second, contrasting decision. Both
-decisions may belong to the same actor.
-Player conversation and broader actor capabilities are later tests of that
-model, not the current foundation.
-
-## Run an interactive fox turn loop
+## Run an interactive turn loop
 
 After installing the project, run:
 
@@ -63,13 +48,10 @@ After installing the project, run:
 python sample/fox_chat.py
 ```
 
-Each input is an independent player turn. The deterministic utility experiment
-scores `flee`, `approach`, and `do_nothing` from validated perception and the
-fox's persistent hunger; the configured LLM then renders only that completed
-outcome. The loop carries authoritative distance and hunger into the next turn,
-prints the selected utility, and does not roleplay the fox or retain dialogue
-history. Type `/exit` to quit. Use `--starting-hunger 0` through
-`--starting-hunger 100` to begin at a different hunger level.
+Each input is an independent player turn. Type `/exit` to quit. Use
+`--starting-hunger 0` through `--starting-hunger 100` to choose the initial
+hunger value. See [the interactive-turn requirements](docs/requirements.md#interactive-deterministic-fox-utility-turns)
+for the command's behavior and state boundaries.
 
 ## Project documentation
 
@@ -78,4 +60,5 @@ history. Type `/exit` to quit. Use `--starting-hunger 0` through
 - [Decisions](docs/decisions.md)
 - [Strategy](docs/strategy.md)
 - [Roadmap](docs/roadmap.md)
+- [Experiment evidence](docs/evidence/README.md)
 - [Development workflow](CONTRIBUTING.md)

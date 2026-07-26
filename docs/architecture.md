@@ -46,79 +46,62 @@ feedback.
 
 `npc.experiments.fox_distance_feedback` is a fox-only wrapper with
 local `TurnTrace`, turn execution, and fixture helpers. Before each turn calls
-`perceive_threat` and `perceive_food_offer`, `run_turn` rejects a starting
-distance that is not a non-boolean integer greater than or equal to `1` with
-`ValueError`. It then checks the authoritative distance against the fixed
-hearing range of `10`. An inaudible turn records no sensor calls and null
-perception fields; an audible turn calls each sensor once and retains its raw
+`perceive_threat` and `perceive_food_offer`, `run_turn` validates the starting
+distance and uses it to gate perception. It retains each called sensor's raw
 candidate, parsed candidate, and validation result independently.
 
-The fox-local policy gives accepted grounded threat priority: threat selects
-`flee`; otherwise accepted grounded food offer selects `approach`; otherwise it
-selects `do_nothing`. Execution is local and deterministic: `flee` adds `5`,
-`approach` subtracts `3` without going below `1`, and `do_nothing` preserves
-distance. The resulting distance is recorded as feedback and becomes the next
-turn's starting distance. `python -m npc.experiments.fox_distance_feedback`
-loads fixture completions from `scenarios/fox_distance_feedback.yaml`; it does
-not introduce a generic actor, movement, state, or world abstraction.
+Its fox-local policy selects and executes an action from accepted perceptions;
+the resulting distance becomes feedback for the following turn.
+`python -m npc.experiments.fox_distance_feedback` loads fixture completions
+from `scenarios/fox_distance_feedback.yaml`; it does not introduce a generic
+actor, movement, state, or world abstraction. Its observable contract is owned
+by [Requirements](requirements.md#bounded-fox-distance-feedback).
 
 ## Non-authoritative rendering of completed fox outcomes
 
 `npc.experiments.fox_outcome_rendering` is a fox-only presentation wrapper
 around an already completed fox turn trace. It copies that frozen turn by value
-before rendering. Its one-argument narrator receives a prompt derived from
-`executed_action`; a utility turn also supplies its resulting authoritative
-hunger as an exact numeric presentation fact only when it is greater than `50`.
-It is called once after
-completion and cannot receive raw player text, perception candidate, certainty,
-distance, or mutable state.
+before rendering. Its one-argument narrator receives a prompt derived from the
+completed action and selected presentation facts. It is called after completion
+and cannot receive raw player text, perception candidate, certainty, distance,
+or mutable state.
 
 The default command uses an injectable fixture narrator. With
 `--configured-narrator`, the module's fox-local adapter makes one
 `complete_text` call using the action prompt and a fixed instruction that its
-response is best-effort, non-authoritative presentation of only the completed
-action. When the prompt includes resulting utility hunger, the narrator must
-use it as expressive prose context for food-seeking, but that interpretation is
-non-authoritative. The guidance also directs the narrator to avoid unsupported
-dialogue, unseen events,
-locations, and world state; it does not semantically validate the response. A nonblank response of at most 280
-Unicode characters is retained as arbitrary player-facing narration; blank,
-oversized, or exceptional responses produce the fixed fallback. A frozen
+response is best-effort, non-authoritative presentation. Validation preserves
+the canonical turn and uses a deterministic fallback when needed. A frozen
 `RenderingTrace` retains the copied canonical turn, prompt, raw output or null,
 validation/failure status, rendered text, and `non_authoritative=True`; rendered
 text has no path to action, distance, feedback, or perception. The module's YAML
 fixtures and narrator are disposable scaffolding, not a general renderer,
-dialogue, state, or event framework.
+dialogue, state, or event framework. Its observable contract is owned by
+[Requirements](requirements.md#non-authoritative-rendering-of-completed-fox-outcomes).
 
 ## Fox deterministic utility experiment
 
 `npc.experiments.fox_deterministic_utility` is a separate fox-local experiment;
 it does not change `fox_distance_feedback` or its fixed threat-first policy.
-It validates an authoritative starting hunger integer from `0` through `100`,
-uses the existing hearing-gated threat and food-offer sensors, and scores only
-accepted perceptions. The fixed experiment scores `flee` at `60` for an
-accepted threat, `approach` at the starting hunger for an accepted food offer,
-and `do_nothing` at `1`; equal scores retain the fixed action order of `flee`,
-`approach`, then `do_nothing`. The selected action uses the existing local
-distance transition. Each valid completed turn then advances hunger by `10`,
-saturating at `100`, for the next turn.
+It combines the existing hearing-gated perceptions with authoritative hunger to
+select and execute a fox action, then carries distance and hunger into the next
+turn.
 
 The frozen trace retains the starting and resulting hunger, sensor validation
 data, candidate utilities, selected score, tie order, action, and distance
 feedback. Its YAML corpus and command-line wrapper are experiment scaffolding,
 not a reusable need, utility, actor, or state framework. The experiment's
-observed result and limits are owned by
-[its evidence record](evidence/2026-07-26-fox-deterministic-utility.md).
+observable contract is owned by
+[Requirements](requirements.md#deterministic-fox-utility-turns); its observed
+result and limits are owned by [its evidence record](evidence/2026-07-26-fox-deterministic-utility.md).
 
 ## Interactive fox utility turns
 
 `sample/fox_chat.py` is a terminal loop modeled on the local sample chat,
 but it does not stream or roleplay a response. For each player input it calls
-the fox-local utility `run_turn`, then `render_completed_turn`, prints the
-selected action, candidate utilities, and resulting non-authoritative narration
-under the `Narration (non-authoritative)` label. It carries only the canonical
-feedback distance and resulting hunger to the next iteration. The loop has no
-conversation history, fox persona, or path from narration back to the next
-action. The renderer can preserve either completed fox trace type, but still
-receives only the completed action and, for utility turns, resulting hunger for
-narration.
+the fox-local utility `run_turn`, then `render_completed_turn`. It carries only
+canonical feedback distance and resulting hunger to the next iteration. The
+loop has no conversation history, fox persona, or path from narration back to
+the next action. The renderer can preserve either completed fox trace type, but
+still receives only completed presentation facts. Its observable command
+contract is owned by
+[Requirements](requirements.md#interactive-deterministic-fox-utility-turns).
