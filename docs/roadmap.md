@@ -30,50 +30,6 @@ are owned by [Strategy](strategy.md).
 
 ## Ordered future outcomes
 
-### 1. Establish the minimal independent actor-description seam
-
-**Strategic horizon:** Bridge from 1 to 2. **Depends on:** the completed
-causal-closure slice.
-
-**Plain-language goal:** Make explicit what belongs to an actor, so a future
-simulation builder can describe a different actor without teaching that actor
-the world's internal schema or recreating the engine's rules.
-
-**Illustrative fox example (non-binding):** A fox description could say that
-it is cautious and hungry, what kinds of observations it can interpret, which
-questions it asks, that it may propose `flee`, `approach`, or `wait`, and which
-actor-local feedback matters on its next turn. It must not contain hidden world
-facts, decide whether an action succeeds, or encode the hunter's rules.
-
-**Target user and problem:** A simulation builder needs to describe an actor's
-own viewpoint and possible attempts independently. Otherwise, each new actor
-will become coupled to the first simulation's data structure and resolution
-logic, undermining the intended product model before composition is tested.
-
-**Desired observable outcome:** The first causal-closure slice yields an
-explicit boundary that distinguishes actor-owned epistemic profile, questions,
-proposal vocabulary, and actor-local retained context from simulation-owned
-canonical state, information filtering, action resolution, and feedback
-selection. A contrasting actor description can be stated against that boundary
-without inheriting fox-specific cognition or traversing the simulation schema.
-
-**Constraints:** Do not select a class hierarchy, DSL, file format, registry,
-or general actor framework merely to make the boundary look reusable. The
-smallest expression that makes ownership and coupling inspectable is enough;
-the Technical Lead selects its technical form. Any accepted consequential
-rationale belongs in [Decisions](decisions.md), not this roadmap.
-
-**Ordinary completion evidence:** A documented comparison identifies which
-elements of the causal-closure actor are actor-owned and which are
-simulation-owned, and a second contrasting actor can be described using the
-former without adding shared schema-specific sensemaking logic. This is direct
-delivery and review, not an experiment: it makes a decided product boundary
-explicit before it is multiplied across a shared world.
-
-**Decision unlocked:** Whether the independent actor boundary is sufficiently
-clear to compose two actors in one authoritative world, or whether a concrete
-coupling pressure warrants a Product Strategist decision before doing so.
-
 ### 2. Compose a shared authoritative world for heterogeneous actors
 
 **Strategic horizon:** 2 — shared-world composition. **Depends on:** outcome

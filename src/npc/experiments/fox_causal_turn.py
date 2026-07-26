@@ -7,16 +7,29 @@ from typing import Any, Literal, cast
 
 import yaml  # type: ignore[import-untyped]
 
-EPISTEMIC_PROFILE = (
-    "You are hungry and cautious. You cannot see beyond the clearing or through obstacles. "
-    "Treat smells and sounds as clues, not facts."
-)
-QUESTIONS = (
-    "Do I believe an immediate threat is present?",
-    "Do I believe the food is reachable by approaching?",
-)
 Proposal = Literal["approach_food", "wait"]
 Resolution = Literal["food_path_blocked", "waited"]
+
+
+@dataclass(frozen=True)
+class ActorDescription:
+    epistemic_profile: str
+    questions: tuple[str, ...]
+    proposal_vocabulary: tuple[Proposal, ...]
+    retained_context: tuple[()] = ()
+
+
+FOX_DESCRIPTION = ActorDescription(
+    epistemic_profile=(
+        "You are hungry and cautious. You cannot see beyond the clearing or through obstacles. "
+        "Treat smells and sounds as clues, not facts."
+    ),
+    questions=(
+        "Do I believe an immediate threat is present?",
+        "Do I believe the food is reachable by approaching?",
+    ),
+    proposal_vocabulary=("approach_food", "wait"),
+)
 Mediation = Callable[[str, str, tuple[str, ...]], Awaitable[str]]
 
 
@@ -39,6 +52,7 @@ class Answer:
 class TurnTrace:
     initial_canonical_state: CanonicalState
     accessible_substate: str
+    actor_description: ActorDescription
     epistemic_profile: str
     subjective_percept: str | None
     questions: tuple[str, ...]
@@ -58,22 +72,32 @@ def initial_state() -> CanonicalState:
     )
 
 
-async def run_turn(mediate: Mediation, canonical_state: CanonicalState | None = None) -> TurnTrace:
+async def run_turn(
+    mediate: Mediation,
+    canonical_state: CanonicalState | None = None,
+    *,
+    actor_description: ActorDescription = FOX_DESCRIPTION,
+) -> TurnTrace:
     initial = canonical_state or initial_state()
     if initial.location != "clearing" or not initial.food_path_blocked:
         raise ValueError("fox causal turn requires the accepted blocked clearing state")
 
     accessible_substate = _derive_accessible_substate(initial)
-    raw_response = await mediate(accessible_substate, EPISTEMIC_PROFILE, QUESTIONS)
-    percept, answers = _validate_mediation(raw_response)
-    proposal = _propose(answers) if percept is not None else "wait"
+    raw_response = await mediate(
+        accessible_substate,
+        actor_description.epistemic_profile,
+        actor_description.questions,
+    )
+    percept, answers = _validate_mediation(raw_response, actor_description.questions)
+    proposal = _propose(answers, actor_description.proposal_vocabulary) if percept is not None else "wait"
     resolution, resulting, feedback = resolve_proposal(initial, proposal)
     return TurnTrace(
         initial_canonical_state=initial,
         accessible_substate=accessible_substate,
-        epistemic_profile=EPISTEMIC_PROFILE,
+        actor_description=actor_description,
+        epistemic_profile=actor_description.epistemic_profile,
         subjective_percept=percept,
-        questions=QUESTIONS,
+        questions=actor_description.questions,
         answers=answers,
         proposal=proposal,
         resolution=resolution,
@@ -91,10 +115,11 @@ def resolve_proposal(canonical_state: CanonicalState, proposal: object) -> tuple
 def replay(trace: TurnTrace) -> TurnTrace:
     if (
         trace.accessible_substate != _derive_accessible_substate(trace.initial_canonical_state)
-        or trace.epistemic_profile != EPISTEMIC_PROFILE
-        or trace.questions != QUESTIONS
+        or trace.epistemic_profile != trace.actor_description.epistemic_profile
+        or trace.questions != trace.actor_description.questions
+        or trace.proposal not in trace.actor_description.proposal_vocabulary
     ):
-        raise ValueError("trace does not match the accepted fox causal-turn input")
+        raise ValueError("trace does not match its recorded actor description")
     resolution, resulting, feedback = resolve_proposal(trace.initial_canonical_state, trace.proposal)
     if (resolution, resulting, feedback) != (
         trace.resolution,
@@ -126,7 +151,7 @@ def load_corpus(path: Path) -> list[dict[str, object]]:
     return [cast(dict[str, object], case) for case in cast(list[dict[str, object]], data["cases"])]
 
 
-def _validate_mediation(raw_response: str) -> tuple[str | None, tuple[Answer, ...]]:
+def _validate_mediation(raw_response: str, questions: tuple[str, ...]) -> tuple[str | None, tuple[Answer, ...]]:
     try:
         record = json.loads(raw_response)
     except json.JSONDecodeError:
@@ -137,10 +162,10 @@ def _validate_mediation(raw_response: str) -> tuple[str | None, tuple[Answer, ..
     raw_answers = record.get("answers")
     if not isinstance(percept, str) or not percept.strip():
         return None, ()
-    if not isinstance(raw_answers, list) or len(raw_answers) != len(QUESTIONS):
+    if not isinstance(raw_answers, list) or len(raw_answers) != len(questions):
         return None, ()
     answers: list[Answer] = []
-    for question, raw_answer in zip(QUESTIONS, raw_answers, strict=True):
+    for question, raw_answer in zip(questions, raw_answers, strict=True):
         if not isinstance(raw_answer, dict):
             return None, ()
         answer = raw_answer.get("answer")
@@ -157,8 +182,13 @@ def _validate_mediation(raw_response: str) -> tuple[str | None, tuple[Answer, ..
     return percept, tuple(answers)
 
 
-def _propose(answers: tuple[Answer, ...]) -> Proposal:
-    if answers[0].answer is False and answers[1].answer is True:
+def _propose(answers: tuple[Answer, ...], proposal_vocabulary: tuple[Proposal, ...]) -> Proposal:
+    if (
+        len(answers) == 2
+        and answers[0].answer is False
+        and answers[1].answer is True
+        and "approach_food" in proposal_vocabulary
+    ):
         return "approach_food"
     return "wait"
 
@@ -183,6 +213,7 @@ def _trace_json(trace: TurnTrace) -> dict[str, object]:
     return {
         "initial_canonical_state": trace.initial_canonical_state.__dict__,
         "accessible_substate": trace.accessible_substate,
+        "actor_description": trace.actor_description.__dict__,
         "epistemic_profile": trace.epistemic_profile,
         "subjective_percept": trace.subjective_percept,
         "questions": trace.questions,

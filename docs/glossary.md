@@ -85,6 +85,13 @@ owners, then link to them here.
   including sensory limitations, knowledge, worldview, biases, and relevant
   current context. It remains actor-local and does not alter canonical reality.
 
+**Actor description.** The immutable actor-owned causal-turn input: epistemic
+profile, ordered questions, bounded proposal vocabulary, and any actor-local
+retained context. Its profile and questions inform mediation; it contains no
+canonical world facts, information-filtering rules, resolution rules, or
+feedback-selection rules. See the [current causal-turn
+boundary](architecture.md#fox-language-mediated-causal-turn).
+
 **Subjective percept.** A recorded actor-local description generated from an
   actor-accessible substate and epistemic profile. It may be incomplete or
   distorted and is not a faithful serialization of, or transition in,

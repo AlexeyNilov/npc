@@ -111,22 +111,42 @@ contract is owned by
 ## Fox language-mediated causal turn
 
 `npc.experiments.fox_causal_turn` is a separate, fox-local causal-closure
-slice. Its simulation core records the accepted blocked clearing state together
-with fox-local `food_scent_nearby` and `leaves_rustling` facts. It
-deterministically renders the clearing, smell, and rustling substate from those
-facts before its sole injected mediation request. That request receives only
-the derived substate, the hungry/cautious epistemic profile, and the two
-ordered fox questions; the canonical blocked-path fact is withheld.
+slice. It makes an immutable actor description explicit, records it in the
+causal trace, and supplies only its profile and questions to mediation. The
+ownership boundary is:
 
-The recorded mediation response contains one subjective percept and an
-evidence-grounded answer for each question. Invalid output fails closed to the
-fox's `wait` proposal. Otherwise, the fox-local intent rule submits either
-`approach_food` or `wait`; only the simulation-core resolver commits the
-resulting state and feedback. An `approach_food` proposal meets the canonical
-blocked path and therefore resolves as `food_path_blocked`, even when the
-actor's recorded belief says the food is reachable. `replay` verifies that the
-recorded proposal, resolution, state, and feedback agree without calling
-mediation again. The module and its YAML fixture are disposable experiment
-scaffolding, not a general actor, world, or mediation framework. Its observable
-contract is owned by
+| Causal-turn element | Owner |
+| --- | --- |
+| Canonical clearing state, including `food_path_blocked` | Simulation core |
+| Actor-accessible substate and the filtering that derives it | Simulation core |
+| Epistemic profile, ordered questions, declared proposal vocabulary, and retained context | Actor description |
+| Subjective percept, answers, supporting evidence, and bounded proposal | Actor-local mediation/cognition |
+| Mediation-output validation and fail-closed behavior | Simulation core |
+| Proposal acceptance, resolution, canonical transition, and feedback selection | Simulation core |
+| Recorded trace and replay verification | Simulation core |
+
+The fox description has empty retained context: it introduces no memory,
+needs, inventory, or persistent belief state. The simulation still renders the
+clearing, smell, and rustling substate from canonical facts, and withholds the
+blocked-path fact from mediation. It alone resolves the recorded proposal and
+selects feedback. `replay` verifies the recorded proposal, resolution, state,
+and feedback without calling mediation again.
+
+The following documentation-only contrast tests the actor-owned side without
+creating a crow world or changing the clearing schema:
+
+| Actor-owned field | Foraging crow description |
+| --- | --- |
+| Epistemic profile | “You are an alert crow looking for food. You may assess what you can observe from above, but you do not know what lies behind obstacles or beyond your view. Treat sounds and smells as clues, not facts.” |
+| Ordered questions | “Do I believe the clearing is safe to enter?”; then “Do I believe the food is worth investigating from here?” |
+| Bounded proposal vocabulary | `approach_food` (attempt to move toward observed food); `wait` (take no world-changing action this turn) |
+| Retained context | Empty: no crow memory, needs, inventory, or persistent belief state |
+
+The crow description contains neither `food_path_blocked` nor another clearing
+field. It does not alter observation filtering; the simulation core remains
+the sole authority that accepts and resolves either proposal. `approach_food`
+is not thereby a universal action.
+
+The module and its YAML fixture are disposable experiment scaffolding, not a
+general actor, world, or mediation framework. Its observable contract is owned by
 [Requirements](requirements.md#fox-language-mediated-causal-turn).
