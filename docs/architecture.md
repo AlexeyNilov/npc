@@ -176,6 +176,28 @@ scheduler, conflict-resolution, or mediation framework. Its observable
 contract is owned by
 [Requirements](requirements.md#fox-and-hunter-shared-world-turn).
 
+## Builder-controlled clearing composition
+
+`npc.composition` provides the narrow, domain-opaque execution boundary for
+this experiment. A `CompositionDeclaration` carries a builder-selected
+simulation, named actors, their explicit proposal pairings, and source state.
+The engine validates membership and proposal-subset structure, asks the
+simulation for each actor's input before mediation, records actor outputs, and
+then asks the simulation to resolve the collected proposals. It does not read
+clearing fields or interpret proposals and outcomes. Actor output contains
+only cognition and a proposal; the trace's shown input is the engine-retained,
+simulation-derived value rather than actor-controlled data.
+
+`npc.experiments.composed_clearing` supplies the experiment's clearing actors
+and hunter-first or fox-first rule components. The supplied rules alone derive
+observations, own accepted proposal vocabularies, and apply canonical
+transitions and feedback. `CompositionTrace` retains only values needed for
+inspection and replay. Replay revalidates the declaration, re-derives inputs
+and authoritative resolution from the selected simulation, and never invokes
+an actor. This is one bounded turn; it establishes neither temporal scheduling
+nor a universal world or proposal schema. Its observable contract is owned by
+[Requirements](requirements.md#builder-controlled-clearing-composition).
+
 ## Village emergency-food rationing turn
 
 `npc.experiments.village_rationing` is a separate, bounded three-actor

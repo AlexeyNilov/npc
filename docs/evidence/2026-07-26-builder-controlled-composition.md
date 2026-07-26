@@ -1,10 +1,10 @@
 # Experiment: builder-controlled composition
 
-**Status:** Planned
+**Status:** Complete
 
 **Date:** 2026-07-26
 
-**Roadmap outcome:** [Builder-controlled composition](../roadmap.md#1-builder-controlled-composition)
+**Roadmap outcome:** Completed; see the current roadmap.
 
 ## Decision unlocked
 
@@ -39,8 +39,27 @@ The developer creates a readable baseline declaration for supplied fox, hunter, 
 
 At task Review, complete every field and set the evidence status to `Review`. The Technical Lead sets the final status after required review and roadmap closure.
 
-- **Observed result:** Pending.
-- **Reproducibility evidence:** Pending.
-- **Interpretation and limits:** Pending.
-- **Decision or unresolved question created:** Pending.
-- **Canonical follow-up:** Pending.
+- **Observed result:** The baseline declaration recorded the named
+  hunter-first clearing rules and supplied fox and hunter components, their
+  separate shown inputs and proposals, authoritative capture resolution,
+  feedback, and resulting state. Replacing only the fox supplied a cautious
+  `wait` and changed the outcome; replacing only the rules supplied fox-first
+  resolution and let the fox reach food. The deliberately invalid fox pairing
+  identified the declaration, component, and `set_trap` proposal without a
+  semantic or domain claim.
+- **Reproducibility evidence:** Focused tests cover the three declarations,
+  structural diagnostic, source-state variation, engine-derived actor input,
+  and replay rejection for each retained authority field. `.venv/bin/pytest
+  tests/test_composition.py`, `make check`, and `git diff --check` passed at
+  Implementer handoff.
+- **Interpretation and limits:** Within this one bounded clearing turn, the
+  declaration, structural validator, value trace, and replay boundary support
+  the Horizon 1 hypothesis. The result does not establish temporal execution,
+  branching, universal proposal semantics, or semantic-compatibility
+  validation.
+- **Decision or unresolved question created:** The evidence supports the
+  builder-controlled composition boundary within its stated limits. The Product
+  Strategist may evaluate whether it is sufficient to carry into stateful
+  execution; no future outcome is implied by this record.
+- **Canonical follow-up:** [Strategy](../strategy.md) — Product Strategist
+  evaluation of the decision unlocked.

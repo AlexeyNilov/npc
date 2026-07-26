@@ -112,6 +112,30 @@ This document owns observable system behavior.
   trace shall reproduce the authoritative sequence without making mediation
   requests.
 
+### Builder-controlled clearing composition
+
+- **When** a builder supplies a readable declaration naming one simulation
+  component and named fox and hunter actor components, **the system shall**
+  validate every actor proposal pairing before observation, mediation, or
+  resolution. Validation shall be structural: each actor-declared proposal
+  must be paired with a proposal accepted for that actor by the selected
+  simulation; it shall not claim semantic compatibility or domain validity.
+- **When** the validated baseline declaration runs, **the system shall** let
+  the supplied clearing rules derive separate actor-visible inputs, let the
+  supplied actors form their bounded proposals, and let those rules resolve
+  the retained proposals. The baseline rules resolve hunter then fox; the
+  supplied fox-first rules resolve fox then hunter. Replacing only the supplied
+  fox component, or separately only the rules component, shall produce an
+  inspectable causal difference while the unrelated component remains supplied
+  unchanged.
+- **When** a composed clearing turn completes, **the system shall** retain a
+  JSON-safe trace by value containing the declaration and participating
+  component names, proposal pairings, source state, actor-visible inputs,
+  actor cognition and proposals, simulation resolution and feedback, and
+  resulting state. Replay shall re-derive simulation-owned observations and
+  resolution without actor mediation and reject a changed recorded declaration,
+  pairing, input, proposal, resolution, feedback, or resulting state.
+
 ### Village emergency-food rationing turn
 
 - **When** a developer runs the checked-in village-rationing corpus, **the

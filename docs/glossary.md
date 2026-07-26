@@ -38,6 +38,15 @@ owners, then link to them here.
   execution mechanism remains deliberately unspecified. See the
   [target composition model](strategy.md#target-modular-composition-model).
 
+**Composition declaration.** A builder-owned, readable input that names one
+  supplied simulation and its supplied actor components and explicitly pairs
+  each actor's declared proposal vocabulary with the selected simulation's
+  accepted vocabulary. The builder owns component membership and semantic
+  compatibility; the engine validates pairing structure; the simulation owns
+  proposal admissibility and meaning. A declaration is retained by value in a
+  composed trace for replay verification. See the
+  [builder-controlled composition requirement](requirements.md#builder-controlled-clearing-composition).
+
 **Engine.** The target product and runtime as a whole. It provides the
   composition and execution environment for simulations and actors. It contains
   the authoritative simulation core and supplies generic mediation,
