@@ -30,6 +30,71 @@ are owned by [Strategy](strategy.md).
 
 ## Ordered future outcomes
 
+### 1. Establish one language-mediated causally closed actor turn
+
+**Strategic horizon:** 1 — causal closure.
+
+**Plain-language goal:** Make one actor turn into a complete, inspectable
+conversation between an actor and a world. The actor can form a belief and try
+something; only the simulation decides what really happens.
+
+**Illustrative fox example (non-binding):** The world knows that a hunter is
+nearby and food is behind a wall. It may tell the fox only that it hears
+footsteps and smells food. A wary, hungry fox interprets those observations,
+asks whether it is safe to approach and whether food is likely nearby, then
+proposes `flee` or `approach`. The world resolves that proposal—for example,
+the wall prevents reaching the food—and records both what the fox believed and
+what actually happened. The fox's belief never becomes a world fact merely
+because it was generated.
+
+**Why this is next:** The accepted product model and strategy require this
+boundary before more fox-local cognition, scheduling, or a reusable framework.
+The completed fox utility work establishes a useful authority constraint, but
+does not establish the actor-to-simulation-core boundary.
+
+**Target user and problem:** A simulation builder needs one independently
+described actor to interpret only what the simulation permits it to know and
+attempt an action without that interpretation becoming canonical reality.
+
+**Desired observable outcome:** In one bounded scenario, a developer can
+inspect and replay a complete turn in which:
+
+- the simulation core starts from canonical state and deterministically derives
+  the actor-accessible substate before any LLM request;
+- the actor supplies its own epistemic profile and two or more ordered,
+  actor-owned questions;
+- generic mediation produces one recorded subjective percept and evaluates the
+  questions in one request, while retaining each answer and the percept
+  evidence that supports it separately;
+- the actor converts those answers into a bounded action proposal; and
+- the simulation core, rather than the actor or model, resolves the proposal,
+  commits the canonical transition, and returns authoritative feedback.
+
+The recorded trace must be sufficient to reproduce the authoritative
+transition from its initial state, actor-accessible substate, epistemic
+profile, percept, ordered questions, answers and evidence, proposal,
+resolution, and any controlled variation. Missing, malformed, or unsupported
+answers and rejected percepts must fail closed without becoming canonical
+facts.
+
+**Constraints:** Preserve the strategic authority and information-boundary
+constraints. This is one small vertical slice, not a claim that the fox schema,
+its utility policy, or its current sensors are reusable engine interfaces.
+Non-authoritative rendering may remain outside the turn unless it is needed to
+inspect the causal trace.
+
+**Ordinary completion evidence:** A checked-in scenario and replay exercise
+the whole sequence; tests demonstrate the hard information boundary, separate
+answer/evidence retention, failure-closed behavior, authoritative resolution,
+and reproduction of the committed transition. This is delivery rather than an
+experiment: the target behavior and authority boundary are already decided,
+and ordinary verification can establish whether the slice meets them.
+
+**Decision unlocked:** Whether the same bounded semantic and causal contracts
+can support a minimal independently described actor boundary, or whether a
+concrete failure requires escalation to the Product Strategist because it
+conflicts with the target model or strategic constraints.
+
 ### 2. Establish the minimal independent actor-description seam
 
 **Strategic horizon:** Bridge from 1 to 2. **Depends on:** outcome 1.
