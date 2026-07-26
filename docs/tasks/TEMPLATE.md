@@ -32,7 +32,8 @@ Required only for a bounded experiment.
 - **Hypothesis and decision unlocked:** link or restate the record's exact
   fields.
 - **Result handoff:** complete the record at Review, including a negative or
-  inconclusive result.
+  inconclusive result, and set its evidence status to `Review`. The Technical
+  Lead finalizes the evidence status during completion reconciliation.
 
 ## Vision alignment
 

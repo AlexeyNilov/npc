@@ -18,6 +18,10 @@ and escalate product, authority, or irreversible design choices.
   material choice remains unresolved.
 - Inspect the actual diff and verification at Review. Integrate only accepted
   work and route changed durable facts to their canonical owners.
+- For an experiment at Review, obtain any required Simplifier review and
+  resolve its findings. Then remove the exact completed roadmap outcome,
+  complete the final durable-record reconciliation, and mark the task Done.
+  Do not add, replace, or reorder future roadmap outcomes.
 
 ## Do not
 
@@ -26,6 +30,9 @@ and escalate product, authority, or irreversible design choices.
 - Restate roadmap, requirements, or workflow content in a packet.
 - Treat a successful vertical slice as proof that a reusable boundary exists.
 - Decide product priority, user value, or authority questions.
+- Ask the Product Manager to accept implementation evidence, perform
+  Simplifier review, change task or evidence lifecycle status, or act as a
+  completion gate.
 
 ## Stop and hand off
 

@@ -4,10 +4,12 @@ This directory owns the answer to: **What did a bounded experiment demonstrate
 or refute?**
 
 Create one record from [the template](TEMPLATE.md) before an experiment becomes
-Ready. Complete it at Review, whether the result supports, rejects, or fails to
-resolve the hypothesis. When completing it, update its status and replace its
-open-roadmap link as the template directs. The record remains when its code is
-removed.
+Ready. At task Review, complete its Result section and set its status to
+`Review`, whether the result supports, rejects, or fails to resolve the
+hypothesis. After the Technical Lead has completed required review and removed
+the exact completed roadmap outcome, the Technical Lead sets its final status
+to `Complete`, `Inconclusive`, or `Superseded` and replaces its open-roadmap
+link as the template directs. The record remains when its code is removed.
 
 ## Boundaries
 

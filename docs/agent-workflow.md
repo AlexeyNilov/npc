@@ -52,7 +52,10 @@ priority signal, not a Ready task.
 1. **Planned:** dependencies or decisions remain unresolved.
 2. **Ready:** outcome, context, write scope, verification, and stop conditions are complete.
 3. **In progress:** one owner is executing the task.
-4. **Review:** execution and task-local verification are complete.
+4. **Review:** execution and task-local verification are complete. The
+   experiment record contains its observed result and is marked `Review`; the
+   Technical Lead obtains any required Simplifier review and resolves its
+   findings.
 5. **Blocked:** a named design or external condition prevents progress.
 6. **Done:** findings are resolved, the Technical Lead has reconciled the
    durable records, and accepted the result.
@@ -87,15 +90,29 @@ Return:
 Raw logs remain outside durable documents. The Technical Lead inspects the actual
 diff, resolves findings, runs final checks, and integrates only accepted work.
 
+### Review and roadmap closure
+
+The Technical Lead owns the sequence from Review to Done. For an experiment
+that requires Simplifier review, the Technical Lead obtains that review and
+resolves its findings. It then removes the exact completed roadmap outcome,
+finalizes the evidence record, and marks the task Done. It does not add,
+replace, or reorder roadmap outcomes.
+
+The Product Manager consumes finalized evidence during normal planning and may
+add or reorder future outcomes then. Product planning is not a completion gate:
+the Product Manager does not accept implementation, review a diff, arrange
+Simplifier review, or change task or evidence lifecycle status.
+
 ### Completion reconciliation
 
 Before marking an experiment or delivery Done, the Technical Lead confirms:
 
+- any required Simplifier review is complete and its findings are resolved;
 - its evidence record has its final status and result;
 - accepted behavior and verified mechanism are routed to Requirements and
   Architecture, while unresolved problems are routed to an issue record;
-- the completed outcome is removed from the incomplete-only roadmap, and its
-  evidence record no longer links to that removed heading;
+- the exact completed outcome has been removed from the incomplete-only
+  roadmap, and its evidence record no longer links to that removed heading;
 - modified Markdown links are checked, with any pre-existing repository-wide
   link failures recorded as issues rather than ignored; and
 - the final diff passes the repository's required verification.

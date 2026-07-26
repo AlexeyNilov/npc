@@ -1,6 +1,6 @@
 # Experiment: short descriptive title
 
-**Status:** Planned | Running | Complete | Inconclusive | Superseded
+**Status:** Planned | Running | Review | Complete | Inconclusive | Superseded
 
 **Date:** YYYY-MM-DD
 
@@ -42,7 +42,9 @@ that feedback must affect.
 
 ## Result
 
-Complete at Review.
+At task Review, complete every field and set the evidence status to `Review`.
+The Technical Lead sets the final status after required review and roadmap
+closure.
 
 - **Observed result:**
 - **Reproducibility evidence:** commands, fixtures, traces, or tests.

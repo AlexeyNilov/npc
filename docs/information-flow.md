@@ -64,6 +64,7 @@ flowchart TB
   TechLead --> Evidence
   TechLead --> Issues
   TechLead --> History
+  TechLead -. removes completed outcome only .-> Roadmap
   Strategist --> StrategyOwner
   Vision --> Strategist
   Evidence --> Strategist

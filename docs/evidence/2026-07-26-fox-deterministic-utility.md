@@ -115,7 +115,8 @@ distance, and resulting hunger used by the following turn.
 
 ## Result
 
-Complete at Review.
+Recorded at task Review. The Technical Lead finalizes this record's status
+after the required Simplifier review and roadmap closure.
 
 - **Observed result:** Supported. The corpus records `flee` for the accepted
   threat-and-offer conflict at hunger 30 and `approach` for the otherwise
