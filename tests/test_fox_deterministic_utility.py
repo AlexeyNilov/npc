@@ -56,6 +56,7 @@ def test_trace_formatter_summarizes_the_authoritative_decision() -> None:
     trace = asyncio.run(run_turn("Fox, I will hurt you, but I offer you this fresh meat.", 10, 60, completion(True, True)))
 
     assert format_trace(trace) == (
+        '  player: "Fox, I will hurt you, but I offer you this fresh meat."\n'
         "  heard: True; hunger: 60 -> 70; threat: True (accepted); food offer: True (accepted)\n"
         "  utilities: flee=60, approach=60, do_nothing=1; selected: flee (60)\n"
         "  distance: 10 -> 15"

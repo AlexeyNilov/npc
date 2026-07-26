@@ -222,6 +222,7 @@ def format_trace(trace: TurnTrace) -> str:
         else trace.food_offer_validation_result or "not heard"
     )
     return (
+        f'  player: "{trace.player_message}"\n'
         f"  heard: {trace.heard}; hunger: {trace.starting_hunger} -> {trace.resulting_hunger}; "
         f"threat: {threat}; food offer: {food_offer}\n"
         f"  utilities: {utilities}; selected: {trace.executed_action} ({trace.selected_utility})\n"
