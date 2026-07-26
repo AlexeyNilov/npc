@@ -150,6 +150,22 @@ Use the prior LLM-system design and external approaches as decision inputs, not
 as architectures to import wholesale. Comparative discovery must be bounded to
 a capability choice or strategic constraint that it can change.
 
+**Alternatives considered:**
+
+- Continue with contrasting fox decisions or richer actor cognition first. This
+  would add actor-policy evidence without establishing the causal simulation
+  boundary required by the product vision.
+- Recreate the prior LLM-system design as a comprehensive framework. This would
+  abandon the incremental decomposition that made the current evidence
+  tractable and repeat the complexity that prompted the new project.
+- Grant a generative Game Master authority over world outcomes. This offers more
+  expressive resolution but is not preferred while canonical validation and
+  causal replay are the product's differentiating constraints.
+- Choose an application-specific vertical immediately. No named external user
+  or problem yet provides stronger capability requirements than the substrate
+  path. The current triggers for revisiting these alternatives remain in
+  [Strategy](strategy.md#reconsideration).
+
 **Consequences:** The strategy pivots from recurring fox decisions to an
 evidenced actor-to-substrate boundary, followed by shared-world composition and
 cross-scale portability. Existing fox evidence and current implementation
