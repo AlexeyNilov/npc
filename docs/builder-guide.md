@@ -64,25 +64,12 @@ Install development dependencies first if needed:
 make install
 ```
 
-Then run this from the repository root:
+The runnable version of this walkthrough is
+[sample/clearing_composition.py](../sample/clearing_composition.py). Run it
+from the repository root:
 
 ```bash
-PYTHONPATH=src .venv/bin/python - <<'PY'
-import asyncio
-import json
-
-from npc.composition import replay, run
-from npc.experiments.composed_clearing import BASELINE_DECLARATION
-
-
-async def main() -> None:
-    trace = await run(BASELINE_DECLARATION)
-    print(json.dumps(trace.as_json(), indent=2, sort_keys=True))
-    assert replay(BASELINE_DECLARATION, trace) == trace
-
-
-asyncio.run(main())
-PY
+PYTHONPATH=src .venv/bin/python sample/clearing_composition.py
 ```
 
 In the JSON, look for:
@@ -95,39 +82,14 @@ In the JSON, look for:
 
 ## Compare the supported substitutions
 
-Run the three supplied declarations together:
+Run the two alternatives through the same sample:
 
 ```bash
-PYTHONPATH=src .venv/bin/python - <<'PY'
-import asyncio
-
-from npc.composition import run
-from npc.experiments.composed_clearing import (
-    BASELINE_DECLARATION,
-    CAUTIOUS_FOX_DECLARATION,
-    FOX_FIRST_RULES_DECLARATION,
-)
-
-
-async def main() -> None:
-    for declaration in (
-        BASELINE_DECLARATION,
-        CAUTIOUS_FOX_DECLARATION,
-        FOX_FIRST_RULES_DECLARATION,
-    ):
-        trace = await run(declaration)
-        print(
-            f"{trace.declaration.name}: "
-            f"rules={trace.declaration.simulation_name}, "
-            f"fox={trace.actors['fox'].component_name}, "
-            f"proposal={trace.actors['fox'].proposal}, "
-            f"outcome={trace.resolution.outcome}"
-        )
-
-
-asyncio.run(main())
-PY
+PYTHONPATH=src .venv/bin/python sample/clearing_composition.py --scenario cautious-fox
+PYTHONPATH=src .venv/bin/python sample/clearing_composition.py --scenario fox-first
 ```
+
+Add `--json` to inspect the complete retained trace.
 
 | Declaration | What changes | Observable result |
 | --- | --- | --- |
@@ -230,4 +192,3 @@ This experiment establishes one bounded clearing turn. It does not yet provide:
 Treat it as a concrete place to learn the composition boundary, not a promise
 that future simulations will use these exact Python classes or clearing
 semantics.
-
