@@ -5,7 +5,7 @@ outcomes, not coding activities or speculative bstractions.
 
 ## 1. YAML-authored authoritative beast simulation
 
-An author can run a minimal beast scenario defined in YAML and observe narrated
+An observer can run a minimal beast scenario defined in YAML and observe narrated
 movement, eating, and fleeing in the command line. The outcome proves that
 actor-specific capabilities, motivations, and ordered behavioural rules are
 separate from the engine, and that scenario content can be changed without
@@ -17,6 +17,34 @@ complexity.
 
 Dependencies and assumptions: the initial generic actor and scenario schema
 must express the beast without placing beast-specific concepts in the engine.
+
+### Delivery plan and completion evidence
+
+1. Establish the smallest YAML description that can express scenario state,
+   an actor profile, ordered behavioural rules, and bounded action proposals.
+2. Run that description deterministically from the command line: a rule selects
+   a proposal, the engine resolves it, commits the canonical transition, and
+   narrates the completed event.
+3. Demonstrate a single beast trace covering fleeing from a threat, moving
+   toward reachable food, and eating it once reachable. This trace is
+   illustrative, not a binding scenario design.
+4. Demonstrate YAML-only variation: changing rule order changes the selected
+   proposal when food and threat coincide, and changing scenario content changes
+   behaviour without engine changes.
+
+Completion evidence must show authoritative resolution and narration for
+movement, eating, and fleeing, including rejection of an invalid or unsupported
+proposal. It must also show that the engine contains no beast-specific policy.
+
+### Considerations and boundaries
+
+- This outcome proves one actor and one minimal scenario, not a general
+  multi-actor framework or a reusable game model.
+- Do not introduce LLM calls, subjective-perception evaluation, generated
+  flavour narration, or replay guarantees here. They belong to later outcomes
+  or are explicitly out of scope.
+- An actor profile may declare binary `perception_questions` for compatibility
+  with outcome 2, but outcome 1 does not evaluate them or require an LLM.
 
 ## 2. YAML-declared LLM perception for the beast
 
