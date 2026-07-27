@@ -14,9 +14,11 @@ systems.
 * Simulation engine
 * Observer
 
-## Key idea
+## Key ideas
 
 * Instead of writing complex code to translate simulation data into actor actions, an LLM acts as a plain-language bridge between the world and the actor. It allows to decouple actors from the engine implementation.
+* Binary perception pattern: LLM-backed perception is modeled as a sequence of small, independent binary
+questions. Each question asks one action-relevant fact, rather than asking the model to choose an NPC action.
 
 ## Simulation loop
 
