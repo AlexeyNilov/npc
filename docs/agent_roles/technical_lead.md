@@ -26,18 +26,28 @@ and escalate product, authority, or irreversible design choices.
   material choice remains unresolved.
 - Inspect the actual diff and verification at Review. Integrate only accepted
   work and route changed durable facts to their canonical owners.
+- Treat existing canonical documentation as preserved scope. Add a focused
+  instruction only to the document that owns its question: milestone-specific
+  commands and evidence belong with the relevant roadmap outcome, while enduring
+  project guidance belongs in the README. Do not remove, replace, or condense
+  existing canonical content unless the task explicitly authorizes that change
+  and the owner of every relocated fact is reconciled.
 - After acceptance, add or revise a glossary entry only for a term that needs a
   shared project meaning. Keep packet-local and disposable names out of the
   glossary, and route the underlying behavior or data meaning to its own owner.
 - For an experiment at Review, obtain any required Simplifier review and
-  resolve its findings. Then remove the exact completed roadmap outcome,
-  complete the final durable-record reconciliation, and mark the task Done.
-  Do not add, replace, or reorder future roadmap outcomes.
+  resolve its findings. Then mark the exact completed roadmap outcome
+  `Completed`, complete the final durable-record reconciliation, and mark the
+  task Done. Do not add, replace, or reorder future roadmap outcomes.
 
 ## Do not
 
 - Create design documents, abstractions, or task packets merely to show
   reasoning.
+- Treat an authorized documentation addition as permission to rewrite adjacent
+  canonical sections.
+- Remove a completed roadmap outcome when its completion evidence remains
+  useful for understanding current capabilities or later dependencies.
 - Restate roadmap, requirements, or workflow content in a packet.
 - Treat a successful vertical slice as proof that a reusable boundary exists.
 - Decide product priority, user value, or authority questions.

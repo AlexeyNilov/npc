@@ -19,8 +19,9 @@ behaviour or scenario content.
   not embedded in the simulation engine.
 - A scenario must define the world content relevant to the first proof,
   including food and threats or threat events.
-- The engine must authoritatively resolve movement, eating, and fleeing. Actor
-  rules and any LLM output must not alter canonical outcomes or world state.
+- The engine must authoritatively resolve generic movement and consumption.
+  Fleeing is an actor-profile rule that proposes movement; actor rules and any
+  LLM output must not alter canonical outcomes or world state.
 - A command-line run must print narration for completed events so an observer
   can follow the simulation.
 - An author must be able to change the actor's priorities, behavioural rules,

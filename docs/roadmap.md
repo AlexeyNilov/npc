@@ -1,9 +1,12 @@
 # Roadmap
 
-This document owns incomplete future outcomes. This document orders evidence-bearing
-outcomes, not coding activities or speculative bstractions.
+This document owns ordered evidence-bearing outcomes, including completed
+milestones retained with their completion evidence. It does not own coding
+activities or speculative abstractions.
 
 ## 1. YAML-authored authoritative beast simulation
+
+**Status:** Completed
 
 An observer can run a minimal beast scenario defined in YAML and observe narrated
 movement, eating, and fleeing in the command line. The outcome proves that
@@ -32,9 +35,24 @@ must express the beast without placing beast-specific concepts in the engine.
    proposal when food and threat coincide, and changing scenario content changes
    behaviour without engine changes.
 
-Completion evidence must show authoritative resolution and narration for
-movement, eating, and fleeing, including rejection of an invalid or unsupported
-proposal. It must also show that the engine contains no beast-specific policy.
+Completion evidence shows authoritative resolution and narration for movement,
+eating, and fleeing, including rejection of invalid and unsupported proposals.
+It also shows that the engine contains no beast-specific policy. Verification:
+`make check` and the 9 behavioural tests pass.
+
+### Run the first proof
+
+After installing development dependencies, run:
+
+```text
+.venv/bin/python -m npc scenarios/beast.yaml
+```
+
+The command prints the deterministic beast trace. The scenario supplies
+canonical initial state and references `actors/beast.yaml`; that profile owns
+the beast's ordered rules, capabilities, and motivations. The one-dimensional
+location model and YAML document shapes are disposable scaffolding for this
+milestone, not a public scenario schema.
 
 ### Considerations and boundaries
 

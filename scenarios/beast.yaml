@@ -1,0 +1,13 @@
+actor_profile: ../actors/beast.yaml
+actor:
+  id: beast
+  location: 0
+entities:
+  - id: wolf
+    location: 1
+    tags: [threat]
+  - id: berry
+    location: -3
+    tags: [food]
+    consumable: true
+turn_limit: 4

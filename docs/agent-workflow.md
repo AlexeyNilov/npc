@@ -101,8 +101,8 @@ diff, resolves findings, runs final checks, and integrates only accepted work.
 
 The Technical Lead owns the sequence from Review to Done. For an experiment
 that requires Simplifier review, the Technical Lead obtains that review and
-resolves its findings. It then removes the exact completed roadmap outcome,
-finalizes the evidence record, and marks the task Done. It does not add,
+resolves its findings. It then marks the exact completed roadmap outcome
+`Completed`, finalizes the evidence record, and marks the task Done. It does not add,
 replace, or reorder roadmap outcomes.
 
 The Product Manager consumes finalized evidence during normal planning and may
@@ -115,11 +115,11 @@ Simplifier review, or change task or evidence lifecycle status.
 Before marking an experiment or delivery Done, the Technical Lead confirms:
 
 - any required Simplifier review is complete and its findings are resolved;
-- its evidence record has its final status and result;
+- any required evidence record has its final status and result;
 - accepted behavior and verified mechanism are routed to Requirements and
   Architecture, while unresolved problems are routed to an issue record;
-- the exact completed outcome has been removed from the incomplete-only
-  roadmap, and its evidence record no longer links to that removed heading;
+- the exact completed outcome is marked `Completed` in the roadmap, and any
+  evidence record reflects that completed status;
 - modified Markdown links are checked, with any pre-existing repository-wide
   link failures recorded as issues rather than ignored; and
 - the final diff passes the repository's required verification.

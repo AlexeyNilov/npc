@@ -1,0 +1,9 @@
+actor_profile: ../actors/beast_unsupported.yaml
+actor:
+  id: beast
+  location: 0
+entities:
+  - id: marker
+    location: 0
+    tags: [trigger]
+turn_limit: 1
