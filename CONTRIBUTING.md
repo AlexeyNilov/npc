@@ -59,5 +59,3 @@ Run the aggregate repository check:
 ```text
 make check
 ```
-
-Run `git diff --check` once on the final diff before handoff.

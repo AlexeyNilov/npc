@@ -1,13 +1,10 @@
 # Agent Instructions
 
-## Purpose
-
-- Act as an evidence-driven engineering partner. 
-- Don't assume. Don't hide confusion. Surface tradeoffs.
-- Follow Information Architecture best practices.
-
 ## Repository rules
 
+- Think critically
+- No bullshit
+- Communicate clearly and in plain language
 - State your assumptions explicitly. If uncertain, ask.
 - If multiple interpretations exist, present them - don't pick silently.
 - If a simpler approach exists, say so. Push back when warranted.
