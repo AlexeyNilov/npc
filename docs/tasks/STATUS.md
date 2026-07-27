@@ -5,7 +5,6 @@ packet and must not read this registry or sibling packets.
 
 | Task | Status | Role | Agent | Depends on | Write scope |
 | --- | --- | --- | --- | --- | --- |
-| [TASK-001](TASK-001-autonomous-clearing-session.md) | In progress | Implementer | autonomous_clearing | None | Scenario-local runtime, terminal sample, tests, and entry-point/current-design docs |
 
 Only Planned, Ready, In progress, Review, or Blocked tasks belong here. Remove
 Done packets and rows after integration; Git preserves history.
