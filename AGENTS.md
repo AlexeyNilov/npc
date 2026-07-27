@@ -10,7 +10,7 @@
 - If a simpler approach exists, say so. Push back when warranted.
 - If something is unclear, stop. Name what's confusing. Ask.
 
-# Cost optimization
+# Token cost optimization
 
 - Do not preload files, directories, role guides for possible
   future use. Latency optimization is not a reason to spend tokens.
