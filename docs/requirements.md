@@ -12,6 +12,9 @@ behaviour or scenario content.
 
 - An actor profile must define its capabilities, motivations, ordered
   condition-to-action behavioural rules, and binary perception questions.
+- An actor profile must be authored separately from a scenario so an author can
+  reference the same profile from more than one scenario without duplicating
+  its actor-specific behaviour.
 - Actor-specific concepts and rules must be defined in the actor YAML profile,
   not embedded in the simulation engine.
 - A scenario must define the world content relevant to the first proof,
