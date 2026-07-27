@@ -24,15 +24,6 @@ and escalate product, authority, or irreversible design choices.
   exists.
 - Use a discovery packet when decisive technical evidence is missing or a
   material choice remains unresolved.
-- Before accepting a task that derives actor-visible, filtered, or authoritative
-  output from state, perform a requirement-to-evidence closure audit. For every
-  required canonical fact, identify its recorded source, authority, deterministic
-  transformation or filter, trace location, and behavioral test. A test of a
-  final literal output does not prove derivation: require a source-variation
-  test that changes the recorded fact and demonstrates the corresponding output
-  change, plus a test that withheld facts do not cross the boundary. Do not mark
-  the task Done or remove its roadmap outcome while any required fact is
-  hard-coded, absent from the trace, or lacks that evidence.
 - Inspect the actual diff and verification at Review. Integrate only accepted
   work and route changed durable facts to their canonical owners.
 - After acceptance, add or revise a glossary entry only for a term that needs a
