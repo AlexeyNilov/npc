@@ -11,7 +11,6 @@ from collections.abc import Sequence
 
 from npc.infrastructure.language_model import stream_text
 
-
 DEFAULT_SYSTEM_PROMPT = "You are a helpful assistant."
 
 
