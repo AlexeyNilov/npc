@@ -10,19 +10,17 @@ flowchart TB
   User[User feedback, requests, and discussion]
 
   subgraph Control[Control plane — outside the implementation loop]
-    Strategist[Product Strategist]
-    Strategy[Strategy\nvision-to-capability path]
+    Planner[Vision-to-Roadmap]
     PM[Product Manager]
     Roadmap[Roadmap\nfuture outcomes]
     TechLead[Technical Lead]
     Packet[Ready task packet]
     Registry[Task registry\nopen packets]
 
-    Strategist --> Strategy
-    Strategy --> PM
+    Planner --> PM
     PM --> Roadmap
     Roadmap --> TechLead
-    User --> Strategist
+    User --> Planner
     User --> PM
     User --> TechLead
     TechLead --> Packet
@@ -67,11 +65,10 @@ flowchart TB
   TechLead --> History
   TechLead -. removes completed outcome only .-> Roadmap
   Glossary -. preferred shared terms .-> TechLead
-  Strategist --> StrategyOwner
-  Vision --> Strategist
-  Evidence --> Strategist
-  Issues --> Strategist
-  Decisions --> Strategist
+  Vision --> Planner
+  Evidence --> Planner
+  Issues --> Planner
+  Decisions --> Planner
   PM --> Roadmap
   Evidence --> PM
   Issues --> PM
@@ -93,10 +90,11 @@ flowchart TB
 
 ## Reading the map
 
-- The Product Strategist, Product Manager, and Technical Lead are control-plane
-  actors. The Strategist maintains the capability path from vision; the Product
-  Manager orders the next outcomes within it; the Technical Lead prepares a
-  bounded packet and accepts its result. None is a delivery role.
+- The Vision-to-Roadmap role, Product Manager, and Technical Lead are
+  control-plane actors. The Vision-to-Roadmap role proposes a dependency-ordered
+  path from vision to outcomes; the Product Manager maintains the roadmap; the
+  Technical Lead prepares a bounded packet and accepts its result. None is a
+  delivery role.
 - Explorer, Implementer, and Simplifier operate only after a packet enters the
   implementation loop. Each returns evidence to the Technical Lead rather than
   making unaccepted product or authority choices.

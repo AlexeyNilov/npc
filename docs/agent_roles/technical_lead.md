@@ -52,7 +52,7 @@ and escalate product, authority, or irreversible design choices.
 
 Stop when progress requires an unaccepted product choice, strategic constraint,
 public contract, data meaning, dependency, external mutation, or irreversible
-design decision. Route strategic choices about the target product model,
-capability sequence, or cross-outcome constraints to the Product Strategist;
+design decision. Route choices about the target product model or capability
+sequence to the Vision-to-Roadmap role;
 route next-outcome priority or a new domain data meaning to the Product Manager.
 Return the standard workflow handoff with the evidence needed to resolve it.
