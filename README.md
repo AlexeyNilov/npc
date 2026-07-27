@@ -6,13 +6,31 @@ The goal is to create a modular engine for building inspectable simulations
 with heterogeneous actors: individuals, groups, organisations, and non-human
 systems.
 
-> Instead of writing complex code to translate simulation data into actor actions, an LLM acts as a plain-language bridge between the world and the actor.
+## Core components
 
-* The Simulation engine limits raw world data to only what the actor is allowed to know or see.
-* The Actor brings its own persona—its senses, biases, knowledge, and intent.
-* The LLM merges the world data and the actor's persona to create their subjective view of reality, answering their questions.
+* Scenario
+* World
+* Actors
+* Simulation engine
+* Observer
 
-> Actors decide what they want to do based on what they think is happening, but only the central engine decides what actually happens.
+## Key idea
+
+* Instead of writing complex code to translate simulation data into actor actions, an LLM acts as a plain-language bridge between the world and the actor. It allows to decouple actors from the engine implementation.
+
+## Simulation loop
+
+* World is created from the scenario and follows its rules
+* World state is determenistic 
+* The Actor brings its own persona - its senses, knowledge, and intent.
+* The Simulation engine limits world data to only what the actor is allowed to know.
+* The LLM merges the limited world data and the actor's persona to create their subjective view of reality.
+* The Actor makes sense of the subjective view by asking LLM questions.
+
+> Actors decide what they want to do based on what they think is happening, but only the simulation engine decides what actually happens.
+
+* Once an action is resolved by the system, an LLM generates a flavor-text description of that event for the observer.
+* The LLM only sees completed event data. It cannot alter outcomes, mechanics, or the official world state.
 
 ## The intended actor loop is:
 
@@ -34,8 +52,6 @@ Authoritative resolution
 Outcome and canonical transition
     ↓
 Feedback
-    ↙                         ↘
-Subjective perception         Sensemaking
 ```
 
 ## Project documentation
