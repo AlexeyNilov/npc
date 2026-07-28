@@ -70,6 +70,8 @@ milestone, not a public scenario schema.
 
 ## 2. YAML-declared LLM perception for the beast
 
+**Status:** Completed
+
 The same actor profile can declare small binary perception questions. The LLM
 answers those questions from the actor-accessible world data, and the actor's
 existing behavioural rules use the answers. Canonical world transitions remain

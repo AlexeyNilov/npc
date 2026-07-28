@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
 import yaml  # type: ignore[import-untyped]
+
+from npc.infrastructure.language_model import complete_text
 
 
 @dataclass
@@ -25,6 +28,14 @@ class State:
 
 
 @dataclass(frozen=True)
+class PerceptionConfig:
+    """Static profile and scenario inputs for an ephemeral perception request."""
+
+    questions: tuple[str, ...]
+    visible_entity_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class Proposal:
     kind: str
     actor_id: str
@@ -39,7 +50,11 @@ class Outcome:
     narration: str
 
 
-def load_scenario(path: Path) -> tuple[State, list[dict[str, Any]]]:
+class PerceptionError(Exception):
+    """The model perception boundary could not provide a valid answer mapping."""
+
+
+def load_scenario(path: Path) -> tuple[State, list[dict[str, Any]], PerceptionConfig]:
     scenario = yaml.safe_load(path.read_text())
     profile_path = path.parent / scenario["actor_profile"]
     profile = yaml.safe_load(profile_path.read_text())
@@ -59,7 +74,11 @@ def load_scenario(path: Path) -> tuple[State, list[dict[str, Any]]]:
         capabilities=set(profile["capabilities"]),
         entities=entities,
     )
-    return state, cast(list[dict[str, Any]], profile["rules"])
+    perception = PerceptionConfig(
+        questions=tuple(profile.get("perception_questions", [])),
+        visible_entity_ids=tuple(scenario.get("visible_entities", [])),
+    )
+    return state, cast(list[dict[str, Any]], profile["rules"]), perception
 
 
 def resolve(state: State, proposal: Proposal) -> Outcome:
@@ -84,9 +103,52 @@ def resolve(state: State, proposal: Proposal) -> Outcome:
     return _rejected(proposal, f"unsupported action '{proposal.kind}'")
 
 
-def select_proposal(state: State, rules: list[dict[str, Any]]) -> Proposal | None:
+async def perceive(state: State, config: PerceptionConfig) -> dict[str, bool]:
+    """Obtain and validate all actor-owned binary answers for one turn."""
+    questions = config.questions
+    if not questions:
+        return {}
+    view = {
+        "actor": {"id": state.actor_id, "location": state.actor_location},
+        "entities": [
+            {
+                "id": entity.identifier,
+                "location": entity.location,
+                "tags": sorted(entity.tags),
+            }
+            for entity_id in config.visible_entity_ids
+            if (entity := state.entities.get(entity_id)) is not None
+        ],
+    }
+    prompt = json.dumps({"questions": questions, "accessible_view": view}, sort_keys=True)
+    try:
+        response = await complete_text(
+            prompt,
+            "Answer every listed question using only the accessible view. "
+            "Return only a JSON object whose keys are exactly the question texts and whose values are JSON booleans.",
+        )
+    except Exception as error:
+        raise PerceptionError(f"perception request failed: {error}") from error
+    return _validate_perception_answers(response, questions)
+
+
+def _validate_perception_answers(response: str, questions: tuple[str, ...]) -> dict[str, bool]:
+    try:
+        answers = json.loads(response)
+    except json.JSONDecodeError as error:
+        raise PerceptionError("perception response is malformed JSON") from error
+    if not isinstance(answers, dict) or set(answers) != set(questions):
+        raise PerceptionError("perception response must contain exactly the declared questions")
+    if any(type(answer) is not bool for answer in answers.values()):
+        raise PerceptionError("perception response values must be JSON booleans")
+    return cast(dict[str, bool], answers)
+
+
+def select_proposal(
+    state: State, rules: list[dict[str, Any]], perception_answers: dict[str, bool] | None = None
+) -> Proposal | None:
     for rule in rules:
-        if _matches(state, rule["when"]):
+        if _matches(state, rule["when"], perception_answers or {}):
             return _proposal_from_rule(state, rule)
     return None
 
@@ -95,11 +157,14 @@ def _rejected(proposal: Proposal, reason: str) -> Outcome:
     return Outcome(False, f"rejected {proposal.label}: {reason}")
 
 
-def _matches(state: State, condition: dict[str, Any]) -> bool:
+def _matches(state: State, condition: dict[str, Any], perception_answers: dict[str, bool]) -> bool:
     if "all" in condition:
-        return all(_matches(state, item) for item in condition["all"])
+        return all(_matches(state, item, perception_answers) for item in condition["all"])
     if "not" in condition:
-        return not _matches(state, condition["not"])
+        return not _matches(state, condition["not"], perception_answers)
+    if "perception_answer" in condition:
+        expected = condition["perception_answer"]
+        return perception_answers.get(expected["question"]) is expected["is"]
     if "tag_exists" in condition:
         return _entity_with_tag(state, condition["tag_exists"]) is not None
     if "co_located_tag" in condition:

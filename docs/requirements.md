@@ -37,6 +37,10 @@ behaviour or scenario content.
   hide inaccessible content.
 - The engine must provide an actor only the world data it is allowed to know
   when obtaining answers to those questions.
+- For the first proof, each questioned turn must make one non-streaming request
+  containing the full declared question list and the derived accessible view.
+  The response must be a JSON object with exactly those question texts as keys
+  and JSON booleans as values.
 - LLM answers may inform an actor's behavioural rules, but the LLM must not
   decide canonical outcomes, change mechanics, or alter authoritative world
   state.

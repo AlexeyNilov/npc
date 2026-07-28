@@ -1,10 +1,10 @@
 # Experiment: YAML-declared LLM perception for one beast
 
-**Status:** Planned
+**Status:** Complete
 
 **Date:** 2026-07-28
 
-**Roadmap outcome:** [YAML-declared LLM perception for the beast](../roadmap.md)
+**Roadmap outcome:** Completed; see the current roadmap.
 
 ## Decision unlocked
 
@@ -32,7 +32,7 @@ canonical transition. The proof retains no subjective history for later turns.
 ## Design
 
 - **Authoritative inputs and initial state:** a beast profile with two binary
-  questions; a scenario whose actor declaration names visible entities and
+  questions; a scenario whose visibility declaration names visible entities and
   whose entity list includes an inaccessible fixture entity.
 - **Scenario timeline or action contracts:** per turn, engine derives the
   accessible view, sends it and all questions once, validates an exact JSON
@@ -68,8 +68,24 @@ At task Review, complete every field and set the evidence status to `Review`.
 The Technical Lead sets the final status after required review and roadmap
 closure.
 
-- **Observed result:** Pending execution.
-- **Reproducibility evidence:** Pending execution.
-- **Interpretation and limits:** Pending execution.
-- **Decision or unresolved question created:** Pending execution.
-- **Canonical follow-up:** Pending execution.
+- **Observed result:** The focused test module passed 17 tests. Captured mocked
+  completions receive both profile questions and a view containing `wolf` and
+  `berry` but not `hidden_cache`; the prompt excludes action and resolution
+  details. Valid boolean mappings select the YAML `perception_answer` rules,
+  and an unsupported perception-informed proposal reaches the existing
+  resolver and is rejected without state transition. Unavailable, malformed,
+  missing, extra, and non-boolean responses produce a diagnostic perception
+  failure before selection or resolution.
+- **Reproducibility evidence:** `.venv/bin/python -m pytest -q
+  tests/test_yaml_beast_proof.py` passes. The tests mock
+  `npc.simulation.complete_text`; no network or live LLM is used.
+- **Interpretation and limits:** This supports the bounded mediated-perception
+  hypothesis only. The visibility entity list, JSON contract, question wording,
+  and predicate remain disposable scaffolding; the evidence establishes no
+  sensing model, retry policy, subjective state, or reusable interface.
+- **Decision or unresolved question created:** No new durable decision. The
+  Simplifier review identified that static perception inputs had initially been
+  placed in canonical `State`; the accepted correction keeps them in immutable
+  noncanonical `PerceptionConfig` input.
+- **Canonical follow-up:** Requirements and Architecture record the verified
+  behavior, and roadmap outcome 2 is completed.
