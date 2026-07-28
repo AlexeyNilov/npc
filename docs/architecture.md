@@ -44,6 +44,8 @@ The command accepts a scenario YAML document. That document supplies:
 The referenced actor-profile YAML supplies capabilities, motivations,
 `perception_questions`, and an ordered rule list. Rules contain a condition, a
 proposal specification, a motivation label, and an observer-facing label.
+Motivations are currently profile-local labels only: the selection algorithm
+does not inspect, compare, or otherwise evaluate them.
 
 This is a local proof format, not a published schema. The loader directly
 indexes the expected YAML fields and does not perform schema validation or
@@ -81,7 +83,8 @@ For each turn, the following happens in order:
    accepted or rejected the proposal.
 
 The profile owns policy: rule order, conditions, motivation labels, tags used
-for selection, and the label shown to the observer. The simulation core owns
+for selection, and the label shown to the observer. Rule order, not motivation
+semantics, resolves this proof's choice conflicts. The simulation core owns
 mechanism: capability checks, movement transition, consumption preconditions,
 state mutation, and rejection. Therefore a profile may describe fleeing by
 selecting a move-away proposal, while the core has no beast-, threat-, or

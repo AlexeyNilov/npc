@@ -40,6 +40,10 @@ eating, and fleeing, including rejection of invalid and unsupported proposals.
 It also shows that the engine contains no beast-specific policy. Verification:
 `make check` and the 9 behavioural tests pass.
 
+Motivations are actor-profile labels in this proof. The result does not show
+that motivations independently rank or alter a choice; ordered rules resolve
+the demonstrated conflict.
+
 ### Run the first proof
 
 After installing development dependencies, run:
