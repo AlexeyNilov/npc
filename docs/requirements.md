@@ -50,6 +50,20 @@ behaviour or scenario content.
   must fail fast with a diagnostic perception error. It must not select,
   resolve, or commit a proposal for the failed turn.
 
+### Observer inspection and narration
+
+- For a resolved turn, the observer must be able to distinguish the actor's
+  declared perception questions and validated answers, and its attempted
+  choice, from the authoritative
+  accepted or rejected outcome.
+- The system must generate entertaining non-authoritative narration only after
+  authoritative resolution. Its input must be limited to completed
+  presentation facts, and it must not become action-selection input or alter
+  canonical state.
+- A narration failure after resolution must not undo or hide the completed
+  outcome. The observer must still receive the authoritative outcome and an
+  explicit indication that narration was unavailable.
+
 ### Explicitly out of scope for the first proof
 
 - Deterministic replay from a fixed seed is not required.

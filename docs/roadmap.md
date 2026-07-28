@@ -136,13 +136,83 @@ This is a useful vertical proof of mediated perception, not evidence of a
 reusable perception platform, general visibility model, subjective-state
 store, or deterministic replay.
 
-## 3. Inspectable subjective and authoritative event narration
+## 3. Inspectable subjective turn trace and entertaining event narration
 
-The command-line observer can distinguish completed canonical events from the
-actor's declared perception and resulting choice. This makes the value of the
-LLM perception layer inspectable in a running scenario.
+The command-line observer can follow an entertaining description of each
+completed event while also inspecting why the actor attempted it. For every
+resolved turn, the output distinguishes the actor's declared perception and
+resulting choice from the authoritative outcome. The narration makes the run
+pleasant to follow; the labelled trace makes the LLM perception layer and the
+authority boundary inspectable.
 
 This follows LLM perception because there must be an actor-specific subjective
-view to inspect.
+view to inspect. It also introduces narration only after an outcome exists, so
+the narrator has no opportunity to select an action or influence reality.
 
 Dependency: outcome 2.
+
+### Product handoff
+
+Deliver one bounded beast proof whose observer output contains two deliberately
+separate layers for each resolved turn:
+
+1. An **inspectable turn trace** shows the actor-owned question/answer pairs,
+   the selected profile rule and its bounded attempted proposal, and the
+   authoritative accepted or rejected outcome.
+2. A clearly labelled **non-authoritative narration** gives an entertaining
+   natural-language description of that completed outcome.
+
+The trace is the inspection record. Narration is presentation only: an observer
+must not need to infer facts, causality, acceptance, or rejection from prose.
+For example, the trace might show that the beast judged a wolf dangerous,
+selected its `flee-threat` rule, and attempted a move; the outcome may then
+record acceptance and narration may colourfully describe the retreat. This is
+illustrative, not a required wording or output format.
+
+### Delivery plan and completion evidence
+
+1. Define a compact, stable observer-facing turn record with labelled
+   `perception`, `choice`, and `authoritative outcome` fields. A perception
+   section presents only declared questions and their validated answers; it
+   must not reveal inaccessible world content or an unbounded model response.
+2. After `resolve` has returned an outcome, provide the narrator only the
+   completed outcome and other approved presentation facts. It must receive no
+   rule-selection control, proposal construction path, resolver control, or
+   writable canonical state.
+3. Show an accepted perception-informed beast turn and a perception-informed
+   rejected proposal. In both cases, the observer can see the same separation
+   between subjective interpretation, attempted choice, and canonical result.
+4. Show a causal contrast: alternate valid answers to the same declared
+   questions can select different profile rules and attempted proposals, while
+   authoritative resolution independently determines the outcome of each.
+
+Completion evidence must show all of the following:
+
+1. The CLI emits a labelled trace for every resolved turn, with validated
+   perception answers, selected choice, and an accepted or rejected outcome
+   distinguishable without interpreting narration.
+2. Narration is requested only after authoritative resolution and is derived
+   only from completed presentation input; it cannot cause a proposal,
+   acceptance decision, state transition, or later-turn input.
+3. A trace for an accepted proposal and one for a rejected proposal preserve
+   the subjective/authoritative distinction.
+4. A controlled alternate-answer fixture demonstrates that perception can
+   alter the displayed choice without granting it authority over outcome.
+5. If narration is unavailable or malformed, the resolved outcome and trace
+   remain visible and canonical state remains committed. The first proof may
+   print a clear narration-unavailable marker rather than retrying or
+   fabricating prose.
+
+### Milestone-specific boundaries
+
+- The narration call is post-resolution and non-authoritative. Unlike the
+  outcome-2 perception call, narration failure must not erase or fail an
+  already resolved turn; this is a deliberate presentation-resilience choice
+  limited to this outcome.
+- This proof does not establish narrator truthfulness beyond its constrained
+  input, deterministic replay, a general event-log format, persisted
+  subjective state, streaming interaction, multi-actor narration, or a
+  reusable prompt/schema platform.
+- Do not expose the actor-accessible view, hidden scenario content, raw model
+  responses, or rule internals merely for entertainment. The labelled trace
+  is intentionally the smallest information needed to inspect a turn.
