@@ -68,17 +68,27 @@ At task Review, complete every field and set the evidence status to `Review`.
 The Technical Lead sets the final status after required review and roadmap
 closure.
 
-- **Observed result:** The focused test module passed 17 tests. Captured mocked
+- **Observed result:** The focused test module passed 18 tests. Captured mocked
   completions receive both profile questions and a view containing `wolf` and
   `berry` but not `hidden_cache`; the prompt excludes action and resolution
   details. Valid boolean mappings select the YAML `perception_answer` rules,
   and an unsupported perception-informed proposal reaches the existing
   resolver and is rejected without state transition. Unavailable, malformed,
   missing, extra, and non-boolean responses produce a diagnostic perception
-  failure before selection or resolution.
+  failure before selection or resolution. A configured live model also returned
+  `{'Is the wolf dangerous?': True, 'Is food available?': True}` through the
+  same perception path; it selected `flee`, and the resolver accepted the
+  beast move from `0` to `-1`.
 - **Reproducibility evidence:** `.venv/bin/python -m pytest -q
   tests/test_yaml_beast_proof.py` passes. The tests mock
-  `npc.simulation.complete_text`; no network or live LLM is used.
+  `npc.simulation.complete_text`. The live one-turn trace used the configured
+  endpoint with:
+  `.venv/bin/python -c 'import asyncio; from pathlib import Path; from
+  npc.simulation import load_scenario, perceive, select_proposal, resolve;
+  state, rules, perception = load_scenario(Path("scenarios/beast_perception.yaml"));
+  answers = asyncio.run(perceive(state, perception)); proposal =
+  select_proposal(state, rules, answers); print(answers); print(proposal);
+  print(resolve(state, proposal).narration)'`.
 - **Interpretation and limits:** This supports the bounded mediated-perception
   hypothesis only. The visibility entity list, JSON contract, question wording,
   and predicate remain disposable scaffolding; the evidence establishes no
