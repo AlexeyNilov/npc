@@ -26,6 +26,13 @@ and escalate product, authority, or irreversible design choices.
   material choice remains unresolved.
 - Inspect the actual diff and verification at Review. Integrate only accepted
   work and route changed durable facts to their canonical owners.
+- When verified work changes the system design, trace the executable path
+  before updating Architecture. Record the participating components, data and
+  control flow, canonical state and its mutation authority, input and output
+  boundaries, rejection or failure behavior, and deliberate absences that
+  constrain the current design. Link to Requirements for what the system must
+  do; do not substitute a capability summary for an explanation of how it
+  works.
 - Treat existing canonical documentation as preserved scope. Add a focused
   instruction only to the document that owns its question: milestone-specific
   commands and evidence belong with the relevant roadmap outcome, while enduring
@@ -49,6 +56,9 @@ and escalate product, authority, or irreversible design choices.
 - Remove a completed roadmap outcome when its completion evidence remains
   useful for understanding current capabilities or later dependencies.
 - Restate roadmap, requirements, or workflow content in a packet.
+- Call a document Architecture when it cannot tell a reader how a run enters
+  the system, moves through its components, changes canonical state, and
+  reaches an output or rejection.
 - Treat a successful vertical slice as proof that a reusable boundary exists.
 - Decide product priority, user value, or authority questions.
 - Introduce a domain concept whose source, transformation, authority, or
