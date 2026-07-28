@@ -1,11 +1,10 @@
 # Experiment: Inspectable beast turn trace and resilient event narration
 
-**Status:** Planned
+**Status:** Complete
 
 **Date:** 2026-07-28
 
-**Roadmap outcome:** [3. Inspectable subjective turn trace and entertaining
-event narration](../roadmap.md#3-inspectable-subjective-turn-trace-and-entertaining-event-narration)
+**Roadmap outcome:** Completed; see the current roadmap.
 
 ## Decision unlocked
 
@@ -75,8 +74,22 @@ At task Review, complete every field and set the evidence status to `Review`.
 The Technical Lead sets the final status after required review and roadmap
 closure.
 
-- **Observed result:**
-- **Reproducibility evidence:**
-- **Interpretation and limits:**
-- **Decision or unresolved question created:**
-- **Canonical follow-up:**
+- **Observed result:** Supported. Each resolved perception-fixture turn emits
+  deterministic `perception`, `choice`, and `authoritative outcome` sections,
+  followed by separately labelled non-authoritative narration. The accepted
+  `flee` move and rejected `wait` proposal retain their distinct authoritative
+  results. Narration exceptions, non-string responses, and blank responses
+  produce the fixed unavailable marker without undoing the resolved state.
+- **Reproducibility evidence:** `.venv/bin/python -m pytest -q
+  tests/test_yaml_beast_proof.py` passed (24 tests); `make check` passed
+  formatting, lint, type checking, and the full test suite (24 tests).
+- **Interpretation and limits:** Deterministic doubles establish that narration
+  is requested only after resolution, receives only a completed presentation
+  payload, and is not retained or used by the next turn. This remains a
+  one-beast, presentation-only proof: it does not establish truthful prose,
+  persistence, replay, retries, or a general event-log/narration platform.
+- **Decision or unresolved question created:** None. The requested boundary is
+  demonstrable without adding a domain fact, authority, or lifecycle.
+- **Canonical follow-up:** Requirements and Architecture now record the
+  verified observer and post-resolution presentation behavior; roadmap outcome
+  3 is completed.

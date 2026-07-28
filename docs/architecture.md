@@ -19,13 +19,14 @@ CLI (`python -m npc <scenario>`) ──> turn loop ──> perceive ──> sele
                                                 └────────── resolve proposal
                                                                     │
                                                                     ▼
-                                                             Outcome narration ──> stdout
+                                            labelled turn trace ──> post-resolution narration ──> stdout
 ```
 
 `src/npc/__main__.py` is the command-line adapter. It takes the scenario path
 from its first argument, obtains the state and rules, reads the scenario's
-`turn_limit`, and runs at most that many turns. It prints the narration from
-each resolved proposal. A turn with no matching rule ends the run.
+`turn_limit`, and runs at most that many turns. After each resolved proposal,
+it prints a labelled turn trace and then non-authoritative narration or a
+labelled unavailable marker. A turn with no matching rule ends the run.
 
 `src/npc/simulation.py` contains the complete proof simulation: YAML loading,
 perception input derivation and validation, rule selection, proposal
@@ -62,7 +63,8 @@ recover from malformed input.
 | `PerceptionConfig` | profile questions and visible entity IDs | Immutable load input passed to `perceive`; it is not canonical state and is used only to derive an ephemeral request. |
 | `Entity` | identifier, location, tags, consumable/consumed state | A scenario object that may participate in conditions or consumption. |
 | `Proposal` | action kind, actor identifier, destination or target, label | A bounded attempted action; it has no authority to update state. |
-| `Outcome` | accepted flag and narration | The result returned by authoritative resolution and printed by the CLI. |
+| `Outcome` | accepted flag and result description | The authoritative result returned by resolution; it is an input to presentation, not a model decision. |
+| `TurnRecord` | ordered validated perception answers, selected proposal, outcome | Immutable observer presentation assembled after resolution; it is not canonical state or a reusable event log. |
 
 Locations are unbounded integers on a disposable one-dimensional line. Entity
 lookup selects the first unconsumed entity with the requested tag in scenario
@@ -91,8 +93,17 @@ For each turn, the following happens in order:
    consumption proposal names the matching tagged entity.
 5. `resolve` validates the proposed actor and action form. It is the only
    function that changes `State`.
-6. The CLI prints the resulting `Outcome.narration` after the resolution has
-   accepted or rejected the proposal.
+6. After `resolve` returns, the CLI builds a `TurnRecord` from declared
+   questions and their validated answers, the selected proposal, and the
+   returned outcome. Its formatter prints labelled `perception`, `choice`, and
+   `authoritative outcome` sections in stable order.
+7. The CLI then calls `narrate` with a newly constructed presentation payload:
+   actor identity, bounded attempted action fields, and the completed outcome.
+   It receives neither perception data, actor-accessible data, rules,
+   mutable state, nor a resolver control. A non-empty response is printed as
+   non-authoritative narration; an exception, non-string response, or blank
+   response prints `non-authoritative narration: unavailable`. The response is
+   discarded and cannot affect a later turn.
 
 The profile owns policy: rule order, conditions, motivation labels, tags used
 for selection, and the label shown to the observer. Rule order, not motivation
@@ -119,7 +130,9 @@ does not mutate canonical state.
 ## Deliberate absences
 
 The current implementation has no subjective state, persistence, replay
-mechanism, public schema, multi-actor scheduling, map topology, or general
-action registry. The entity-list visibility declaration, prompt wording,
-strict binary JSON mapping, and `perception_answer` predicate are bounded
-proof scaffolding, not a general sensing or perception platform.
+mechanism, public schema, multi-actor scheduling, map topology, general
+action registry, narration truthfulness guarantee, retry policy, or general
+event-log/narration platform. The entity-list visibility declaration, prompt
+wording, strict binary JSON mapping, `perception_answer` predicate, and turn
+formatter are bounded proof scaffolding, not a general sensing or perception
+platform.

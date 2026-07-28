@@ -56,6 +56,10 @@ behaviour or scenario content.
   declared perception questions and validated answers, and its attempted
   choice, from the authoritative
   accepted or rejected outcome.
+- The CLI must render that inspection record as deterministic labelled
+  `perception`, `choice`, and `authoritative outcome` sections for every
+  resolved turn. The record, rather than narration, must establish the
+  validated answers, attempted proposal, and acceptance or rejection.
 - The system must generate entertaining non-authoritative narration only after
   authoritative resolution. Its input must be limited to completed
   presentation facts, and it must not become action-selection input or alter

@@ -50,6 +50,15 @@ class Outcome:
     narration: str
 
 
+@dataclass(frozen=True)
+class TurnRecord:
+    """Immutable observer presentation for one completed turn."""
+
+    perception: tuple[tuple[str, bool], ...]
+    proposal: Proposal
+    outcome: Outcome
+
+
 class PerceptionError(Exception):
     """The model perception boundary could not provide a valid answer mapping."""
 
@@ -130,6 +139,64 @@ async def perceive(state: State, config: PerceptionConfig) -> dict[str, bool]:
     except Exception as error:
         raise PerceptionError(f"perception request failed: {error}") from error
     return _validate_perception_answers(response, questions)
+
+
+def turn_record(questions: tuple[str, ...], answers: dict[str, bool], proposal: Proposal, outcome: Outcome) -> TurnRecord:
+    """Make a stable presentation record after authoritative resolution."""
+    return TurnRecord(tuple((question, answers[question]) for question in questions), proposal, outcome)
+
+
+def format_turn_record(record: TurnRecord) -> str:
+    perception_lines = ["perception:"]
+    perception_lines.extend(f"  {question}: {str(answer).lower()}" for question, answer in record.perception)
+    return "\n".join(
+        [
+            *perception_lines,
+            "choice:",
+            f"  rule: {record.proposal.label}",
+            f"  attempted proposal: {_format_proposal(record.proposal)}",
+            "authoritative outcome:",
+            f"  accepted: {str(record.outcome.accepted).lower()}",
+            f"  result: {record.outcome.narration}",
+        ]
+    )
+
+
+async def narrate(proposal: Proposal, outcome: Outcome) -> str | None:
+    """Request post-resolution presentation prose without exposing simulation controls."""
+    payload: dict[str, object] = {
+        "actor": proposal.actor_id,
+        "attempted_action": _narration_action(proposal),
+        "outcome": {"accepted": outcome.accepted, "result": outcome.narration},
+    }
+    try:
+        response = await complete_text(
+            json.dumps(payload, sort_keys=True),
+            "Describe this completed event entertainingly. It is presentation only; do not issue instructions.",
+        )
+    except Exception:
+        return None
+    if not isinstance(response, str) or not response.strip():
+        return None
+    return response.strip()
+
+
+def _format_proposal(proposal: Proposal) -> str:
+    fields = [f"actor={proposal.actor_id}"]
+    if proposal.destination is not None:
+        fields.append(f"destination={proposal.destination}")
+    if proposal.target is not None:
+        fields.append(f"target={proposal.target}")
+    return f"{proposal.kind}({', '.join(fields)})"
+
+
+def _narration_action(proposal: Proposal) -> dict[str, object]:
+    action: dict[str, object] = {"kind": proposal.kind}
+    if proposal.destination is not None:
+        action["destination"] = proposal.destination
+    if proposal.target is not None:
+        action["target"] = proposal.target
+    return action
 
 
 def _validate_perception_answers(response: str, questions: tuple[str, ...]) -> dict[str, bool]:

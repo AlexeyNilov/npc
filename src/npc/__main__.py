@@ -6,7 +6,16 @@ from pathlib import Path
 
 import yaml  # type: ignore[import-untyped]
 
-from .simulation import PerceptionError, load_scenario, perceive, resolve, select_proposal
+from .simulation import (
+    PerceptionError,
+    format_turn_record,
+    load_scenario,
+    narrate,
+    perceive,
+    resolve,
+    select_proposal,
+    turn_record,
+)
 
 
 def main() -> int:
@@ -22,7 +31,10 @@ def main() -> int:
         proposal = select_proposal(state, rules, answers)
         if proposal is None:
             break
-        print(resolve(state, proposal).narration)
+        outcome = resolve(state, proposal)
+        print(format_turn_record(turn_record(perception.questions, answers, proposal, outcome)))
+        narration = asyncio.run(narrate(proposal, outcome))
+        print(f"non-authoritative narration: {narration or 'unavailable'}")
     return 0
 
 

@@ -138,6 +138,8 @@ store, or deterministic replay.
 
 ## 3. Inspectable subjective turn trace and entertaining event narration
 
+**Status:** Completed
+
 The command-line observer can follow an entertaining description of each
 completed event while also inspecting why the actor attempted it. For every
 resolved turn, the output distinguishes the actor's declared perception and
@@ -216,3 +218,14 @@ Completion evidence must show all of the following:
 - Do not expose the actor-accessible view, hidden scenario content, raw model
   responses, or rule internals merely for entertainment. The labelled trace
   is intentionally the smallest information needed to inspect a turn.
+
+### Completion evidence
+
+The CLI now emits deterministic labelled `perception`, `choice`, and
+`authoritative outcome` sections for every resolved turn, followed by separately
+labelled non-authoritative narration or an unavailable marker. Controlled
+perception fixtures demonstrate an accepted `flee` proposal and rejected
+`wait` proposal, while narration receives only a completed presentation payload
+after resolution. Its failure does not hide the trace or undo committed state.
+Verification: the 24 focused behavioral tests and `make check` pass. See
+[experiment evidence](evidence/2026-07-28-inspectable-turn-trace-and-event-narration.md).
