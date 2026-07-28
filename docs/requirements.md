@@ -40,7 +40,8 @@ behaviour or scenario content.
 - For the first proof, each questioned turn must make one non-streaming request
   containing the full declared question list and the derived accessible view.
   The response must be a JSON object with exactly those question texts as keys
-  and JSON booleans as values.
+  and JSON booleans as values; a standalone `json` Markdown code fence around
+  that object is accepted.
 - LLM answers may inform an actor's behavioural rules, but the LLM must not
   decide canonical outcomes, change mechanics, or alter authoritative world
   state.

@@ -48,6 +48,20 @@ def test_perception_request_contains_all_questions_and_only_accessible_world_dat
     assert isinstance(perception, PerceptionConfig)
 
 
+def test_perception_accepts_a_standalone_json_code_fence(monkeypatch: pytest.MonkeyPatch) -> None:
+    state, _, perception = load_scenario(ROOT / "scenarios" / "beast_perception.yaml")
+
+    async def mocked_completion(prompt: str, system_prompt: str) -> str:
+        return '```json\n{"Is the wolf dangerous?": true, "Is food available?": false}\n```'
+
+    monkeypatch.setattr("npc.simulation.complete_text", mocked_completion)
+
+    assert asyncio.run(perceive(state, perception)) == {
+        "Is the wolf dangerous?": True,
+        "Is food available?": False,
+    }
+
+
 def test_perception_answer_selects_profile_rule_and_yaml_question_change_alters_selection(
     tmp_path: Path,
 ) -> None:
@@ -97,7 +111,10 @@ def test_invalid_perception_response_stops_before_selection_or_resolution(
     monkeypatch.setattr(sys, "argv", ["npc", str(ROOT / "scenarios" / "beast_perception.yaml")])
 
     assert __main__.main() == 1
-    assert reason in capsys.readouterr().err
+    diagnostic = capsys.readouterr().err
+    assert reason in diagnostic
+    if completion == "not json":
+        assert repr(completion) in diagnostic
 
 
 def test_unavailable_perception_is_a_diagnostic_cli_failure_before_selection(

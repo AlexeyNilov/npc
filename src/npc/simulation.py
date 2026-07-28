@@ -133,15 +133,25 @@ async def perceive(state: State, config: PerceptionConfig) -> dict[str, bool]:
 
 
 def _validate_perception_answers(response: str, questions: tuple[str, ...]) -> dict[str, bool]:
+    response_body = _json_response_body(response)
     try:
-        answers = json.loads(response)
+        answers = json.loads(response_body)
     except json.JSONDecodeError as error:
-        raise PerceptionError("perception response is malformed JSON") from error
+        raise PerceptionError(f"perception response is malformed JSON: {response[:1000]!r}") from error
     if not isinstance(answers, dict) or set(answers) != set(questions):
         raise PerceptionError("perception response must contain exactly the declared questions")
     if any(type(answer) is not bool for answer in answers.values()):
         raise PerceptionError("perception response values must be JSON booleans")
     return cast(dict[str, bool], answers)
+
+
+def _json_response_body(response: str) -> str:
+    """Accept a standalone JSON code fence while rejecting surrounding prose."""
+    stripped = response.strip()
+    lines = stripped.splitlines()
+    if len(lines) >= 3 and lines[0].strip().lower() == "```json" and lines[-1].strip() == "```":
+        return "\n".join(lines[1:-1])
+    return stripped
 
 
 def select_proposal(

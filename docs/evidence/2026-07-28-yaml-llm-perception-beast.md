@@ -88,4 +88,5 @@ closure.
   placed in canonical `State`; the accepted correction keeps them in immutable
   noncanonical `PerceptionConfig` input.
 - **Canonical follow-up:** Requirements and Architecture record the verified
-  behavior, and roadmap outcome 2 is completed.
+  behavior, including acceptance of a standalone `json` code fence around an
+  otherwise valid binary mapping, and roadmap outcome 2 is completed.

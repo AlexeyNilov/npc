@@ -77,10 +77,10 @@ For each turn, the following happens in order:
    containing only the actor identity/location and scenario-declared visible
    entities, then makes one completion request containing that view and all
    question texts. It accepts only a JSON object whose keys exactly match the
-   questions and whose values are booleans. A request or validation failure is
-   a diagnostic perception error: the CLI exits non-zero before selection or
-   resolution. Profiles without questions use an empty answer mapping and make
-   no request.
+   questions and whose values are booleans; a standalone `json` code fence is
+   removed before validation. A request or validation failure is a diagnostic
+   perception error: the CLI exits non-zero before selection or resolution.
+   Profiles without questions use an empty answer mapping and make no request.
 2. `select_proposal` scans the actor profile's rules in YAML order and selects
    the first matching rule.
 3. `_matches` evaluates only the proof predicates: conjunction (`all`),
