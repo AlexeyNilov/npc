@@ -31,11 +31,19 @@ behaviour or scenario content.
 
 - The system must support actor-owned, binary perception questions declared in
   YAML.
+- For the first LLM perception proof, a scenario must declare the minimal
+  subset of its world content visible to its actor. The engine must derive the
+  actor-accessible view from that declaration; it must not rely on the LLM to
+  hide inaccessible content.
 - The engine must provide an actor only the world data it is allowed to know
   when obtaining answers to those questions.
 - LLM answers may inform an actor's behavioural rules, but the LLM must not
   decide canonical outcomes, change mechanics, or alter authoritative world
   state.
+- For the first LLM perception proof, if the LLM is unavailable, or its
+  response is malformed, incomplete, or contains a non-binary answer, the run
+  must fail fast with a diagnostic perception error. It must not select,
+  resolve, or commit a proposal for the failed turn.
 
 ### Explicitly out of scope for the first proof
 

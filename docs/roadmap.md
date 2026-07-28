@@ -81,6 +81,59 @@ legible world state, actor boundary, and action-resolution loop to mediate.
 Dependency: outcome 1. The LLM's role remains limited to perception; it does
 not decide actions or outcomes.
 
+### Product handoff and acceptance evidence
+
+Deliver one bounded beast proof in which the profile declares at least two
+binary actor-owned questions and its ordered rules use the resulting answers.
+For example, non-binding questions might ask whether a nearby threat requires
+fleeing or whether food is reachable. The questions are not action requests.
+
+#### Milestone-specific visibility decision
+
+Outcome 2 must demonstrate an engine-enforced actor-accessible view, but the
+first proof has no sensory or spatial model from which to infer one. Therefore,
+the scenario declares the minimal subset of its world content visible to the
+beast. The builder controls this proof's information boundary in YAML; it is
+not a general sensing, visibility, or spatial-observation model.
+
+Before any model call, the engine derives the beast's actor-accessible view
+from that declaration. A scenario fixture includes inaccessible content so the
+proof can show that the content is absent from the LLM input.
+
+#### Milestone-specific perception-failure decision
+
+The first proof fails fast when the LLM is unavailable or returns a malformed,
+incomplete, or non-binary response. It terminates the run with a diagnostic
+perception error before that turn selects or resolves a proposal. This exposes
+the cause for investigation rather than silently inventing a fallback decision;
+fallback perception and recovery behavior are outside this outcome.
+
+For one turn, the engine sends the actor-accessible view and all declared
+questions in one LLM request, as required by the accepted natural-language
+interface decision. It accepts only the bounded binary-answer contract needed
+by the rules. The selected rule still creates only an ordinary bounded action
+proposal, and the existing authoritative resolver alone accepts or rejects it
+and changes canonical state.
+
+Completion evidence must show all of the following:
+
+1. YAML-only changes to a declared perception question or a rule that uses its
+   answer can change the selected beast behaviour.
+2. The request contains every declared question and only actor-accessible world
+   content.
+3. A parsed answer can select a perception-dependent rule, while the LLM has
+   no route to select an action, target, destination, resolution result, or
+   canonical state transition.
+4. The same resolver rejection behavior remains possible after a
+   perception-informed proposal.
+5. An unavailable LLM or a malformed, incomplete, or non-binary response ends
+   the run with a diagnostic perception error before that turn selects or
+   resolves a proposal.
+
+This is a useful vertical proof of mediated perception, not evidence of a
+reusable perception platform, general visibility model, subjective-state
+store, or deterministic replay.
+
 ## 3. Inspectable subjective and authoritative event narration
 
 The command-line observer can distinguish completed canonical events from the

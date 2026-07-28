@@ -32,8 +32,9 @@ Do not preload every document automatically.
 | How do we reach the vision coherently? | [Strategy](docs/strategy.md) |
 | What must the system do? | [Requirements](docs/requirements.md) |
 | How does the system work now? | [Architecture](docs/architecture.md) |
-| Why was a consequential choice made? | [Decisions](docs/decisions.md) |
+| Why was an enduring, project-level consequential choice made? | [Decisions](docs/decisions.md) |
 | What should happen next? | [Roadmap](docs/roadmap.md) |
+| Why is a choice, assumption, or boundary accepted only for one open outcome? | That outcome in [Roadmap](docs/roadmap.md) |
 | What did a bounded experiment demonstrate or refute? | [Experiment evidence](docs/evidence/) |
 | What observed problems remain unresolved? | [Issue records](docs/issues/) |
 | How do humans/agents build, test, and contribute? | [Contributing](CONTRIBUTING.md) |

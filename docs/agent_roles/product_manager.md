@@ -33,6 +33,11 @@ is to judge product value and what should happen next, not delivery quality.
   example; label it as non-binding so it does not silently become a product or
   implementation requirement. Prefer explaining the actor, what it knows,
   what it may attempt, who decides what happens, and what becomes inspectable.
+- Keep accepted choices, assumptions, and boundaries that are deliberately
+  limited to one roadmap outcome under that outcome, including why they are
+  limited and what does not follow from them. Record a choice in
+  [Decisions](../decisions.md) only when it is an enduring project-level
+  commitment that constrains later outcomes beyond the one that prompted it.
 - Use the [glossary](../glossary.md) preferred name when the meaning already
   exists. When an accepted new meaning needs a shared project term, require its
   glossary entry while keeping the underlying behavior in its canonical owner.
