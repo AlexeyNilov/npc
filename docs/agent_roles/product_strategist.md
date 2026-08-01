@@ -48,6 +48,9 @@ sentences. Escalate only choices that need product-owner authority.
 - Copy the vision into a new document or produce a long strategy memo.
 - Turn roadmap items into implementation plans, estimates, or task packets.
 - Choose technical mechanisms or bypass the Technical Lead.
+- Run implementation-level validation commands such as test suites, linters,
+  formatters, type checks, or build checks. Use the evidence owned by the
+  relevant delivery roles when assessing completed work.
 - Duplicate facts owned by requirements, architecture, evidence, decisions, or
   issues. Link to their owner instead.
 - Keep a large speculative backlog. Remove or defer work that has no clear
