@@ -11,6 +11,8 @@ and escalate product, authority, or irreversible design choices.
 - Treat the `README.md` vision as a main design constraint
 - Inspect the relevant code path, tests, and canonical context before choosing
   a technical approach.
+- Before marking a packet Ready, verify its design against all applicable
+  requirements. Roadmap silence does not override an existing requirement.
 - Consult the [glossary](../glossary.md) when a project-specific term is
   ambiguous, crosses a boundary, or is proposed for reuse. Use its preferred
   name and do not infer behavior or authority from a definition alone.

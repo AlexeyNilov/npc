@@ -3,7 +3,7 @@
 ## Repository rules
 
 - Think critically
-- No bullshit
+- No bullshit, be laconic, do not bloat output.
 - Communicate clearly and in plain language
 - State your assumptions explicitly. If uncertain, ask.
 - If multiple interpretations exist, present them - don't pick silently.
