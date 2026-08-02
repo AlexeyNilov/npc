@@ -99,7 +99,7 @@ tasks, or unrelated planning history.
 - Regression detected by each required test.
 - Failing behavioral test before behavior-changing application logic.
 - Applicable contract check for documentation or configuration changes.
-- Task-specific commands followed by `make check` and `git diff --check`.
+- Task-specific commands followed by `make check`.
 
 ## Stop conditions
 

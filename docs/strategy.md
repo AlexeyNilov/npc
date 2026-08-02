@@ -10,7 +10,21 @@ owns the vision, the [roadmap](roadmap.md) owns ordered incomplete next outcomes
 and [decisions](decisions.md) owns the rationale for accepted consequential
 choices. Link to those owners rather than copying their contents.
 
-## Capabilities not yet demonstrated
+## Product direction
+
+The bounded beast and trader demonstrations are sufficient evidence for the
+project to begin platform construction. They are disposable scaffolding: retain
+them only while they help build the replacement, then remove them with their
+proof-specific code and tests. They are no longer the delivery model for
+deciding whether to build the product.
+
+The product should now be assembled as a modular simulation engine. Build
+reusable seams around canonical world execution, actor access and cognition,
+and inspection before expanding domain mechanics. Preserve the demonstrated
+boundaries, but do not generalize either proof's beast movement, offers,
+visibility list, or YAML shapes as a platform contract.
+
+## Platform capabilities to establish
 
 The completed beast proof and trader-offer proof establish bounded authoritative
 simulations with LLM-mediated binary assessments, constrained actor proposals,
@@ -29,6 +43,23 @@ still establish, in a deliberate dependency order:
 - general actions, map topology, and event-log facilities where they are
   needed for the product;
 
-These are capability gaps, not a committed backlog. The roadmap should select
-only the smallest next outcome that delivers value or resolves a dependency
-blocking further value.
+The platform needs the following capabilities in dependency order:
+
+1. A shared authoritative world that hosts heterogeneous participants and
+   accepts bounded action proposals through domain-provided resolvers.
+2. An execution loop that schedules participants, derives each actor's
+   accessible view, obtains validated actor-owned sensemaking, and feeds
+   committed outcomes into later turns.
+3. An inspectable canonical event history that records the actor's available
+   information, proposal, outcome, and presentation boundary independently of
+   any one domain.
+4. A composition boundary through which a builder can select scenario content,
+   actor profiles, action/resolution modules, access policies, and actor
+   decision policies without the engine inventing their domain policy.
+5. Domain modules that can add spatial, economic, group, organisational, or
+   non-human mechanics without changing the generic engine.
+
+The roadmap should deliver these as coherent construction outcomes, beginning
+with the foundation that makes the later modules possible. Existing proofs are
+temporary reference material, not compatibility requirements or gates requiring
+further experiments.
