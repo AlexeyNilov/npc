@@ -11,7 +11,7 @@ from typing import cast
 import yaml  # type: ignore[import-untyped]
 
 from npc.infrastructure.language_model import complete_text
-from npc.platform import LanguageModelMediator, Mediator, Simulation, SimulationBuilder
+from npc.platform import LanguageModelMediator, Mediator, Simulation, SimulationBuilder, TurnRecord
 
 
 @dataclass(frozen=True)
@@ -317,17 +317,59 @@ def _boolean(value: object, name: str) -> bool:
     return cast(bool, value)
 
 
-async def _run(path: Path) -> None:
+def render_turn(record: TurnRecord[dict[str, object], BuyLandedProperty | None, BoardOutcome], world: BoardWorld) -> str:
+    view = record.accessible_view
+    landing = cast(Mapping[str, object], view["landing"])
+    space_name = str(landing.get("name", landing["kind"]))
+    lines = [f"Turn {world.turn}/{view['turn_limit']} — {record.participant}"]
+    if landing["kind"] == "property":
+        lines.append(f"Landed on {space_name} (price {landing['price']}; rent {landing['rent']}).")
+    else:
+        lines.append(f"Landed on {space_name}.")
+    for question, answer in record.answers:
+        lines.append(f"Decision: {question} {'yes' if answer else 'no'}.")
+    if record.proposal is not None:
+        lines.append("Action: buy landed property.")
+    lines.append(_outcome_text(record.outcome.event, landing))
+    lines.append("Cash: " + " | ".join(f"{player.actor_id} {player.cash}" for player in world.players))
+    if world.ended:
+        lines.append(f"Game over: {(world.end_reason or 'game ended').replace('_', ' ')}.")
+    return "\n".join(lines)
+
+
+def _outcome_text(event: str, landing: Mapping[str, object]) -> str:
+    name = str(landing.get("name", landing["kind"]))
+    if event == "property_bought":
+        return f"Outcome: bought {name} for {landing['price']}."
+    if event == "property_declined":
+        return f"Outcome: declined {name}."
+    if event == "purchase_rejected_insufficient_cash":
+        return f"Outcome: could not afford {name}."
+    if event == "rent_paid":
+        return f"Outcome: paid {landing['rent']} rent to {landing['owner']} for {name}."
+    if event == "unable_to_pay_rent":
+        return f"Outcome: could not pay {landing['rent']} rent to {landing['owner']} for {name}."
+    if event == "landed_own_property":
+        return f"Outcome: already owns {name}."
+    return "Outcome: no property action."
+
+
+async def _run(path: Path, json_output: bool) -> None:
     simulation = build_game(load_game(path), LanguageModelMediator(complete_text))
     while (result := await simulation.run_next()) is not None:
-        print(json.dumps(asdict(result.record), sort_keys=True))
+        if json_output:
+            print(json.dumps(asdict(result.record), sort_keys=True))
+        else:
+            print(render_turn(result.record, simulation.world))
+            print()
 
 
 def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Run the two-player property-board application.")
     parser.add_argument("scenario", type=Path, help="path to the property-board scenario YAML")
+    parser.add_argument("--json", action="store_true", help="print raw canonical turn records as JSON")
     args = parser.parse_args(argv)
-    asyncio.run(_run(args.scenario))
+    asyncio.run(_run(args.scenario, args.json))
 
 
 if __name__ == "__main__":

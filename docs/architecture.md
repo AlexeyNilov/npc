@@ -71,4 +71,5 @@ is affordable, transfers fixed rent on another player's property, and ends the
 world immediately on an unpaid rent or after the sixteenth completed turn.
 Each platform `TurnRecord` retains the pre-resolution public view, question
 and validated answer, attempted proposal, and authoritative board outcome.
-The module entry point prints those canonical records as JSON after each turn.
+The module entry point renders a readable turn log from the completed record
+and current world; `--json` prints the raw canonical records instead.

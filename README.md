@@ -65,8 +65,8 @@ python -m npc.property_board scenarios/property_board.yaml
 ```
 
 The scenario and its two actor profiles are authored separately in
-`scenarios/` and `actors/`. The command prints one canonical turn record per
-completed turn.
+`scenarios/` and `actors/`. The command prints a readable turn-by-turn game
+log. Use `--json` to print raw canonical turn records instead.
 
 ## Project documentation
 

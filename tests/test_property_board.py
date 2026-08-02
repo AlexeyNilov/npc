@@ -14,6 +14,7 @@ from npc.property_board import (
     PublicBoardAccess,
     build_game,
     load_game,
+    render_turn,
 )
 
 SCENARIO = Path("scenarios/property_board.yaml")
@@ -79,6 +80,14 @@ def test_profiles_make_distinct_recorded_buy_decisions_from_the_same_landing() -
     assert first.record.answers == ((collector_question, False),)
     assert second.record.answers == ((conserver_question, True),)
     assert simulation.world.owners[1] == "conserver"
+    assert render_turn(second.record, simulation.world) == (
+        "Turn 2/16 — conserver\n"
+        "Landed on amber (price 2; rent 1).\n"
+        "Decision: Should I buy this landed property without endangering my cash reserve? yes.\n"
+        "Action: buy landed property.\n"
+        "Outcome: bought amber for 2.\n"
+        "Cash: collector 12 | conserver 10"
+    )
 
 
 def test_resolver_collects_rent_and_ends_immediately_when_it_cannot_be_paid() -> None:
