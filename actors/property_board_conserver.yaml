@@ -1,0 +1,5 @@
+actor_id: conserver
+intent: Preserve cash unless buying is clearly worth the risk.
+questions:
+  - Should I buy this landed property without endangering my cash reserve?
+buy_when_answer: true

@@ -1,0 +1,39 @@
+platform:
+  scheduling: alternating
+  participants:
+    - actor_id: collector
+      profile: ../actors/property_board_collector.yaml
+    - actor_id: conserver
+      profile: ../actors/property_board_conserver.yaml
+property_board:
+  action: buy_landed_property
+  starting_cash: 12
+  movement: 1
+  turn_limit: 16
+  spaces:
+    - kind: start
+    - kind: property
+      name: amber
+      price: 2
+      rent: 1
+    - kind: property
+      name: birch
+      price: 3
+      rent: 1
+    - kind: property
+      name: coral
+      price: 4
+      rent: 2
+    - kind: property
+      name: dune
+      price: 5
+      rent: 2
+    - kind: property
+      name: ember
+      price: 6
+      rent: 3
+    - kind: property
+      name: fern
+      price: 7
+      rent: 3
+    - kind: neutral

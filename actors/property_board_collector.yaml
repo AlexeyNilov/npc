@@ -1,0 +1,5 @@
+actor_id: collector
+intent: Build a property portfolio whenever the purchase is sensible.
+questions:
+  - Should I buy this landed property to build my portfolio?
+buy_when_answer: true

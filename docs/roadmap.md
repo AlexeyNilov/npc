@@ -48,6 +48,23 @@ position, ownership, and turn order become canonical feedback for later turns.
 The game ends after a fixed turn limit or when a player cannot pay an
 obligation.
 
+**Accepted fixture constants:** use one eight-space board: `start`, six
+properties, and one neutral space. The properties use fixed `(price, rent)`
+pairs in board order: `(2, 1)`, `(3, 1)`, `(4, 2)`, `(5, 2)`, `(6, 3)`, and
+`(7, 3)`. Each actor starts with `12` cash. The scheduler advances the active
+actor exactly one space per turn. End after `16` turns or immediately when an
+actor cannot pay a rent obligation. The only actor proposal is
+`buy_landed_property`; declining is the absence of that proposal.
+
+**Accepted YAML boundary:** the platform scenario identifies generic
+composition inputs—participants, their profile references, selected modules,
+and scheduling configuration. The property-board application owns an
+application configuration section containing the board spaces, property prices
+and rents, starting cash, movement increment, turn limit, and its
+`buy_landed_property` action. Actor profiles own actor ID, plain-language
+intent, binary questions, and answer-to-proposal policy. No property-board
+field or action name belongs in the platform schema.
+
 **Decision unlocked:** determine which domain-module improvements the general
 platform needs after a real application, without promoting property-game rules
 into the engine by default.

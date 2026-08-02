@@ -56,6 +56,18 @@ Outcome and canonical transition
 Feedback
 ```
 
+## Run the property-board application
+
+After configuring the local LLM used by the project, run:
+
+```bash
+python -m npc.property_board scenarios/property_board.yaml
+```
+
+The scenario and its two actor profiles are authored separately in
+`scenarios/` and `actors/`. The command prints one canonical turn record per
+completed turn.
+
 ## Project documentation
 
 - [Builder guide: clearing composition experiment](docs/builder-guide.md)
