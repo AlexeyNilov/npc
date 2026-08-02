@@ -45,8 +45,8 @@ result; and the balances retained as feedback for the next offer.
 - **Expected trace or outputs:** Each trader-offer block exposes intent, current
   situation, question and answer, attempted choice, authoritative result, and
   resulting balances. A later request reflects earlier accepted state changes.
-- **Deliberate exclusions:** Intent-dependent answer differences, prompt
-  reliability, market modeling, matching, negotiation, other traders,
+- **Deliberate exclusions:** Reliable intent-dependent answer differences,
+  prompt reliability, market modeling, matching, negotiation, other traders,
   persistence, narration, and a public or reusable trading schema.
 - **Candidate durable elements and disposable scaffolding:** The existing
   non-streaming language-model adapter, separate actor/scenario authoring
@@ -75,7 +75,9 @@ result; and the balances retained as feedback for the next offer.
 
 - **Observed result:** The real-LLM run completed all three offers for both
   traders. Each block reported the intent, offer facts, question and validated
-  answer, attempted choice, authoritative result, and retained balances.
+  answer, attempted choice, authoritative result, and retained balances. With
+  the same starting state and offers, the greedy trader accepted the first two
+  offers while the cautious trader rejected all three.
 - **Reproducibility evidence:**
 
 ```text
@@ -119,29 +121,29 @@ resulting balances:
 cash: 13
 inventory: apple: 2, gem: 0
 trader: cautious
-intent: Preserve resources and avoid uncertain deals.
+intent: Preserve resources and avoid deals.
 offer: Buy one apple for four cash.
 offer facts: side=buy, item=apple, quantity=1, total price=4
 question: Does accepting this offer fit your intent in your current situation?
-answer: true
-attempted choice: accept offer
-authoritative result: accepted
+answer: false
+attempted choice: do nothing
+authoritative result: no transaction proposed
 resulting balances:
-cash: 6
-inventory: apple: 3, gem: 0
+cash: 10
+inventory: apple: 2, gem: 0
 trader: cautious
-intent: Preserve resources and avoid uncertain deals.
+intent: Preserve resources and avoid deals.
 offer: Sell one apple for seven cash.
 offer facts: side=sell, item=apple, quantity=1, total price=7
 question: Does accepting this offer fit your intent in your current situation?
-answer: true
-attempted choice: accept offer
-authoritative result: accepted
+answer: false
+attempted choice: do nothing
+authoritative result: no transaction proposed
 resulting balances:
-cash: 13
+cash: 10
 inventory: apple: 2, gem: 0
 trader: cautious
-intent: Preserve resources and avoid uncertain deals.
+intent: Preserve resources and avoid deals.
 offer: Sell one gem for five cash.
 offer facts: side=sell, item=gem, quantity=1, total price=5
 question: Does accepting this offer fit your intent in your current situation?
@@ -149,7 +151,7 @@ answer: false
 attempted choice: do nothing
 authoritative result: no transaction proposed
 resulting balances:
-cash: 13
+cash: 10
 inventory: apple: 2, gem: 0
 ```
 
@@ -160,8 +162,10 @@ inventory: apple: 2, gem: 0
 
 - **Interpretation and limits:** The run exposes the complete decision and
   authority boundary for both traders, and state persists independently through
-  the ordered offers. It does not show that their intents caused different
-  answers or establish prompt effectiveness beyond this smoke execution.
+  the ordered offers. It also provides one observed intent-linked behavioral
+  difference under the recorded profiles: greedy accepted the first two offers,
+  while cautious accepted none. This is not evidence that the prompt produces
+  that difference reliably across runs, intents, or offers.
 - **Decision or unresolved question created:** The bounded
   intent-to-binary-proposal boundary is sufficient for this completed outcome.
   The result does not promote the experiment's trading types or transaction
