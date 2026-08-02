@@ -3,33 +3,57 @@
 This document owns ordered incomplete outcomes. Completion evidence belongs in
 [experiment evidence](evidence/README.md).
 
-## 1. Build the modular simulation foundation
+## 1. Build the general simulation-platform foundation
 
-Create the reusable engine foundation for simulations with heterogeneous
+Create the domain-neutral engine foundation for simulations with heterogeneous
 actors. A builder can compose a scenario from a shared authoritative world,
-participant profiles, and domain modules; the engine can schedule actors,
-derive each actor's permitted view, mediate and validate its actor-owned
-questions, receive a bounded proposal, and commit or reject the canonical
-outcome. Every completed turn is available as an inspectable canonical record;
-presentation remains post-resolution and non-authoritative.
+participant profiles, and replaceable domain modules; the engine can schedule
+actors, derive each actor's permitted view, mediate and validate its
+actor-owned questions, receive a bounded proposal, and commit or reject the
+canonical outcome. Every completed turn is available as an inspectable
+canonical record; presentation remains post-resolution and non-authoritative.
 
-The outcome is a platform construction step, not an experiment. The current
-beast and trader demonstrations are temporary reference material while the
-replacement is built. Once the foundation covers their useful boundaries, remove
-their proof-specific code, scenarios, profiles, and tests; they are not
-templates for the new public schema or compatibility fixtures.
+The outcome is platform construction, not an experiment or an application
+module. It establishes generic contracts and composition seams without making
+spatial, economic, or property-game mechanics part of the engine.
 
 **Decision unlocked:** establish the stable engine seams that later spatial,
 economic, group, organisational, and non-human modules can use without
 changing generic execution or actor mediation.
 
-**Observable behavior:** a builder can run a composed, shared-world simulation
-with more than one participant; a participant's accepted outcome becomes
-canonical feedback visible only as allowed to later participants; observer
-inspection distinguishes the actor-accessible view, validated sensemaking,
-proposal, authoritative outcome, and any non-authoritative narration.
+**Observable behavior:** a builder can compose a simulation from the generic
+engine and supplied modules; the engine coordinates multiple participants in
+one canonical world, keeps each actor's permitted view separate, and emits an
+inspectable turn record without interpreting domain state or mechanics itself.
 
 **Boundaries for this outcome:** the Technical Lead chooses the smallest
 initial module API and migration path. Do not promise a universal YAML DSL,
-general map topology, persistence, replay UI, negotiation, or every actor type
-in this outcome. Those build on the foundation once its generic seams exist.
+general map topology, persistence, or every actor type in this
+outcome. Those build on the foundation once its generic seams exist. As part of
+this milestone, remove the old beast and trader proof code, scenarios,
+profiles, and tests; they are superseded scaffolding, not compatibility
+fixtures.
+
+## 2. Apply the platform to a two-player property-board game
+
+Build an original, simplified property-board game as the first application of
+the platform foundation. Two actors with distinct profiles compete in one
+shared game: turns advance around a small board; a landing can create a bounded
+buy-or-decline proposal; ownership produces deterministic rent obligations;
+and cash, position, ownership, and turn order become canonical feedback for
+later turns.
+
+**Decision unlocked:** determine which domain-module improvements the general
+platform needs after a real application, without promoting property-game rules
+into the engine by default.
+
+**Observable behavior:** the two actors run on the platform from separately
+authored profiles. They receive the same permitted game facts but can have
+different plain-language intent and actor-owned binary questions—for example,
+acquisition versus preserving cash. The engine validates answers and resolves
+only bounded game proposals; neither profile nor language-model output changes
+money, ownership, movement, or rent directly. An observer can inspect the
+resulting canonical event sequence and actor-specific decision records.
+
+**Boundaries for this outcome:** exclude auctions, cards, jail, buildings,
+negotiation, and Monopoly-specific names or rules.

@@ -40,3 +40,32 @@ Use plain human language as the primary communication bridge between world data 
 
 * **Independent Development:** World engines and actor behaviors can be built separately without sharing code structures.
 * **Strict Contracts Remain:** Natural language makes communication flexible, but defined action proposal rules are still strictly required.
+
+### 2026-08-02: Keep the simulation platform separate from applications
+
+**Status:** Accepted
+
+**Context:**
+
+The first planned application is a simplified two-player property-board game,
+but the product vision is a shared platform for many games and simulations.
+Embedding property-game concepts in the engine would make that first
+application a hidden constraint on every later simulation.
+
+**Decision:**
+
+The simulation platform owns generic composition, execution, actor mediation,
+authoritative transition coordination, and inspection. Each game or simulation
+is an independent application that supplies its own world model, domain state,
+rules, action/resolution modules, access policy, and actor profiles through the
+platform's composition boundary. The property-board game must depend on the
+platform; the platform must not depend on it.
+
+**Consequences:**
+
+* Domain concepts such as boards, cash, properties, rent, and turns are owned
+  by the property-game application, not the generic platform.
+* A later builder can compose a different game or simulation without carrying
+  the property-game module or modifying platform internals.
+* Changes to a domain application may identify a missing generic capability,
+  but that capability enters the platform only when it is truly domain-neutral.

@@ -24,6 +24,14 @@ and inspection before expanding domain mechanics. Preserve the demonstrated
 boundaries, but do not generalize either proof's beast movement, offers,
 visibility list, or YAML shapes as a platform contract.
 
+The platform is a shared execution and inspection foundation, not a game. A
+game or simulation composes the platform with its own world model, state,
+rules, action/resolution modules, access policy, and actor profiles. The first
+property-board game is one such application: it depends on the platform, while
+the platform must remain independent of property-board concepts. Later games
+and simulations use the same composition boundary rather than inherit or
+modify that application's mechanics.
+
 ## Platform capabilities to establish
 
 The completed beast proof and trader-offer proof establish bounded authoritative
@@ -56,8 +64,9 @@ The platform needs the following capabilities in dependency order:
 4. A composition boundary through which a builder can select scenario content,
    actor profiles, action/resolution modules, access policies, and actor
    decision policies without the engine inventing their domain policy.
-5. Domain modules that can add spatial, economic, group, organisational, or
-   non-human mechanics without changing the generic engine.
+5. Independent game and simulation applications that can add spatial,
+   economic, group, organisational, or non-human mechanics without changing
+   the generic engine or one another.
 
 The roadmap should deliver these as coherent construction outcomes, beginning
 with the foundation that makes the later modules possible. Existing proofs are
