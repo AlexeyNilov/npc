@@ -38,10 +38,13 @@ fixtures.
 
 Build an original, simplified property-board game as the first application of
 the platform foundation. Two actors with distinct profiles compete in one
-shared game: turns advance around a small board; a landing can create a bounded
-buy-or-decline proposal; ownership produces deterministic rent obligations;
-and cash, position, ownership, and turn order become canonical feedback for
-later turns.
+shared game. The game uses a small, fixed board (eight spaces at most),
+deterministic movement, a small set of purchasable properties with fixed prices
+and rent, and a bounded buy-or-decline proposal on an unowned property. A
+landing on an owned property creates a deterministic rent obligation. Cash,
+position, ownership, and turn order become canonical feedback for later turns.
+The game ends after a fixed turn limit or when a player cannot pay an
+obligation.
 
 **Decision unlocked:** determine which domain-module improvements the general
 platform needs after a real application, without promoting property-game rules
@@ -56,4 +59,7 @@ money, ownership, movement, or rent directly. An observer can inspect the
 resulting canonical event sequence and actor-specific decision records.
 
 **Boundaries for this outcome:** exclude auctions, cards, jail, buildings,
-negotiation, and Monopoly-specific names or rules.
+negotiation, chance-style spaces, trading between players, variable pricing,
+and Monopoly-specific names or rules. Do not add mechanics merely to imitate
+Monopoly; every included rule must exercise a platform boundary or make the
+two actors' competition legible.
