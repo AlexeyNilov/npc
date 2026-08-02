@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Awaitable, Callable, Mapping
+from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Protocol, TypeVar, cast
 
@@ -85,7 +86,7 @@ class SimulationBuilder[World, Profile, View, Proposal, Outcome]:
         if not self.profiles:
             raise ValueError("a simulation requires at least one participant profile")
         return Simulation(
-            world=self.world,
+            _world=_snapshot(self.world),
             profiles=dict(self.profiles),
             scheduler=self.scheduler,
             access_policy=self.access_policy,
@@ -98,7 +99,7 @@ class SimulationBuilder[World, Profile, View, Proposal, Outcome]:
 
 @dataclass
 class Simulation[World, Profile, View, Proposal, Outcome]:
-    world: World
+    _world: World
     profiles: dict[str, Profile]
     scheduler: Scheduler[World]
     access_policy: AccessPolicy[World, Profile, View]
@@ -109,37 +110,41 @@ class Simulation[World, Profile, View, Proposal, Outcome]:
     _history: list[TurnRecord[View, Proposal, Outcome]] = field(default_factory=list, init=False)
 
     @property
+    def world(self) -> World:
+        return _snapshot(self._world)
+
+    @property
     def history(self) -> tuple[TurnRecord[View, Proposal, Outcome], ...]:
-        return tuple(self._history)
+        return tuple(_snapshot(record) for record in self._history)
 
     async def run_next(self) -> TurnResult[View, Proposal, Outcome] | None:
-        participant = self.scheduler.next_participant(self.world, tuple(self.profiles))
+        participant = self.scheduler.next_participant(_snapshot(self._world), tuple(self.profiles))
         if participant is None:
             return None
         profile = self.profiles.get(participant)
         if profile is None:
             raise ValueError(f"scheduler selected unknown participant {participant!r}")
-        view = self.access_policy.view_for(self.world, participant, profile)
+        view = self.access_policy.view_for(_snapshot(self._world), participant, profile)
         questions = self.decision_policy.questions_for(profile, view)
         answers = _validated_answers(await self.mediator.answer(view, questions), questions)
         proposal = self.decision_policy.propose(profile, view, answers)
-        next_world, outcome = self.resolver.resolve(self.world, participant, proposal)
-        self.world = next_world
+        next_world, outcome = self.resolver.resolve(_snapshot(self._world), participant, proposal)
+        self._world = _snapshot(next_world)
         record = TurnRecord(
             participant,
-            view,
+            _snapshot(view),
             tuple((question, answers[question]) for question in questions),
-            proposal,
-            outcome,
+            _snapshot(proposal),
+            _snapshot(outcome),
         )
         self._history.append(record)
-        return TurnResult(record, await self._present(record))
+        return TurnResult(_snapshot(record), await self._present(record))
 
     async def _present(self, record: TurnRecord[View, Proposal, Outcome]) -> str | None:
         if self.presenter is None:
             return None
         try:
-            presentation = await self.presenter.present(record)
+            presentation = await self.presenter.present(_snapshot(record))
         except Exception:
             return None
         return presentation.strip() or None
@@ -183,3 +188,7 @@ def _json_response_body(response: str) -> str:
     if len(lines) >= 3 and lines[0].strip().lower() == "```json" and lines[-1].strip() == "```":
         return "\n".join(lines[1:-1])
     return response.strip()
+
+
+def _snapshot[Snapshot](value: Snapshot) -> Snapshot:
+    return cast(Snapshot, deepcopy(value))

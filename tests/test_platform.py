@@ -10,7 +10,7 @@ import pytest
 from npc.platform import LanguageModelMediator, MediationError, Presenter, SimulationBuilder, TurnRecord
 
 
-@dataclass(frozen=True)
+@dataclass
 class World:
     value: int = 0
 
@@ -20,12 +20,12 @@ class Profile:
     question: str
 
 
-@dataclass(frozen=True)
+@dataclass
 class Proposal:
     change: int
 
 
-@dataclass(frozen=True)
+@dataclass
 class Outcome:
     accepted: bool
 
@@ -132,6 +132,50 @@ def test_presentation_failure_cannot_hide_completed_turn() -> None:
     assert result.presentation is None
     assert simulation.world == World(1)
     assert simulation.history == (result.record,)
+
+
+def test_non_resolver_mutation_cannot_change_canonical_world() -> None:
+    class MutatingScheduler:
+        def next_participant(self, world: World, participants: tuple[str, ...]) -> str:
+            world.value = 99
+            return "alpha"
+
+    class MutatingViews:
+        def view_for(self, world: World, participant: str, profile: Profile) -> dict[str, object]:
+            world.value = 42
+            return {"participant": participant, "visible_value": world.value}
+
+    answers = Answers([{"Advance?": True}])
+    resolver = Resolver()
+    simulation = SimulationBuilder(
+        world=World(),
+        profiles={"alpha": Profile("Advance?")},
+        scheduler=MutatingScheduler(),
+        access_policy=MutatingViews(),
+        decision_policy=Policies(),
+        mediator=answers,
+        resolver=resolver,
+    ).build()
+
+    asyncio.run(simulation.run_next())
+
+    assert resolver.calls == [(World(), "alpha", Proposal(1))]
+    assert simulation.world == World(1)
+
+
+def test_record_payload_mutation_cannot_change_canonical_history() -> None:
+    simulation = _simulation(Answers([{"Advance?": True}, {"Respond?": False}]), Resolver())
+
+    result = asyncio.run(simulation.run_next())
+
+    assert result is not None
+    result.record.accessible_view["visible_value"] = 99
+    result.record.proposal.change = 99
+    result.record.outcome.accepted = False
+    record = simulation.history[0]
+    assert record.accessible_view == {"participant": "alpha", "visible_value": 0}
+    assert record.proposal == Proposal(1)
+    assert record.outcome == Outcome(True)
 
 
 def test_language_mediator_batches_questions_and_requires_an_exact_boolean_mapping() -> None:

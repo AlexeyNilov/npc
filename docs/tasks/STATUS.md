@@ -5,7 +5,6 @@ packet and must not read this registry or sibling packets.
 
 | Task | Status | Role | Agent | Depends on | Write scope |
 | --- | --- | --- | --- | --- | --- |
-| [TASK-001](TASK-001-platform-foundation.md) | Review | Implementer | Technical Lead | None | `src/npc/`, `tests/`, fixtures, selected canonical docs |
 
 Only Planned, Ready, In progress, Review, or Blocked tasks belong here. Remove
 Done packets and rows after integration; Git preserves history.

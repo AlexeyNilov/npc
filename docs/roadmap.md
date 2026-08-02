@@ -5,6 +5,8 @@ This document owns ordered incomplete outcomes. Completion evidence belongs in
 
 ## 1. Build the general simulation-platform foundation
 
+**Status:** Completed
+
 Create the domain-neutral engine foundation for simulations with heterogeneous
 actors. A builder can compose a scenario from a shared authoritative world,
 participant profiles, and replaceable domain modules; the engine can schedule

@@ -38,6 +38,22 @@ owners, then link to them here.
   resolves actor action proposals, commits outcomes, and returns feedback. It
   is distinct from actor cognition, generic LLM mediation, and presentation.
 
+**Scheduler.** A supplied simulation component that selects the next
+participant to run. It does not define domain rules or mutate canonical state.
+
+**Access policy.** A supplied simulation component that derives one
+participant's actor-accessible view from authoritative reality and that
+participant's profile.
+
+**Decision policy.** A supplied actor component that declares its actor-owned
+questions and transforms validated answers into a bounded action proposal.
+
+**Resolver.** A supplied domain component that evaluates a bounded action
+proposal and alone returns the next authoritative world and outcome.
+
+**Presenter.** A supplied post-resolution component that produces
+non-authoritative observer-facing text from a completed turn record.
+
 ## Actor-loop terms
 
 **Actor loop.** The target model `authoritative reality → actor-accessible
