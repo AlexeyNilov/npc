@@ -3,28 +3,7 @@
 This document owns ordered incomplete outcomes. Completion evidence belongs in
 [experiment evidence](evidence/README.md).
 
-## 1. Remove disposable proof code
-
-**Status:** Completed
-
-The repository keeps the completed beast proof and its behavioural coverage,
-but removes obsolete fox scenario fixtures with no role in that proof or the
-next product outcome. The standalone chat utility is retained because the user
-expects it to support near-term work.
-
-**Observable result:** the beast proof still demonstrates authoritative
-resolution, bounded LLM perception, and post-resolution narration; the three
-obsolete fox fixtures are gone, while `sample/chat.py` remains available for
-near-term work.
-
-**Boundary:** retaining `sample/chat.py` is a scoped product direction for
-this cleanup, not evidence that it is a supported product capability or a
-reusable foundation.
-
-**Unlocks:** choosing the next product capability without carrying unrelated
-experiments forward.
-
-## 2. Intent-shaped trader decisions over a sequence of offers
+## 1. Intent-shaped trader decisions over a sequence of offers
 
 **Status:** Planned
 
