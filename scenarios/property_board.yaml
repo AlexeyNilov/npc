@@ -8,7 +8,9 @@ platform:
 property_board:
   action: buy_landed_property
   starting_cash: 12
-  movement: 1
+  movement:
+    minimum: 1
+    maximum: 3
   turn_limit: 16
   spaces:
     - kind: start

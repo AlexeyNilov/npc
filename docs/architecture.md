@@ -59,14 +59,14 @@ The generic platform does not parse this file or import this module.
 
 `build_game` composes the loaded profiles and an initial `BoardWorld` through
 `SimulationBuilder`. `AlternatingScheduler` selects the next player;
-`PublicBoardAccess` gives the active player the public game state and its
-deterministic next landing; and `PurchaseDecisionPolicy` asks that player's
+`PublicBoardAccess` gives the active player the public game state, its seeded
+one-to-three-space roll, and resulting landing; and `PurchaseDecisionPolicy` asks that player's
 profile-owned binary question only for an unowned property. A true or false
 answer becomes respectively the sole `buy_landed_property` proposal or no
 proposal.
 
 `PropertyBoardResolver` is the only component that changes board state. It
-moves the selected player one space, records a purchase when its fixed price
+moves the selected player by that canonical roll, records a purchase when its fixed price
 is affordable, transfers fixed rent on another player's property, and ends the
 world immediately on an unpaid rent or after the sixteenth completed turn.
 Each platform `TurnRecord` retains the pre-resolution public view, question

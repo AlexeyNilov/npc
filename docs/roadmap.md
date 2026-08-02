@@ -41,7 +41,7 @@ fixtures.
 Build an original, simplified property-board game as the first application of
 the platform foundation. Two actors with distinct profiles compete in one
 shared game. The game uses a small, fixed board (eight spaces at most),
-deterministic movement, a small set of purchasable properties with fixed prices
+seeded movement, a small set of purchasable properties with fixed prices
 and rent, and a bounded buy-or-decline proposal on an unowned property. A
 landing on an owned property creates a deterministic rent obligation. Cash,
 position, ownership, and turn order become canonical feedback for later turns.
@@ -51,8 +51,9 @@ obligation.
 **Accepted fixture constants:** use one eight-space board: `start`, six
 properties, and one neutral space. The properties use fixed `(price, rent)`
 pairs in board order: `(2, 1)`, `(3, 1)`, `(4, 2)`, `(5, 2)`, `(6, 3)`, and
-`(7, 3)`. Each actor starts with `12` cash. The scheduler advances the active
-actor exactly one space per turn. End after `16` turns or immediately when an
+`(7, 3)`. Each actor starts with `12` cash. Each active actor rolls from `1`
+through `3` spaces per turn from a run seed retained in canonical world state;
+the seed must be displayed so a trace can be replayed. End after `16` turns or immediately when an
 actor cannot pay a rent obligation. The only actor proposal is
 `buy_landed_property`; declining is the absence of that proposal.
 
@@ -60,7 +61,7 @@ actor cannot pay a rent obligation. The only actor proposal is
 composition inputs—participants, their profile references, selected modules,
 and scheduling configuration. The property-board application owns an
 application configuration section containing the board spaces, property prices
-and rents, starting cash, movement increment, turn limit, and its
+and rents, starting cash, movement range, turn limit, and its
 `buy_landed_property` action. Actor profiles own actor ID, plain-language
 intent, binary questions, and answer-to-proposal policy. No property-board
 field or action name belongs in the platform schema.

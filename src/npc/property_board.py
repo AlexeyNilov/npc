@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import random
+import secrets
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -27,7 +29,8 @@ class PropertyBoardConfig:
     spaces: tuple[Space, ...]
     player_ids: tuple[str, ...]
     starting_cash: int
-    movement: int
+    movement_minimum: int
+    movement_maximum: int
     turn_limit: int
 
 
@@ -50,6 +53,7 @@ class PlayerState:
 class BoardWorld:
     players: tuple[PlayerState, ...]
     owners: tuple[str | None, ...]
+    movement_seed: int = 0
     turn: int = 0
     ended: bool = False
     end_reason: str | None = None
@@ -64,6 +68,7 @@ class BuyLandedProperty:
 class BoardOutcome:
     event: str
     landing: int
+    movement: int
     ended: bool = False
 
 
@@ -93,6 +98,7 @@ class PublicBoardAccess:
             "ownership": list(world.owners),
             "turn": world.turn,
             "turn_limit": self._config.turn_limit,
+            "movement": _movement_for(world, self._config),
             "landing": {"index": landing, **_space_facts(space), "owner": world.owners[landing]},
         }
 
@@ -125,6 +131,7 @@ class PropertyBoardResolver:
         if proposal is not None and proposal.action != "buy_landed_property":
             raise ValueError("property board accepts only buy_landed_property")
 
+        movement = _movement_for(world, self._config)
         landing = _landing_index(world, participant, self._config)
         players = list(world.players)
         player_index = self._config.player_ids.index(participant)
@@ -170,8 +177,8 @@ class PropertyBoardResolver:
         if not ended and next_turn >= self._config.turn_limit:
             ended = True
             end_reason = "turn_limit_reached"
-        next_world = BoardWorld(tuple(players), tuple(owners), next_turn, ended, end_reason)
-        return next_world, BoardOutcome(event, landing, ended)
+        next_world = BoardWorld(tuple(players), tuple(owners), world.movement_seed, next_turn, ended, end_reason)
+        return next_world, BoardOutcome(event, landing, movement, ended)
 
 
 def load_game(path: Path) -> LoadedGame:
@@ -204,19 +211,25 @@ def load_game(path: Path) -> LoadedGame:
     if property_board.get("action") != "buy_landed_property":
         raise ValueError("property board action must be buy_landed_property")
     starting_cash = _integer(property_board.get("starting_cash"), "property_board.starting_cash")
-    movement = _integer(property_board.get("movement"), "property_board.movement")
+    movement = _mapping(property_board.get("movement"), "property_board.movement")
+    movement_minimum = _integer(movement.get("minimum"), "property_board.movement.minimum")
+    movement_maximum = _integer(movement.get("maximum"), "property_board.movement.maximum")
     turn_limit = _integer(property_board.get("turn_limit"), "property_board.turn_limit")
-    if starting_cash < 0 or movement < 1 or turn_limit < 1:
-        raise ValueError("starting cash must be non-negative; movement and turn limit must be positive")
-    return LoadedGame(PropertyBoardConfig(spaces, tuple(player_ids), starting_cash, movement, turn_limit), profiles)
+    if starting_cash < 0 or movement_minimum < 1 or movement_maximum < movement_minimum or turn_limit < 1:
+        raise ValueError("cash must be non-negative; movement bounds and turn limit must be positive")
+    return LoadedGame(
+        PropertyBoardConfig(spaces, tuple(player_ids), starting_cash, movement_minimum, movement_maximum, turn_limit),
+        profiles,
+    )
 
 
 def build_game(
-    loaded: LoadedGame, mediator: Mediator[dict[str, object]]
+    loaded: LoadedGame, mediator: Mediator[dict[str, object]], movement_seed: int | None = None
 ) -> Simulation[BoardWorld, PropertyProfile, dict[str, object], BuyLandedProperty | None, BoardOutcome]:
     world = BoardWorld(
         tuple(PlayerState(actor_id, loaded.config.starting_cash) for actor_id in loaded.config.player_ids),
         tuple(None for _ in loaded.config.spaces),
+        movement_seed if movement_seed is not None else secrets.randbits(64),
     )
     return SimulationBuilder(
         world=world,
@@ -231,7 +244,11 @@ def build_game(
 
 def _landing_index(world: BoardWorld, participant: str, config: PropertyBoardConfig) -> int:
     player = next(player for player in world.players if player.actor_id == participant)
-    return (player.position + config.movement) % len(config.spaces)
+    return (player.position + _movement_for(world, config)) % len(config.spaces)
+
+
+def _movement_for(world: BoardWorld, config: PropertyBoardConfig) -> int:
+    return random.Random(f"{world.movement_seed}:{world.turn}").randint(config.movement_minimum, config.movement_maximum)
 
 
 def _space_facts(space: Space) -> dict[str, object]:
@@ -321,7 +338,7 @@ def render_turn(record: TurnRecord[dict[str, object], BuyLandedProperty | None, 
     view = record.accessible_view
     landing = cast(Mapping[str, object], view["landing"])
     space_name = str(landing.get("name", landing["kind"]))
-    lines = [f"Turn {world.turn}/{view['turn_limit']} — {record.participant}"]
+    lines = [f"Turn {world.turn}/{view['turn_limit']} — {record.participant} (rolled {record.outcome.movement})"]
     if landing["kind"] == "property":
         lines.append(f"Landed on {space_name} (price {landing['price']}; rent {landing['rent']}).")
     else:
@@ -354,8 +371,10 @@ def _outcome_text(event: str, landing: Mapping[str, object]) -> str:
     return "Outcome: no property action."
 
 
-async def _run(path: Path, json_output: bool) -> None:
-    simulation = build_game(load_game(path), LanguageModelMediator(complete_text))
+async def _run(path: Path, json_output: bool, movement_seed: int | None) -> None:
+    simulation = build_game(load_game(path), LanguageModelMediator(complete_text), movement_seed)
+    if not json_output:
+        print(f"Movement seed: {simulation.world.movement_seed}\n")
     while (result := await simulation.run_next()) is not None:
         if json_output:
             print(json.dumps(asdict(result.record), sort_keys=True))
@@ -368,8 +387,9 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Run the two-player property-board application.")
     parser.add_argument("scenario", type=Path, help="path to the property-board scenario YAML")
     parser.add_argument("--json", action="store_true", help="print raw canonical turn records as JSON")
+    parser.add_argument("--seed", type=int, help="movement seed; print it from a normal run to replay that trace")
     args = parser.parse_args(argv)
-    asyncio.run(_run(args.scenario, args.json))
+    asyncio.run(_run(args.scenario, args.json, args.seed))
 
 
 if __name__ == "__main__":
