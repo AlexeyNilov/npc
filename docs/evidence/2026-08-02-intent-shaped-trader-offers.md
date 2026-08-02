@@ -1,11 +1,10 @@
 # Experiment: Intent-shaped trader decisions over ordered offers
 
-**Status:** Planned
+**Status:** Complete
 
 **Date:** 2026-08-02
 
-**Roadmap outcome:** [1. Intent-shaped trader decisions over a sequence of
-offers](../roadmap.md#1-intent-shaped-trader-decisions-over-a-sequence-of-offers)
+**Roadmap outcome:** Completed; see the current roadmap.
 
 ## Decision unlocked
 
@@ -26,11 +25,10 @@ This does not assume or predict that the two intents produce different answers.
 
 A developer runs one YAML scenario referencing two YAML actor profiles and
 inspects, for both traders and every offer: the intent serving as the actor's
-goal; the current balances and offered
-facts available for its decision; the shared binary question and validated
-answer; the resulting accept-or-do-nothing choice; any proposed buy or sell;
-the authoritative accepted or rejected result; and the balances retained as
-feedback for the next offer.
+goal; the current balances and offered facts available for its decision; the
+shared binary question and validated answer; the resulting accept-or-do-nothing
+choice; any proposed buy or sell; the authoritative accepted or rejected
+result; and the balances retained as feedback for the next offer.
 
 ## Design
 
@@ -75,12 +73,98 @@ feedback for the next offer.
 
 ## Result
 
-At task Review, complete every field and set the evidence status to `Review`.
-The Technical Lead sets the final status after required review and roadmap
-closure.
+- **Observed result:** The real-LLM run completed all three offers for both
+  traders. Each block reported the intent, offer facts, question and validated
+  answer, attempted choice, authoritative result, and retained balances.
+- **Reproducibility evidence:**
 
-- **Observed result:** Pending.
-- **Reproducibility evidence:** Pending.
-- **Interpretation and limits:** Pending.
-- **Decision or unresolved question created:** Pending.
-- **Canonical follow-up:** Pending.
+```text
+.venv/bin/python -m npc.experiments.trader_offers scenarios/trader_offers.yaml
+```
+
+Observed trace:
+
+```text
+trader: greedy
+intent: Build wealth by taking favorable deals.
+offer: Buy one apple for four cash.
+offer facts: side=buy, item=apple, quantity=1, total price=4
+question: Does accepting this offer fit your intent in your current situation?
+answer: true
+attempted choice: accept offer
+authoritative result: accepted
+resulting balances:
+cash: 6
+inventory: apple: 3, gem: 0
+trader: greedy
+intent: Build wealth by taking favorable deals.
+offer: Sell one apple for seven cash.
+offer facts: side=sell, item=apple, quantity=1, total price=7
+question: Does accepting this offer fit your intent in your current situation?
+answer: true
+attempted choice: accept offer
+authoritative result: accepted
+resulting balances:
+cash: 13
+inventory: apple: 2, gem: 0
+trader: greedy
+intent: Build wealth by taking favorable deals.
+offer: Sell one gem for five cash.
+offer facts: side=sell, item=gem, quantity=1, total price=5
+question: Does accepting this offer fit your intent in your current situation?
+answer: false
+attempted choice: do nothing
+authoritative result: no transaction proposed
+resulting balances:
+cash: 13
+inventory: apple: 2, gem: 0
+trader: cautious
+intent: Preserve resources and avoid uncertain deals.
+offer: Buy one apple for four cash.
+offer facts: side=buy, item=apple, quantity=1, total price=4
+question: Does accepting this offer fit your intent in your current situation?
+answer: true
+attempted choice: accept offer
+authoritative result: accepted
+resulting balances:
+cash: 6
+inventory: apple: 3, gem: 0
+trader: cautious
+intent: Preserve resources and avoid uncertain deals.
+offer: Sell one apple for seven cash.
+offer facts: side=sell, item=apple, quantity=1, total price=7
+question: Does accepting this offer fit your intent in your current situation?
+answer: true
+attempted choice: accept offer
+authoritative result: accepted
+resulting balances:
+cash: 13
+inventory: apple: 2, gem: 0
+trader: cautious
+intent: Preserve resources and avoid uncertain deals.
+offer: Sell one gem for five cash.
+offer facts: side=sell, item=gem, quantity=1, total price=5
+question: Does accepting this offer fit your intent in your current situation?
+answer: false
+attempted choice: do nothing
+authoritative result: no transaction proposed
+resulting balances:
+cash: 13
+inventory: apple: 2, gem: 0
+```
+
+- `.venv/bin/pytest tests/test_trader_offers.py`: 13 passed.
+- `make check`: formatting, lint, type checking, and all tests passed (37
+  passed).
+- `git diff --check`: passed.
+
+- **Interpretation and limits:** The run exposes the complete decision and
+  authority boundary for both traders, and state persists independently through
+  the ordered offers. It does not show that their intents caused different
+  answers or establish prompt effectiveness beyond this smoke execution.
+- **Decision or unresolved question created:** The bounded
+  intent-to-binary-proposal boundary is sufficient for this completed outcome.
+  The result does not promote the experiment's trading types or transaction
+  contract into reusable system boundaries.
+- **Canonical follow-up:** Current mechanism recorded in Architecture; roadmap
+  outcome marked Completed.

@@ -1,8 +1,8 @@
 # TASK-001: Inspect intent-shaped trader decisions over ordered offers
 
-**Status:** Ready
+**Status:** Done
 
-**Owner:** Unassigned
+**Owner:** implement_task_001
 
 **Delivery role:** [Implementer](../agent_roles/implementer.md)
 
@@ -25,8 +25,8 @@ and its evidence handoff.
 mechanism -> `docs/architecture.md` only during Technical Lead completion
 reconciliation. No requirement change is authorized by this bounded proof.
 
-**Simplifier review:** Required because the work adds an executable module,
-scenario contract, and domain state types.
+**Simplifier review:** Completed; two test-coverage findings were resolved and
+the final re-review reported no findings.
 
 ## Outcome
 
@@ -191,10 +191,22 @@ unrelated planning history.
 
 ## Handoff
 
-**Status and outcome:** Pending
+**Status and outcome:** Done — implemented and accepted the isolated YAML-defined trader
+offer experiment with strict LLM-response validation and deterministic
+transaction authority.
 
-**Changed files and ownership impact:** Pending
+**Changed files and ownership impact:** `src/npc/experiments/trader_offers.py`,
+the two experiment-local actor profiles, scenario fixture, and focused tests
+implement the disposable proof. The evidence record owns the observed result.
 
-**Verification:** Pending
+**Verification:** Test-first red: focused test collection failed because the
+new module was absent. Green: `.venv/bin/pytest tests/test_trader_offers.py`
+passed (13 passed); `make check` passed (37 passed); `git diff --check`
+passed. The required real-LLM smoke command completed; its full trace is in
+the evidence record.
 
-**Assumptions, risks, and next action:** Pending
+**Assumptions, risks, and next action:** The smoke result does not establish
+that intent caused different answers. Request and validation failures exit
+before the current trader-offer pair can propose or resolve. Simplifier review
+completed with both initial findings resolved; Technical Lead reconciliation
+and final integration checks passed.

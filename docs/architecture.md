@@ -1,7 +1,8 @@
 # Architecture
 
-This document owns the current verified system design. It describes the first
-reboot proof as implemented, not a target reusable simulation platform.
+This document owns the current verified system design. It describes the
+bounded executable experiments as implemented, not a target reusable
+simulation platform.
 
 For project-specific vocabulary, see the [Glossary](glossary.md). Observable
 behaviour is owned by [Requirements](requirements.md).
@@ -136,3 +137,40 @@ event-log/narration platform. The entity-list visibility declaration, prompt
 wording, strict binary JSON mapping, `perception_answer` predicate, and turn
 formatter are bounded proof scaffolding, not a general sensing or perception
 platform.
+
+## Intent-shaped trader-offer experiment
+
+`src/npc/experiments/trader_offers.py` is an isolated executable experiment
+entered with `python -m npc.experiments.trader_offers <scenario.yaml>`. It uses
+the existing non-streaming completion adapter but does not call or extend
+`npc.simulation`.
+
+The supplied scenario YAML contains two actor-profile paths, one starting cash
+and inventory mapping copied independently for each trader, and one ordered
+offer list. Each actor-profile YAML supplies a trader identifier,
+plain-language intent, and actor-owned binary question. An offer supplies a
+description plus its authoritative side, item, quantity, and total transaction
+price. The loader resolves relative profile paths from the scenario directory
+and directly indexes these experiment-local fields without schema validation.
+
+For each trader, `run` copies the starting `Balances` and visits every offer in
+scenario order. `evaluate_offer` constructs one request from only that trader's
+identifier, intent, current balances, current offer, and question. It accepts
+only a JSON object with exactly the question as its key and a boolean value. A
+request or validation error reaches `main`, which prints a diagnostic and exits
+non-zero before that trader-offer pair proposes or resolves a transaction.
+
+A validated `false` records `do nothing` and leaves balances unchanged. A
+validated `true` proposes the current offer to `resolve`, the sole mutation
+authority. An accepted buy subtracts the offer's total price and adds its item
+quantity; an accepted sell removes the quantity and adds the total price.
+Insufficient cash or inventory rejects the proposal without mutation. After
+each decision, `_print_record` exposes the intent, offer, question and answer,
+attempted choice, authoritative result, and resulting balances. The trace is
+presentation only and is not retained as later input; only the mutated balances
+feed the next request.
+
+`Balances`, the trader profile and offer shapes, response contract, transaction
+rules, and formatter are disposable experiment scaffolding. This path has no
+market, matching, negotiation, shared state between traders, persistence,
+generative narration, public schema, or reusable transaction abstraction.

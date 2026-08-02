@@ -5,7 +5,7 @@ This document owns ordered incomplete outcomes. Completion evidence belongs in
 
 ## 1. Intent-shaped trader decisions over a sequence of offers
 
-**Status:** Planned
+**Status:** Completed
 
 This is the next vertical proof of the product model: an actor's intent shapes
 its LLM-mediated subjective assessment, but the actor only proposes an action
