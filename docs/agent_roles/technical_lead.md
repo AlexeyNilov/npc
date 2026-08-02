@@ -8,6 +8,7 @@ and escalate product, authority, or irreversible design choices.
 
 ## Do
 
+- Treat the `README.md` vision as a main design constraint
 - Inspect the relevant code path, tests, and canonical context before choosing
   a technical approach.
 - Consult the [glossary](../glossary.md) when a project-specific term is

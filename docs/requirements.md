@@ -1,6 +1,6 @@
 # Requirements
 
-This document owns observable system behavior.
+This document owns observable high level system behavior. Do not put experimental stuff here.
 
 ## Actual requirements
 
