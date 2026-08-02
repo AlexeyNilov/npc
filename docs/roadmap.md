@@ -5,15 +5,21 @@ This document owns ordered incomplete outcomes. Completion evidence belongs in
 
 ## 1. Remove disposable proof code
 
-**Status:** Planned
+**Status:** Completed
 
 The repository keeps the completed beast proof and its behavioural coverage,
-but removes code and fixtures with no role in that proof or the next product
-outcome.
+but removes obsolete fox scenario fixtures with no role in that proof or the
+next product outcome. The standalone chat utility is retained because the user
+expects it to support near-term work.
 
 **Observable result:** the beast proof still demonstrates authoritative
-resolution, bounded LLM perception, and post-resolution narration; obsolete
-fox fixtures and the standalone generic LLM chat utility are gone.
+resolution, bounded LLM perception, and post-resolution narration; the three
+obsolete fox fixtures are gone, while `sample/chat.py` remains available for
+near-term work.
+
+**Boundary:** retaining `sample/chat.py` is a scoped product direction for
+this cleanup, not evidence that it is a supported product capability or a
+reusable foundation.
 
 **Unlocks:** choosing the next product capability without carrying unrelated
 experiments forward.
