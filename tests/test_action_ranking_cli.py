@@ -89,6 +89,7 @@ def test_ranking(
     assert json.loads(requests[0].content)["state"] == {
         "intent": REQUEST["intent"],
         "situation": REQUEST["state"],
+        "available_actions": json.dumps(REQUEST["actions"]),
     }
     assert requests[0].extensions["timeout"] == dict.fromkeys(
         ["connect", "read", "write", "pool"],

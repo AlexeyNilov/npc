@@ -48,7 +48,7 @@ def test_recording() -> None:
     )
     assert len(evaluator.calls) == 4
     assert all(
-        set(state) <= {"intent", "situation", "available_tools"}
+        set(state) <= {"intent", "situation", "available_tools", "available_actions"}
         for state in evaluator.calls
     )
     assert report["cutoffs"] == {"usefulness": 0.6, "readiness": 0.7}
@@ -66,7 +66,7 @@ def test_recording() -> None:
     assert first["elapsed_seconds"] >= 0
     assert first["input_tokens"] == 12
     assert first["prompt_version"] == "tool-assessment-v1"
-    assert results[1]["prompt_version"] == "action-relevance-v2"
+    assert results[1]["prompt_version"] == "action-relevance-v3"
     assert results[1]["scores"] == [
         {"action": name, "probability": 0.8} for name in cases[0].tools
     ]

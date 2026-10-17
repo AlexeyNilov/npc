@@ -6,9 +6,11 @@ ranked by how relevant it is as the next action toward the intent.
 ## Flow
 
 1. Validate the inputs.
-2. Ask System One one `noul` question per action in a single request:
-   “Is this action a relevant next action toward the intent in this situation?”
-   Include actions that gather needed information or establish a prerequisite.
+2. Supply the intent, situation, and complete action catalog as shared context.
+   Ask System One one `noul` question per action in a single request: is it a
+   useful next step, either advancing the intent directly or supplying something
+   another useful action needs? Account for costs and completed work, including
+   information gathering and prerequisites.
 3. Validate every returned probability and associate it with its original action.
 4. Return all actions sorted by descending probability.
 
@@ -57,6 +59,11 @@ the next action makes the current state matter, including completed work and
 unmet prerequisites. Explicitly including information gathering avoids favoring
 premature fixes over useful diagnosis.
 
+Supplying the full catalog lets each question consider how one action could
+support another available action. Prompt version `action-relevance-v3` adds this
+context and explicit usefulness wording without changing the ranking contract.
+This is a candidate improvement; its benefit over v2 still needs evaluation.
+
 Return the full ranking without a default cutoff because relevance probabilities
 are not guaranteed to be calibrated. First place alone is insufficient grounds
 for execution. A partial ranking is also misleading: an unscored action might
@@ -89,8 +96,8 @@ reassessing its result.
 compared the existing prompt with five revisions covering outcomes, research,
 costs, and examples. None improved aggregate development ordering accuracy;
 the example-based revision regressed on held-out cases. Some runs also preferred
-research costing more than its possible benefit. The original ranking prompt
-remains unchanged.
+research costing more than its possible benefit. That study retained v2; the
+current v3 change described above has not yet been evaluated against it.
 
 **A separate readiness judgment has not demonstrated additional value.** The
 [initial tool-assessment study](experiments/tool-assessment-2026-10-17/README.md)

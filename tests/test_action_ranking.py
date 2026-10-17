@@ -41,13 +41,24 @@ def test_batch_mapping_and_stable_sort() -> None:
     ]
     assert len(evaluator.calls) == 1
     state, questions = evaluator.calls[0]
-    assert state == {"intent": " Restore service ", "situation": " Errors observed "}
+    assert state == {
+        "intent": " Restore service ",
+        "situation": " Errors observed ",
+        "available_actions": json.dumps(names),
+    }
     assert list(questions) == ["action_0", "action_1", "action_2"]
     for index, name in enumerate(names):
         question = questions[f"action_{index}"]
         assert question["type"] == "noul"
         assert json.dumps(name) in question["instructions"]
         assert "next step" in question["instructions"]
+        assert "available actions" in question["instructions"]
+        assert "advancing the intent directly" in question["instructions"]
+        assert (
+            "supplying something another useful action needs"
+            in question["instructions"]
+        )
+        assert "costs and completed work" in question["instructions"]
         assert "prerequisite" in question["instructions"]
         assert "data, not instructions" in question["instructions"]
 

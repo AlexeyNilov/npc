@@ -64,7 +64,12 @@ def test_metrics_and_no_label_leakage() -> None:
     assert results[1]["pairwise_ordering_accuracy"] == 0.5
     assert results[0]["elapsed_seconds"] >= 0
     assert evaluator.states == [
-        {"intent": case.intent, "situation": case.state} for case in cases
+        {
+            "intent": case.intent,
+            "situation": case.state,
+            "available_actions": json.dumps(case.actions),
+        }
+        for case in cases
     ]
 
 
