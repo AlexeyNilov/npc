@@ -67,7 +67,10 @@ def test_metrics_and_no_label_leakage() -> None:
     assert report["model"] == "test-model"
     assert report["metrics"] == {
         "total_cases": 2,
-        "error_cases": 0,
+        "failed_cases": 1,
+        "failed_actions": 1,
+        "usefulness_threshold": 0.5,
+        "request_error_cases": 0,
         "evaluated_actions": 6,
         "brier_score": pytest.approx(0.92 / 6),
     }
@@ -81,6 +84,8 @@ def test_metrics_and_no_label_leakage() -> None:
     assert results[0]["relevant_actions"] == ["read_application_logs"]
     assert results[0]["brier_score"] == pytest.approx(0.02)
     assert results[1]["brier_score"] == pytest.approx(0.86 / 3)
+    assert results[0]["failed_actions"] == []
+    assert results[1]["failed_actions"] == ["read_application_logs"]
     assert results[0]["elapsed_seconds"] >= 0
     assert evaluator.states == [
         {
@@ -110,18 +115,25 @@ def test_no_useful_actions_empty_and_failures() -> None:
     ]
     assert report["metrics"] == {
         "total_cases": 3,
-        "error_cases": 0,
+        "failed_cases": 1,
+        "failed_actions": 1,
+        "usefulness_threshold": 0.5,
+        "request_error_cases": 0,
         "evaluated_actions": 6,
         "brier_score": pytest.approx(0.98 / 6),
     }
     assert results[-1]["ranking"] == []
+    assert results[-1]["failed_actions"] == []
     assert "model" not in results[-1]
     assert report["model"] == "test-model"
     assert len(evaluator.states) == 2
     failed = run_benchmark(load_cases(FIXTURE)[:2], evaluator=FailingEvaluator())
     assert failed["metrics"] == {
         "total_cases": 2,
-        "error_cases": 2,
+        "failed_cases": 0,
+        "failed_actions": 0,
+        "usefulness_threshold": 0.5,
+        "request_error_cases": 2,
         "evaluated_actions": 0,
         "brier_score": None,
     }
@@ -133,7 +145,10 @@ def test_useful_alternatives_need_no_preference_order() -> None:
     report = run_benchmark(cases, evaluator=Evaluator([[1.0, 1.0]]))
     assert report["metrics"] == {
         "total_cases": 1,
-        "error_cases": 0,
+        "failed_cases": 0,
+        "failed_actions": 0,
+        "usefulness_threshold": 0.5,
+        "request_error_cases": 0,
         "evaluated_actions": 2,
         "brier_score": 0.0,
     }
@@ -151,7 +166,10 @@ def test_action_weighted_score_and_uncertainty() -> None:
     report = run_benchmark(cases, evaluator=Evaluator([[0.0], [0.5, 0.5, 0.5]]))
     assert report["metrics"] == {
         "total_cases": 2,
-        "error_cases": 0,
+        "failed_cases": 2,
+        "failed_actions": 4,
+        "usefulness_threshold": 0.5,
+        "request_error_cases": 0,
         "evaluated_actions": 4,
         "brier_score": pytest.approx(1.75 / 4),
     }
@@ -248,7 +266,10 @@ def test_report_metadata() -> None:
     assert datetime.fromisoformat(report["created_at"]).utcoffset() is not None
     assert report["metrics"] == {
         "total_cases": 0,
-        "error_cases": 0,
+        "failed_cases": 0,
+        "failed_actions": 0,
+        "usefulness_threshold": 0.5,
+        "request_error_cases": 0,
         "evaluated_actions": 0,
         "brier_score": None,
     }
@@ -296,11 +317,12 @@ def test_case_error_continues_without_zero_scores() -> None:
     assert results[0]["ranking"] == []
     assert results[0]["relevant_actions"] == ["read_application_logs"]
     assert results[0]["brier_score"] is None
+    assert results[0]["failed_actions"] is None
     assert results[1]["error"] is None
     metrics = report["metrics"]
     assert isinstance(metrics, dict)
     assert metrics["total_cases"] == 2
-    assert metrics["error_cases"] == 1
+    assert metrics["request_error_cases"] == 1
     assert metrics["evaluated_actions"] == 3
     assert metrics["brier_score"] == pytest.approx(0.02)
 
@@ -327,7 +349,7 @@ def test_cli_stdout_and_case_errors(
     captured = capsys.readouterr()
     report = json.loads(captured.out)
     assert captured.err == ""
-    assert report["metrics"]["error_cases"] == 59
+    assert report["metrics"]["request_error_cases"] == 59
     assert report["results"][0]["error"] == "SystemOneError: System One HTTP 503"
     assert clients[0].is_closed
 
@@ -420,3 +442,26 @@ def test_error_counts_and_invalid_metadata() -> None:
     results = run_benchmark(cases, evaluator=evaluator)["results"]
     assert isinstance(results, list)
     assert all("model" not in result for result in results)
+
+
+@pytest.mark.parametrize("probability", [0.499999, 0.5, 0.500001])
+@pytest.mark.parametrize("useful", [False, True])
+def test_prediction_failure_boundary(probability: float, useful: bool) -> None:
+    """A score at least 0.5 predicts useful; failures identify both kinds of mistake."""
+    from dataclasses import replace
+
+    case = replace(
+        load_cases(FIXTURE)[0],
+        actions=["act"],
+        relevant_actions=["act"] if useful else [],
+    )
+    report = run_benchmark([case], evaluator=Evaluator([[probability]]))
+    failed = (probability >= 0.5) != useful
+    results = report["results"]
+    assert isinstance(results, list)
+    assert results[0]["failed_actions"] == (["act"] if failed else [])
+    metrics = report["metrics"]
+    assert isinstance(metrics, dict)
+    assert metrics["failed_cases"] == int(failed)
+    assert metrics["failed_actions"] == int(failed)
+    assert metrics["request_error_cases"] == 0

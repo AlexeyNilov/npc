@@ -71,15 +71,23 @@ one question per action. It reports the ranking, labels, timing, model metadata,
 and a Brier score: the mean of `(probability - label) ** 2`, where useful is 1 and
 not useful is 0. A score of 0 is perfect; 1 is maximally wrong. The overall score
 weights every evaluated action equally. Empty catalogs and failed requests have
-no score; failures are counted separately.
+no score; request errors are counted separately.
 
 The report's `elapsed_seconds` measures total evaluation and scoring time,
 including failed requests. Each result also has its own `elapsed_seconds`.
 Total time excludes loading the fixture and writing the report.
 
-There are no ordering tiers or usefulness cutoffs. Multiple actions can be useful,
-even when their costs or expected benefits differ. Cases where every action is
-useless measure whether scores stay near zero, including singleton catalogs.
+The benchmark treats scores of at least 0.5 as predicting useful. `failed_actions`
+counts predictions that disagree with their labels; `failed_cases` counts cases
+with at least one such mistake. Each result lists the failed action names.
+Request errors appear in `request_error_cases` and each result's `error` field;
+their `failed_actions` is null because no predictions were evaluated. Successful
+empty catalogs have an empty failure list and contribute no prediction failures.
+The threshold is a benchmark convention and does not change `npc-rank-actions`.
+
+There are no ordering tiers. Multiple actions can be useful, even when their
+costs or expected benefits differ. Cases where every action is useless measure
+whether scores stay near zero, including singleton catalogs.
 
 The scenarios probe prerequisites, uncertain retries, stale evidence, deadlines,
 budgets, disclosure constraints, misleading names, and embedded instructions.

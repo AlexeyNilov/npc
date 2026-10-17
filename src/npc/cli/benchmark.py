@@ -1,4 +1,4 @@
-"""Measure action usefulness probabilities against binary labels with Brier scores."""
+"""Report action usefulness prediction failures and Brier scores."""
 
 import argparse
 import json
@@ -21,8 +21,9 @@ def _parser() -> argparse.ArgumentParser:
             "npc-benchmark --input tests/fixtures/action_ranking/cases.json "
             "--output /tmp/action-ranking-report.json. "
             "Exit codes: 0 completed, 1 configuration/I/O error, "
-            "2 report saved with case errors. Brier scores measure probability error "
-            "and do not change the exit code."
+            "2 report saved with request errors. Scores >= 0.5 predict useful; "
+            "failed_cases counts cases with any mislabeled prediction. "
+            "Prediction failures and Brier scores do not change the exit code."
         ),
     )
     parser.add_argument(
@@ -74,7 +75,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 1
     metrics = report["metrics"]
     assert isinstance(metrics, dict)
-    return 2 if metrics["error_cases"] else 0
+    return 2 if metrics["request_error_cases"] else 0
 
 
 if __name__ == "__main__":

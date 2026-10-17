@@ -15,6 +15,8 @@ from npc.action_ranking import (
 )
 from npc.system_one import SystemOneError
 
+USEFULNESS_THRESHOLD = 0.5
+
 
 @dataclass(frozen=True)
 class BenchmarkCase:
@@ -37,6 +39,7 @@ class CaseResult:
     elapsed_seconds: float
     error: str | None
     brier_score: float | None = None
+    failed_actions: list[str] | None = None
 
 
 def _text(value: object) -> str:
@@ -101,6 +104,12 @@ def _evaluate(case: BenchmarkCase, evaluator: SystemOneEvaluator) -> CaseResult:
         perf_counter() - started,
         None,
     )
+    result.failed_actions = [
+        item.action
+        for item in ranking
+        if (item.probability >= USEFULNESS_THRESHOLD)
+        != (item.action in case.relevant_actions)
+    ]
     if ranking:
         result.brier_score = sum(
             (item.probability - int(item.action in case.relevant_actions)) ** 2
@@ -119,6 +128,8 @@ def run_benchmark(
     Useful actions have target 1; all other actions have target 0. Lower scores
     are better. Each evaluated action has equal weight in the overall mean.
     Labels stay local. Empty catalogs and failed requests contribute no scores.
+    Scores at least 0.5 predict useful. A case fails if any prediction differs
+    from its label. Request errors remain separate from prediction failures.
     """
     started = perf_counter()
     results = []
@@ -143,7 +154,12 @@ def run_benchmark(
         "elapsed_seconds": perf_counter() - started,
         "metrics": {
             "total_cases": len(results),
-            "error_cases": sum(result.error is not None for result in results),
+            "failed_cases": sum(bool(result.failed_actions) for result in results),
+            "failed_actions": sum(
+                len(result.failed_actions or []) for result in results
+            ),
+            "usefulness_threshold": USEFULNESS_THRESHOLD,
+            "request_error_cases": sum(result.error is not None for result in results),
             "evaluated_actions": evaluated_actions,
             "brier_score": squared_error / evaluated_actions
             if evaluated_actions
