@@ -93,9 +93,10 @@ the intent. The model judges this; the client validates numbers and ordering.
 - `src/npc/action_ranking.py`: `RankedAction`, a narrow typed evaluator protocol,
   input validation, question construction, response validation, and stable sort.
 - `src/npc/system_one.py`: synchronous HTTP adapter implementing that protocol,
-  using standard-library `urllib.request` and JSON. Configure endpoint and a
-  finite timeout explicitly. Close responses and translate transport, HTTP, and
-  decoding failures into an actionable `SystemOneError`.
+  using `httpx2`. Receive the endpoint and a finite timeout explicitly. Reuse a
+  client across benchmark cases and close it at the owning caller's boundary.
+  Translate transport, HTTP, and decoding failures into an actionable
+  `SystemOneError`.
 - `tests/test_action_ranking.py`: public behavior tests with an injected evaluator.
 - `tests/test_system_one.py`: adapter request and failure contracts against a
   local HTTP fixture, with no model dependency.
@@ -105,9 +106,12 @@ Keep transport concerns out of the ranker. Invalid caller input raises
 raise an `InvalidEvaluationError` owned by the ranking module. Tests exercise
 these distinctions through the public interfaces.
 
-Start with a Python API and no runtime dependencies. Add CLI or MCP exposure when
-a caller needs it. Keep installation and endpoint configuration documentation in
-`doc/install.md` when the adapter is implemented.
+Add `httpx2` as a runtime dependency; its addition is approved. Start with a Python
+API and a small benchmark CLI. At CLI startup, load and validate the endpoint from
+the environment as documented in [installation](install.md#system-one-planned).
+Pass configuration into the adapter, keeping environment access out of the
+ranking logic. Keep the benchmark CLI's arguments and usage in its `--help`.
+Add MCP exposure when a caller needs it.
 
 ## Selection policy and limits
 
@@ -134,13 +138,17 @@ failure instead of silently truncating actions or context.
    malformed responses and dependency failures remain distinguishable.
 2. Implement the ranker with a fake evaluator, then the HTTP adapter with local
    request/response tests. Verify timeouts, HTTP failures, malformed JSON, and
-   response cleanup. Follow the repository's TDD and mutation review workflow.
+   client cleanup. Verify missing, blank, or invalid endpoint configuration fails
+   before network access. Follow the repository's TDD and mutation review workflow.
 3. Run `make check`, scoped mutation tests, and `git diff --check`.
 4. Evaluate with a real decision model using labeled cases: direct progress,
    useful information gathering, prerequisites, completed steps, irrelevant
    actions, no useful action, ambiguous names, and state text containing
    instructions. Include paired cases where changing only the state should
    change the preferred action.
+   Implement a benchmark CLI that loads fixture inputs, calls the ranker, and
+   saves scores, rankings, model/prompt identifiers, elapsed time, and errors.
+   Report the comparison metrics defined by the benchmark documentation.
 
 Initial scenarios and comparison rules live in the
 [action ranking benchmark](../tests/fixtures/action_ranking/README.md).
