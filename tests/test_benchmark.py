@@ -36,8 +36,8 @@ class Evaluator:
 def test_fixture_labels_are_complete() -> None:
     """Every shipped scenario loads with valid usefulness annotations."""
     cases = load_cases(FIXTURE)
-    assert len(cases) == 39
-    assert len({case.id for case in cases}) == 39
+    assert len(cases) == 40
+    assert len({case.id for case in cases}) == 40
     assert cases[-1].actions == []
 
 
@@ -307,7 +307,7 @@ def test_cli_stdout_and_case_errors(
     captured = capsys.readouterr()
     report = json.loads(captured.out)
     assert captured.err == ""
-    assert report["metrics"]["error_cases"] == 38
+    assert report["metrics"]["error_cases"] == 39
     assert report["results"][0]["error"] == "SystemOneError: System One HTTP 503"
     assert clients[0].is_closed
 

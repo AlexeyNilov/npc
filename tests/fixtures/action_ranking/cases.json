@@ -488,6 +488,22 @@
     "relevant_actions": []
   },
   {
+    "id": "trader_guaranteed_future_grain_price",
+    "intent": "Maximize gold by the end of tomorrow",
+    "state": "You are an NPC trader with 100 gold and 1 sack of grain. Today you can buy 1 additional sack for 10 gold or sell your existing sack for 10 gold. You may execute at most one trade today. Tomorrow a buyer guarantees to buy every sack you hold for 20 gold each. There are no other costs, payments, or trades. You may perform research and calculations before trading; they take no time or gold and do not consume your trade opportunity.",
+    "actions": [
+      "buy",
+      "sell",
+      "calculate final gold tomorrow after buying versus selling today",
+      "compare today's grain price with tomorrow's guaranteed price"
+    ],
+    "relevant_actions": [
+      "buy",
+      "calculate final gold tomorrow after buying versus selling today",
+      "compare today's grain price with tomorrow's guaranteed price"
+    ]
+  },
+  {
     "id": "empty_catalog",
     "intent": "Check whether the nightly backup succeeded.",
     "state": "The scheduled backup window has ended and its outcome is unknown. No actions are available to this caller.",
