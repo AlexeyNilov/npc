@@ -5,7 +5,7 @@ from urllib.parse import urlsplit
 
 import httpx2
 
-from npc.action_ranking import Question
+from npc._evaluation import Question
 
 
 class SystemOneError(RuntimeError):
