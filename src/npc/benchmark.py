@@ -34,7 +34,6 @@ class CaseResult:
     id: str
     ranking: list[RankedAction]
     relevant_actions: list[str]
-    model: str | None
     elapsed_seconds: float
     error: str | None
     brier_score: float | None = None
@@ -92,16 +91,13 @@ def _evaluate(case: BenchmarkCase, evaluator: SystemOneEvaluator) -> CaseResult:
             case.id,
             [],
             case.relevant_actions,
-            None,
             perf_counter() - started,
             f"{type(error).__name__}: {error}",
         )
-    model = getattr(evaluator, "model", None) if case.actions else None
     result = CaseResult(
         case.id,
         ranking,
         case.relevant_actions,
-        model if isinstance(model, str) else None,
         perf_counter() - started,
         None,
     )
@@ -125,7 +121,15 @@ def run_benchmark(
     Labels stay local. Empty catalogs and failed requests contribute no scores.
     """
     started = perf_counter()
-    results = [_evaluate(case, evaluator) for case in cases]
+    results = []
+    model = None
+    for case in cases:
+        result = _evaluate(case, evaluator)
+        results.append(result)
+        if model is None and result.ranking:
+            name = getattr(evaluator, "model", None)
+            if isinstance(name, str):
+                model = name
     evaluated_actions = sum(len(result.ranking) for result in results)
     squared_error = sum(
         result.brier_score * len(result.ranking)
@@ -135,6 +139,7 @@ def run_benchmark(
     return {
         "created_at": datetime.now(UTC).isoformat(),
         "prompt_version": PROMPT_VERSION,
+        "model": model,
         "elapsed_seconds": perf_counter() - started,
         "metrics": {
             "total_cases": len(results),

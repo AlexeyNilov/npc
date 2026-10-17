@@ -41,11 +41,30 @@ def test_fixture_labels_are_complete() -> None:
     assert cases[-1].actions == []
 
 
+@pytest.mark.parametrize("name", ["laya", None, 123])
+def test_report_model(name: object) -> None:
+    """The served model appears once at run level when its name is available."""
+    evaluator = Evaluator([[0.1, 0.2, 0.9], [0.2, 0.9, 0.9]])
+    object.__setattr__(evaluator, "model", name)
+    report = run_benchmark(load_cases(FIXTURE)[:2], evaluator=evaluator)
+    assert report["model"] == (name if isinstance(name, str) else None)
+    assert "models" not in report
+    results = report["results"]
+    assert isinstance(results, list)
+    assert all("model" not in result for result in results)
+    assert run_benchmark([], evaluator=Evaluator([]))["model"] is None
+    assert (
+        run_benchmark(load_cases(FIXTURE)[-1:], evaluator=Evaluator([]))["model"]
+        is None
+    )
+
+
 def test_metrics_and_no_label_leakage() -> None:
     """Every probability is scored against usefulness; labels stay local."""
     cases = load_cases(FIXTURE)[:2]
     evaluator = Evaluator([[0.1, 0.2, 0.9], [0.2, 0.9, 0.9]])
     report = run_benchmark(cases, evaluator=evaluator)
+    assert report["model"] == "test-model"
     assert report["metrics"] == {
         "total_cases": 2,
         "error_cases": 0,
@@ -54,7 +73,7 @@ def test_metrics_and_no_label_leakage() -> None:
     }
     results = report["results"]
     assert isinstance(results, list)
-    assert results[0]["model"] == "test-model"
+    assert "model" not in results[0]
     assert results[0]["ranking"][0] == {
         "action": "read_application_logs",
         "probability": 0.9,
@@ -96,7 +115,8 @@ def test_no_useful_actions_empty_and_failures() -> None:
         "brier_score": pytest.approx(0.98 / 6),
     }
     assert results[-1]["ranking"] == []
-    assert results[-1]["model"] is None
+    assert "model" not in results[-1]
+    assert report["model"] == "test-model"
     assert len(evaluator.states) == 2
     failed = run_benchmark(load_cases(FIXTURE)[:2], evaluator=FailingEvaluator())
     assert failed["metrics"] == {
@@ -357,9 +377,10 @@ def test_elapsed_time_ids_and_optional_model(monkeypatch: pytest.MonkeyPatch) ->
     assert failure["elapsed_seconds"] == 14.0
     results = success["results"]
     assert isinstance(results, list)
-    assert [
-        (result["id"], result["elapsed_seconds"], result["model"]) for result in results
-    ] == [(cases[0].id, 0.25, None), (cases[1].id, 0.5, None)]
+    assert [(result["id"], result["elapsed_seconds"]) for result in results] == [
+        (cases[0].id, 0.25),
+        (cases[1].id, 0.5),
+    ]
     failed = failure["results"]
     assert isinstance(failed, list)
     assert [(result["id"], result["elapsed_seconds"]) for result in failed] == [
@@ -398,4 +419,4 @@ def test_error_counts_and_invalid_metadata() -> None:
     object.__setattr__(evaluator, "model", 123)
     results = run_benchmark(cases, evaluator=evaluator)["results"]
     assert isinstance(results, list)
-    assert all(result["model"] is None for result in results)
+    assert all("model" not in result for result in results)
