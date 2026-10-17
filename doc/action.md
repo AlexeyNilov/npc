@@ -142,6 +142,9 @@ failure instead of silently truncating actions or context.
    instructions. Include paired cases where changing only the state should
    change the preferred action.
 
+Initial scenarios and comparison rules live in the
+[action ranking benchmark](../tests/fixtures/action_ranking/README.md).
+
 Deterministic tests establish the API contract; model evaluation establishes
 whether the ranking is useful. Review top-ranked relevance and pairwise ordering
 against human labels before choosing any execution threshold. Fix the model and
