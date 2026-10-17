@@ -67,5 +67,22 @@ rankings with labeled expectations, especially when changing only the state
 should change the preferred action. Establish a selection threshold using
 representative evaluation data before relying on scores for execution.
 
+## Limitations
+
+Relevance scoring does not reliably optimize numerical outcomes. The ranking
+pipeline performs no explicit calculation of costs, profit, or expected value;
+it asks the model for a contextual judgment. A score does not establish that the
+model calculated or compared the outcomes correctly.
+
+In a grain-trader experiment, buying yielded 235 expected gold and selling
+yielded 205. Buying tied selling at the lower future price and beat it at the
+higher price, yet the model ranked selling above buying (about 0.82 versus 0.53).
+This illustrates how a plausible action can outrank the mathematically better
+choice even when the state supplies all necessary numbers and an explicit goal.
+
+When decisions depend on arithmetic, calculate outcomes in ordinary code and
+select by the stated objective. Use relevance ranking for contextual judgments
+that remain after those calculations.
+
 See the [System One API contract](system-one-api.md) for protocol details and
 [installation](install.md) for configuration.
