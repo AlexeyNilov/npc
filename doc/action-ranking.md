@@ -63,63 +63,15 @@ without executing them.
 
 The [benchmark cases](../tests/fixtures/action_ranking/cases.json) use the same
 `intent`, `state`, and `actions` inputs as `npc-rank-actions`. Each case adds an
-`id` and `relevant_actions`. Listed actions are labeled useful now; all other
-available actions are labeled not useful. Labels never enter model requests.
-
-The benchmark calls `rank_actions` once per case, preserving its single batch of
-one question per action. It reports the ranking, labels, timing, model metadata,
-and a Brier score: the mean of `(probability - label) ** 2`, where useful is 1 and
-not useful is 0. A score of 0 is perfect; 1 is maximally wrong. The overall score
-weights every evaluated action equally. Empty catalogs and failed requests have
-no score; request errors are counted separately.
-
-The report's `elapsed_seconds` measures total evaluation and scoring time,
-including failed requests. Each result also has its own `elapsed_seconds`.
-Total time excludes loading the fixture and writing the report.
-
-The benchmark treats scores of at least 0.5 as predicting useful. `failed_actions`
-counts predictions that disagree with their labels; `failed_cases` counts cases
-with at least one such mistake. Each result lists the failed action names.
-Request errors appear in `request_error_cases` and each result's `error` field;
-their `failed_actions` is null because no predictions were evaluated. Successful
-empty catalogs have an empty failure list and contribute no prediction failures.
-The threshold is a benchmark convention and does not change `npc-rank-actions`.
-
-There are no ordering tiers. Multiple actions can be useful, even when their
-costs or expected benefits differ. Cases where every action is useless measure
-whether scores stay near zero, including singleton catalogs.
-
-The scenarios probe prerequisites, uncertain retries, stale evidence, deadlines,
-budgets, disclosure constraints, misleading names, and embedded instructions.
-The labels are human judgments about the supplied context. Inspect individual
-rankings and repeat runs to assess failures and model variability.
+`id` and `relevant_actions`.
 
 ### Model comparison
 
-User-supplied runs use `tests/fixtures/action_ranking/cases.json` and prompt
-version `action-relevance-v3`. Compare Brier scores and total times only across
-runs with the same evaluated actions. Lower values are better.
-Times describe individual runs, not averages. Hardware and server versions were
-not recorded. Each run has 40 cases. Complete runs evaluate 119 actions.
-
-| Model | Run time (UTC) | Errors | Brier score | Total time (s) |
-| --- | --- | ---: | ---: | ---: |
-| `ggml-org/Laya-GGUF:Q8_0` | 2026-10-17 21:33:09 | 0 | 0.459959 | 2.165 |
-| `ggml-org/Clef-Flash-GGUF:Q4_K_M` | 2026-10-17 21:36:49 | 0 | 0.026349 | 11.024 |
-| `LiquidAI/d1-3B-GGUF:Q8_0` | 2026-10-17 21:37:57 | 0 | 0.049221 | 3.322 |
-| `ggml-org/Kev-4B-GGUF:Q4_K_M` | 2026-10-17 21:38:32 | 0 | 0.028099 | 5.905 |
-| `ggml-org/lev-GGUF:Q4_K_M` | 2026-10-17 21:40:03 | 0 | 0.050921 | 6.362 |
-
-The first Clef-Flash run failed on 36 cases. Its Brier score covers only 5 actions,
-so its score and total time do not establish better accuracy or speed than Laya.
-The server reported an 830-token input exceeding its 512-token physical batch.
-The [Clef-Flash launch script](../scripts/start_clef_flash.sh) now sets both
-`--batch-size` and `--ubatch-size` to 2048. The second Clef-Flash run uses this
-configuration and completes without errors.
-
-Among complete runs, Clef-Flash has the lowest Brier score at 0.026349.
-Kev-4B is close at 0.028099 and takes about 46% less total time.
-d1-3B has a higher Brier score of 0.049221 but finishes in 3.322 seconds.
-Laya is fastest at 2.165 seconds, with the highest Brier score of 0.459959.
-lev has a higher Brier score and takes longer than both Kev-4B and d1-3B in these
-runs.
+| Model | Request errors | Failed cases | Failed actions | Brier score | Total time (s) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| [ggml-org/Clef-Flash-GGUF:Q4_K_M](benchmark-results/2026-10-17/clef_flash.json) | 0 | 13 | 17 | 0.063012 | 18.620 |
+| [ggml-org/vllm-d3-mini-GGUF:Q4_K_M](benchmark-results/2026-10-17/d3_mini.json) | 0 | 12 | 22 | 0.072490 | 15.233 |
+| [ggml-org/Kev-4B-GGUF:Q4_K_M](benchmark-results/2026-10-17/kev.json) | 0 | 14 | 22 | 0.078522 | 9.759 |
+| [ggml-org/lev-GGUF:Q4_K_M](benchmark-results/2026-10-17/lev.json) | 0 | 15 | 24 | 0.102554 | 10.450 |
+| [LiquidAI/d1-3B-GGUF:Q8_0](benchmark-results/2026-10-17/d1.json) | 0 | 19 | 34 | 0.113632 | 5.450 |
+| [ggml-org/Laya-GGUF:Q8_0](benchmark-results/2026-10-17/laya.json) | 0 | 58 | 119 | 0.467099 | 4.678 |
