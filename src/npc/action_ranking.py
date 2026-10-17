@@ -35,14 +35,19 @@ class InvalidEvaluationError(ValueError):
     """The evaluator returned an invalid answer structure or mismatched IDs."""
 
 
-def _validate_inputs(intent: str, state: str, actions: Sequence[str]) -> None:
+def validate_ranking_inputs(
+    intent: str, state: str, actions: Sequence[str]
+) -> list[str]:
+    """Validate context and return trimmed action names, unique after trimming."""
     if isinstance(actions, str):
         raise ValueError("actions must be a sequence of action names")
     for value in (intent, state, *actions):
         if not isinstance(value, str) or not value.strip():
             raise ValueError("intent, state, and action names must be nonblank strings")
-    if len(set(actions)) != len(actions):
+    names = [action.strip() for action in actions]
+    if len(set(names)) != len(names):
         raise ValueError("action names must be unique")
+    return names
 
 
 def _question(action: str) -> Question:
@@ -89,7 +94,8 @@ def rank_actions(
     Args:
         intent: Nonblank goal to advance.
         state: Nonblank description of the current situation.
-        actions: Unique, nonblank action names; an empty sequence avoids evaluation.
+        actions: Nonblank action names, unique after trimming. Returned names are
+            trimmed; an empty sequence avoids evaluation.
         evaluator: Injected typed-question evaluator that guarantees finite numeric
             probabilities in [0, 1].
 
@@ -100,7 +106,7 @@ def rank_actions(
         ValueError: An input is blank or action names are duplicated.
         InvalidEvaluationError: The answer structure or requested IDs do not match.
     """
-    _validate_inputs(intent, state, actions)
+    actions = validate_ranking_inputs(intent, state, actions)
     if not actions:
         return []
     questions = {f"action_{i}": _question(action) for i, action in enumerate(actions)}

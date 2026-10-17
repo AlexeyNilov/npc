@@ -36,8 +36,8 @@ class Evaluator:
 def test_fixture_labels_are_complete() -> None:
     """Every shipped case has a complete ranking and valid relevance annotations."""
     cases = load_cases(FIXTURE)
-    assert len(cases) == 16
-    assert len({case.id for case in cases}) == 16
+    assert len(cases) == 17
+    assert len({case.id for case in cases}) == 17
     assert sum(case.pair_id is not None for case in cases) == 10
     assert cases[-1].actions == []
 
@@ -75,7 +75,11 @@ def test_metrics_and_no_label_leakage() -> None:
 
 def test_abstention_empty_and_failures() -> None:
     """No-useful-action scores and empty catalogs remain distinct from failed requests."""
-    cases = load_cases(FIXTURE)[-3:]
+    cases = [
+        case
+        for case in load_cases(FIXTURE)
+        if case.id in {"invoice_already_sent", "catalog_cannot_help", "empty_catalog"}
+    ]
     evaluator = Evaluator([[0.8, 0.2, 0.1], [0.2, 0.3, 0.4]])
     report = run_benchmark(cases, evaluator=evaluator)
     results = report["results"]
@@ -303,7 +307,7 @@ def test_cli_stdout_and_case_errors(
     captured = capsys.readouterr()
     report = json.loads(captured.out)
     assert captured.err == ""
-    assert report["metrics"]["error_cases"] == 15
+    assert report["metrics"]["error_cases"] == 16
     assert report["results"][0]["error"] == "SystemOneError: System One HTTP 503"
     assert clients[0].is_closed
 

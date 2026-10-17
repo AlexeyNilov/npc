@@ -7,6 +7,8 @@ import pytest
 
 from npc.action_ranking import InvalidEvaluationError, Question, rank_actions
 
+NONSTRING_VALUES: tuple[object, ...] = (None, 1, [])
+
 
 class Evaluator:
     def __init__(self, response: object) -> None:
@@ -72,6 +74,10 @@ def test_batch_mapping_and_stable_sort() -> None:
         ("goal", "state", ["a", "a"]),
         ("", "state", []),
         ("goal", "state", "action"),
+        *[(value, "state", ["a"]) for value in NONSTRING_VALUES],
+        *[("goal", value, ["a"]) for value in NONSTRING_VALUES],
+        *[("goal", "state", [value]) for value in NONSTRING_VALUES],
+        ("goal", "state", ["a", " a "]),
     ],
 )
 def test_invalid_inputs_avoid_evaluation(
@@ -84,6 +90,29 @@ def test_invalid_inputs_avoid_evaluation(
     with pytest.raises(ValueError):
         rank_actions(intent, state, actions, evaluator=evaluator)
     assert evaluator.calls == []
+
+
+def test_trimmed_tuple_actions_map_answers_by_id() -> None:
+    """Sequence inputs yield trimmed names with scores matched by ID, not position."""
+    evaluator = Evaluator(
+        {
+            "answers": {
+                "action_1": {"type": "noul", "noul": 0.9},
+                "action_0": {"type": "noul", "noul": 0.2},
+            }
+        }
+    )
+    result = rank_actions(
+        "goal", "state", (" inspect_logs \n", " restart_service "), evaluator=evaluator
+    )
+    assert [(item.action, item.probability) for item in result] == [
+        ("restart_service", 0.9),
+        ("inspect_logs", 0.2),
+    ]
+    state, questions = evaluator.calls[0]
+    assert json.loads(state["available_actions"]) == ["inspect_logs", "restart_service"]
+    for key, name in (("action_0", "inspect_logs"), ("action_1", "restart_service")):
+        assert json.dumps(name) in questions[key]["instructions"]
 
 
 def test_empty_catalog() -> None:

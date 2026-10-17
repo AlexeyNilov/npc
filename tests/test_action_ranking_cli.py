@@ -13,18 +13,9 @@ from npc.cli.action_ranking import main
 REQUEST = {
     "intent": " Restore checkout ",
     "state": " Cause unknown ",
-    "actions": ["Read logs", "Roll back", "Write docs"],
+    "actions": [" Read logs ", "Roll back", "Write docs"],
 }
-INVALID_TEXT: tuple[object, ...] = (None, 1, [], "", " ")
-INVALID_ACTIONS: tuple[object, ...] = (
-    None,
-    "Read logs",
-    {},
-    [1],
-    [None],
-    [" "],
-    ["a", "a"],
-)
+INVALID_ARRAYS: tuple[object, ...] = (None, "Read logs", {})
 
 
 @pytest.fixture
@@ -41,7 +32,7 @@ def test_ranking(
     capsys: pytest.CaptureFixture[str],
     stdin: None,
 ) -> None:
-    """Every input source yields raw scores, stable ties, and exact action names."""
+    """Every input source yields raw scores, stable ties, and trimmed action names."""
     requests: list[httpx2.Request] = []
     clients: list[httpx2.Client] = []
 
@@ -89,7 +80,7 @@ def test_ranking(
     assert json.loads(requests[0].content)["state"] == {
         "intent": REQUEST["intent"],
         "situation": REQUEST["state"],
-        "available_actions": json.dumps(REQUEST["actions"]),
+        "available_actions": json.dumps(["Read logs", "Roll back", "Write docs"]),
     }
     assert requests[0].extensions["timeout"] == dict.fromkeys(
         ["connect", "read", "write", "pool"],
@@ -106,12 +97,7 @@ def test_ranking(
         {},
         {**REQUEST, "extra": 1},
         *[{k: v for k, v in REQUEST.items() if k != field} for field in REQUEST],
-        *[
-            {**REQUEST, field: value}
-            for field in ("intent", "state")
-            for value in INVALID_TEXT
-        ],
-        *[{**REQUEST, "actions": value} for value in INVALID_ACTIONS],
+        *[{**REQUEST, "actions": value} for value in INVALID_ARRAYS],
         {**REQUEST, "intent": "", "actions": []},
     ],
 )
@@ -260,7 +246,7 @@ def test_help(capsys: pytest.CaptureFixture[str]) -> None:
         ({}, "intent, state, and actions"),
         ({**REQUEST, "actions": None}, "actions must be an array"),
         ({**REQUEST, "state": " "}, "nonblank strings"),
-        ({**REQUEST, "actions": ["a", "a"]}, "unique"),
+        ({**REQUEST, "actions": ["a", " a "]}, "unique"),
     ],
 )
 def test_actionable_input_error(

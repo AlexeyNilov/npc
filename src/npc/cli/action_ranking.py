@@ -10,7 +10,12 @@ from pathlib import Path
 
 import httpx2
 
-from npc.action_ranking import InvalidEvaluationError, RankedAction, rank_actions
+from npc.action_ranking import (
+    InvalidEvaluationError,
+    RankedAction,
+    rank_actions,
+    validate_ranking_inputs,
+)
 from npc.system_one import SystemOneClient, SystemOneError, validate_endpoint
 
 
@@ -30,6 +35,7 @@ def _parser() -> argparse.ArgumentParser:
         epilog=(
             'Input: one JSON object with required nonblank string fields "intent" '
             'and "state", and "actions": an array of unique nonblank strings. '
+            "Action names are trimmed and must be unique after trimming. "
             "Unknown fields are rejected. Output: a JSON array of action/score objects, "
             "sorted by descending relevance probability, preserving ties and raw scores. "
             "Scores need not sum to one. Requires SYSTEM_ONE containing the complete "
@@ -65,14 +71,7 @@ def _request(text: str) -> tuple[str, str, list[str]]:
     intent, state, actions = payload["intent"], payload["state"], payload["actions"]
     if not isinstance(actions, list):
         raise ValueError("actions must be an array")
-    if any(
-        not isinstance(value, str) or not value.strip()
-        for value in (intent, state, *actions)
-    ):
-        raise ValueError("intent, state, and action names must be nonblank strings")
-    if len(set(actions)) != len(actions):
-        raise ValueError("action names must be unique")
-    return intent, state, actions
+    return intent, state, validate_ranking_inputs(intent, state, actions)
 
 
 def _rank(

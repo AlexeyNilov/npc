@@ -19,7 +19,8 @@ to use when selecting an action.
 
 `rank_actions` follows this sequence:
 
-1. Validate nonblank intent, state, and action names.
+1. Validate nonblank intent, state, and action names. Trim action names and require
+   uniqueness after trimming. Preserve intent and state as supplied.
 2. Create one question per action.
 3. Call `evaluator.evaluate` once with all questions. Shared context contains
    `intent`, `situation`, and the complete JSON-encoded `available_actions` list.

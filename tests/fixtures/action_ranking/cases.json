@@ -359,6 +359,25 @@
     "rationale": "The catalog contains no diagnostic or recovery action; the module should not imply that first place means useful."
   },
   {
+    "id": "report_delivery_cost",
+    "pair_id": null,
+    "intent": "Deliver the approved report to the client by tomorrow.",
+    "state": "The report is approved and ready. The client accepts either a secure download link or a printed copy. Both delivery methods are authorized and available now, meet the deadline, and provide the same required confidentiality and delivery confirmation. Sending a secure link takes one minute and costs nothing. Printing and booking a courier takes an hour and costs 100 euros. The client has no preference and a printed copy provides no additional benefit.",
+    "actions": [
+      "print_and_courier_report",
+      "send_secure_report_link"
+    ],
+    "expected_tiers": [
+      ["send_secure_report_link"],
+      ["print_and_courier_report"]
+    ],
+    "relevant_actions": [
+      "send_secure_report_link",
+      "print_and_courier_report"
+    ],
+    "rationale": "Both methods advance the intent, but the secure link achieves the same result with less time and expense."
+  },
+  {
     "id": "empty_catalog",
     "pair_id": null,
     "intent": "Check whether the nightly backup succeeded.",
