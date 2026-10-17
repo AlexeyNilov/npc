@@ -69,27 +69,93 @@ representative evaluation data before relying on scores for execution.
 
 ## Limitations
 
-Relevance scoring does not reliably optimize numerical outcomes. The ranking
-pipeline performs no explicit calculation of costs, profit, or expected value;
-it asks the model for a contextual judgment. A score does not establish that the
-model calculated or compared the outcomes correctly.
+Ranking estimates whether an action looks useful as the next step. It does not
+establish that the action has the best outcome, can execute successfully, or
+will achieve the intent. The pipeline has no explicit calculation or verification
+stage. Its scores do not show whether the model performed arithmetic internally.
 
-In a grain-trader experiment, buying yielded 235 expected gold and selling
-yielded 205. Buying tied selling at the lower future price and beat it at the
-higher price, yet the model ranked selling above buying (about 0.82 versus 0.53).
-This illustrates how a plausible action can outrank the mathematically better
-choice even when the state supplies all necessary numbers and an explicit goal.
+### What the experiments showed
 
-When decisions depend on arithmetic, calculate outcomes in ordinary code and
-select by the stated objective. Use relevance ranking for contextual judgments
-that remain after those calculations.
+**Recognizing useful preparation and choosing the best final action are separate
+capabilities.** In the latest simple trader test, buying leaves 130 gold and
+selling leaves 110. The usefulness-only assessor recommended calculating final
+gold first (0.761), yet still scored selling (0.601) above buying (0.579).
+Selecting a calculator is promising, but does not demonstrate a correct trade
+decision. That run assessed tool names without executing the calculation or
+reassessing its result.
 
-The [100-evaluation prompt study](experiments/action-ranking-2026-10-17/README.md)
-compares the current prompt with five revisions, including research guidance,
-outcome comparisons, and examples. None improved the tested development ordering;
-the example-based revision regressed on held-out cases. The current prompt is
-retained. Explicit missing prerequisites worked better than numerical tradeoffs
-in this sample; offering calculation actions alone did not resolve the failures.
+**More detailed instructions did not reliably fix numerical decisions.** The
+[100-evaluation prompt study](experiments/action-ranking-2026-10-17/README.md)
+compared the existing prompt with five revisions covering outcomes, research,
+costs, and examples. None improved aggregate development ordering accuracy;
+the example-based revision regressed on held-out cases. Some runs also preferred
+research costing more than its possible benefit. The original ranking prompt
+remains unchanged.
+
+**A separate readiness judgment has not demonstrated additional value.** The
+[initial tool-assessment study](experiments/tool-assessment-2026-10-17/README.md)
+tied relevance ranking's accuracy, with different abstention behavior. In the
+[controlled follow-up](experiments/tool-assessment-controlled-2026-10-17/README.md),
+usefulness-only and usefulness-plus-readiness received identical state, tool
+catalogs, usefulness questions, and usefulness cutoffs. Both scored 8/8 on
+development and 8/8 on held-out cases. Removing the readiness gate changed
+0/16 recommendations; usefulness-only used about 51% fewer input tokens.
+Readiness wording can also overlap with usefulness: an unnecessary tool may
+still be executable.
+
+**State and catalog context can support indirect tool selection.** In the
+controlled study, both methods preferred calculation for raw supplier costs and
+travel times, then direct action when verified results were supplied. They also
+selected preparation when a printer was off or an invoice was not local. These
+examples support testing contextual usefulness for prerequisite recognition;
+they do not establish general planning or mathematical reliability.
+
+These results concern small, synthetic sets on one quantized model, with fixed
+tool order and one run per input. Correct first-step labels do not establish
+execution success, probability calibration, or robustness. The studies' selected
+cutoffs are experimental settings, not general defaults. The trader failure
+remains relevant despite perfect scores on the smaller controlled set.
+
+### Direction for a decision-making framework
+
+The simplest candidate is one contextual usefulness question per available tool:
+would using it now advance the intent directly, or supply something another
+useful tool needs? Supply the intent, current state, and complete tool-name
+catalog. Account for costs and completed work, and allow no recommendation when
+the catalog cannot help. Keep the original ranker's return-all contract separate
+from this experimental selection and abstention policy.
+
+The current scope is a single read-only assessment. The
+[tool-assessment design](decision_loop_architecture.md) describes the implemented
+two-score experiment; the controlled results favor usefulness-only as the
+simpler candidate to test next. Execution, argument generation, and automatic
+state updates remain outside this phase.
+
+A complete framework would also need to handle the following boundaries:
+
+- **Identify the needed operation.** Having all facts does not mean they have
+  been evaluated. Missing information, an unresolved comparison, and an already
+  verified result should lead to different next steps.
+- **Formulate and validate tool inputs.** Adding a calculator does not explain
+  when to call it or how to extract operands, units, assumptions, and the
+  objective from prose. A trip may require route time rather than straight-line
+  distance. Structured domain data can supply these inputs; free-form text still
+  requires an extraction and validation mechanism that these tests do not cover.
+- **Update state from evidence.** If execution is introduced, actual tool results
+  should establish new facts and completed calculations. Model scores alone
+  cannot establish completion. Subsequent assessments need those results so
+  they can prefer the newly unblocked tool over repeated research. Changed inputs
+  can make earlier findings stale; supplied results are not permanently valid.
+- **Verify the resulting decision.** Test whether preparation actually improves
+  the final choice, including its cost. Recognition of a useful research step
+  is only one part of successful decision-making.
+
+Evaluate these capabilities with paired states: information missing versus
+known, calculation unresolved versus verified, research worthwhile versus too
+costly, and prerequisites available versus impossible to obtain. Compare methods
+with the same context and resource budget, freeze selection settings before
+held-out evaluation, and retain failures. Add a separate judgment or component
+only when it demonstrably improves the decisions being tested.
 
 See the [System One API contract](system-one-api.md) for protocol details and
 [installation](install.md) for configuration.
