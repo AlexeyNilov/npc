@@ -1,4 +1,4 @@
-exec llama-server \
+llama serve \
   -hf ggml-org/Kev-4B-GGUF:Q4_K_M \
   --host 127.0.0.1 \
   --port 12346
