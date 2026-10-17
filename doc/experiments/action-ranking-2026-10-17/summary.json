@@ -1,0 +1,72 @@
+{
+  "baseline/development": {
+    "comparable_cases": 12,
+    "experiments": 12,
+    "input_tokens": 5438,
+    "mean_pairwise_accuracy": 0.6944444444444445,
+    "top_tier_correct": 9
+  },
+  "baseline/existing": {
+    "comparable_cases": 7,
+    "experiments": 8,
+    "input_tokens": 2936,
+    "mean_pairwise_accuracy": 1.0,
+    "top_tier_correct": 7
+  },
+  "baseline/heldout": {
+    "comparable_cases": 8,
+    "experiments": 8,
+    "input_tokens": 2777,
+    "mean_pairwise_accuracy": 0.625,
+    "top_tier_correct": 5
+  },
+  "comparative/development": {
+    "comparable_cases": 12,
+    "experiments": 12,
+    "input_tokens": 7839,
+    "mean_pairwise_accuracy": 0.6944444444444445,
+    "top_tier_correct": 9
+  },
+  "examples/development": {
+    "comparable_cases": 8,
+    "experiments": 8,
+    "input_tokens": 5796,
+    "mean_pairwise_accuracy": 0.6041666666666666,
+    "top_tier_correct": 5
+  },
+  "examples/existing": {
+    "comparable_cases": 7,
+    "experiments": 8,
+    "input_tokens": 5561,
+    "mean_pairwise_accuracy": 1.0,
+    "top_tier_correct": 7
+  },
+  "examples/heldout": {
+    "comparable_cases": 8,
+    "experiments": 8,
+    "input_tokens": 4667,
+    "mean_pairwise_accuracy": 0.5625,
+    "top_tier_correct": 4
+  },
+  "net_benefit/development": {
+    "comparable_cases": 12,
+    "experiments": 12,
+    "input_tokens": 6616,
+    "mean_pairwise_accuracy": 0.6944444444444445,
+    "top_tier_correct": 9
+  },
+  "outcome/development": {
+    "comparable_cases": 12,
+    "experiments": 12,
+    "input_tokens": 7019,
+    "mean_pairwise_accuracy": 0.6944444444444445,
+    "top_tier_correct": 9
+  },
+  "research/development": {
+    "comparable_cases": 12,
+    "experiments": 12,
+    "input_tokens": 7143,
+    "mean_pairwise_accuracy": 0.6944444444444445,
+    "top_tier_correct": 9
+  }
+}

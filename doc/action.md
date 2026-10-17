@@ -84,5 +84,12 @@ When decisions depend on arithmetic, calculate outcomes in ordinary code and
 select by the stated objective. Use relevance ranking for contextual judgments
 that remain after those calculations.
 
+The [100-evaluation prompt study](experiments/action-ranking-2026-10-17/README.md)
+compares the current prompt with five revisions, including research guidance,
+outcome comparisons, and examples. None improved the tested development ordering;
+the example-based revision regressed on held-out cases. The current prompt is
+retained. Explicit missing prerequisites worked better than numerical tradeoffs
+in this sample; offering calculation actions alone did not resolve the failures.
+
 See the [System One API contract](system-one-api.md) for protocol details and
 [installation](install.md) for configuration.
