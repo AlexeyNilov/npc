@@ -63,9 +63,8 @@ without executing them.
 
 The [benchmark cases](../tests/fixtures/action_ranking/cases.json) use the same
 `intent`, `state`, and `actions` inputs as `npc-rank-actions`. Each case adds an
-`id`, `relevant_actions`, and a rationale. Listed actions are labeled useful now;
-all other available actions are labeled not useful. Labels and rationales never
-enter model requests.
+`id` and `relevant_actions`. Listed actions are labeled useful now; all other
+available actions are labeled not useful. Labels never enter model requests.
 
 The benchmark calls `rank_actions` once per case, preserving its single batch of
 one question per action. It reports the ranking, labels, timing, model metadata,

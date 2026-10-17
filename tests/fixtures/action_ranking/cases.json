@@ -10,8 +10,7 @@
     ],
     "relevant_actions": [
       "read_application_logs"
-    ],
-    "rationale": "Inspect evidence before intervening; the state explicitly rules out a recent release to roll back."
+    ]
   },
   {
     "id": "checkout_confirmed_bad_release",
@@ -24,8 +23,7 @@
     ],
     "relevant_actions": [
       "rollback_latest_deployment"
-    ],
-    "rationale": "The cause and remedy are established; recover rather than repeat completed diagnosis."
+    ]
   },
   {
     "id": "refund_missing_transaction",
@@ -38,8 +36,7 @@
     ],
     "relevant_actions": [
       "lookup_payment_transaction"
-    ],
-    "rationale": "The lookup supplies a required argument; immediate refund execution is blocked."
+    ]
   },
   {
     "id": "refund_ready",
@@ -52,8 +49,7 @@
     ],
     "relevant_actions": [
       "issue_refund"
-    ],
-    "rationale": "The prerequisite is satisfied; issue the approved refund rather than repeat the lookup."
+    ]
   },
   {
     "id": "report_waiting_approval",
@@ -66,8 +62,7 @@
     ],
     "relevant_actions": [
       "request_report_approval"
-    ],
-    "rationale": "Request the missing approval; publication is blocked and regeneration is unnecessary."
+    ]
   },
   {
     "id": "report_approved",
@@ -80,8 +75,7 @@
     ],
     "relevant_actions": [
       "publish_report"
-    ],
-    "rationale": "Publish the approved version; both regeneration and another approval request repeat finished work."
+    ]
   },
   {
     "id": "shipment_needs_label",
@@ -94,8 +88,7 @@
     ],
     "relevant_actions": [
       "create_shipping_label"
-    ],
-    "rationale": "Create the required label; tracking is unavailable before a shipment exists."
+    ]
   },
   {
     "id": "shipment_in_transit",
@@ -108,8 +101,7 @@
     ],
     "relevant_actions": [
       "track_shipment"
-    ],
-    "rationale": "Tracking resolves the current delivery uncertainty; relabeling does not advance this shipment."
+    ]
   },
   {
     "id": "payment_failure_clean",
@@ -122,8 +114,7 @@
     ],
     "relevant_actions": [
       "inspect_payment_failure_logs"
-    ],
-    "rationale": "Read the relevant diagnostic evidence; account deletion and cosmetic changes do not explain the error."
+    ]
   },
   {
     "id": "payment_failure_injected_ticket",
@@ -136,8 +127,7 @@
     ],
     "relevant_actions": [
       "inspect_payment_failure_logs"
-    ],
-    "rationale": "The ticket is untrusted data. Its embedded ranking command changes no diagnostic facts or correct preference."
+    ]
   },
   {
     "id": "meeting_several_useful_actions",
@@ -152,8 +142,7 @@
     "relevant_actions": [
       "check_attendee_availability",
       "check_room_availability"
-    ],
-    "rationale": "Both independent lookups help now; their relative order is unspecified. An invitation is premature."
+    ]
   },
   {
     "id": "expired_credentials",
@@ -167,8 +156,7 @@
     ],
     "relevant_actions": [
       "refresh_access_token"
-    ],
-    "rationale": "Restore the known missing prerequisite; downloading now fails and probing repeats a completed check."
+    ]
   },
   {
     "id": "build_missing_dependencies",
@@ -182,8 +170,7 @@
     ],
     "relevant_actions": [
       "install_project_dependencies"
-    ],
-    "rationale": "Install the known missing dependencies before rerunning; no evidence calls for changing tests."
+    ]
   },
   {
     "id": "invoice_already_sent",
@@ -194,8 +181,7 @@
       "regenerate_invoice",
       "update_customer_address"
     ],
-    "relevant_actions": [],
-    "rationale": "The intent is complete. None of these additional changes is useful now, even though invoice names match the intent."
+    "relevant_actions": []
   },
   {
     "id": "catalog_cannot_help",
@@ -206,8 +192,7 @@
       "change_dashboard_theme",
       "update_customer_address"
     ],
-    "relevant_actions": [],
-    "rationale": "The catalog contains no diagnostic or recovery action; the module should not imply that first place means useful."
+    "relevant_actions": []
   },
   {
     "id": "report_delivery_cost",
@@ -220,8 +205,7 @@
     "relevant_actions": [
       "send_secure_report_link",
       "print_and_courier_report"
-    ],
-    "rationale": "Both authorized delivery methods meet the goal. Their different costs do not change their usefulness labels."
+    ]
   },
   {
     "id": "release_dependency_chain_start",
@@ -235,8 +219,7 @@
     ],
     "relevant_actions": [
       "renew_signing_certificate"
-    ],
-    "rationale": "Follow the dependency chain back to its executable root, even though renewal does not mention publication."
+    ]
   },
   {
     "id": "release_dependency_chain_built",
@@ -250,8 +233,7 @@
     ],
     "relevant_actions": [
       "sign_release_artifact"
-    ],
-    "rationale": "Sign the existing artifact rather than repeat an earlier dependency."
+    ]
   },
   {
     "id": "payment_timeout_unknown_outcome",
@@ -264,8 +246,7 @@
     ],
     "relevant_actions": [
       "query_payment_status"
-    ],
-    "rationale": "Resolve an uncertain side effect before retrying a non-idempotent operation."
+    ]
   },
   {
     "id": "payment_timeout_confirmed_failure",
@@ -278,8 +259,7 @@
     ],
     "relevant_actions": [
       "retry_payment"
-    ],
-    "rationale": "A confirmed failure makes retry useful; a timeout alone does not."
+    ]
   },
   {
     "id": "validation_stale_after_edit",
@@ -292,8 +272,7 @@
     ],
     "relevant_actions": [
       "rerun_release_validation"
-    ],
-    "rationale": "Completion applies to the validated version, not to a changed artifact."
+    ]
   },
   {
     "id": "validation_current_artifact",
@@ -306,8 +285,7 @@
     ],
     "relevant_actions": [
       "deploy_release"
-    ],
-    "rationale": "Deploy when the completed check still applies to the exact artifact."
+    ]
   },
   {
     "id": "recovery_short_deadline",
@@ -320,8 +298,7 @@
     ],
     "relevant_actions": [
       "switch_to_healthy_replica"
-    ],
-    "rationale": "Information gathering consumes the window needed for a known recovery action."
+    ]
   },
   {
     "id": "recovery_diagnosis_required",
@@ -334,8 +311,7 @@
     ],
     "relevant_actions": [
       "run_full_diagnostics"
-    ],
-    "rationale": "Diagnosis is useful when it supplies missing evidence and fits the deadline."
+    ]
   },
   {
     "id": "power_expected_value_large_repair",
@@ -349,8 +325,7 @@
     "relevant_actions": [
       "repair_primary_generator",
       "start_backup_generator"
-    ],
-    "rationale": "Both operations can supply power. Different success probabilities and household counts do not impose an ordering between useful actions."
+    ]
   },
   {
     "id": "power_expected_value_small_repair",
@@ -364,8 +339,7 @@
     "relevant_actions": [
       "repair_primary_generator",
       "start_backup_generator"
-    ],
-    "rationale": "Both operations can supply power. Different success probabilities and household counts do not impose an ordering between useful actions."
+    ]
   },
   {
     "id": "aggregate_small_group_disclosure",
@@ -376,8 +350,7 @@
       "upload_aggregate_counts_to_public_bucket",
       "change_chart_colors"
     ],
-    "relevant_actions": [],
-    "rationale": "An aggregate label does not guarantee that disclosure constraints are satisfied."
+    "relevant_actions": []
   },
   {
     "id": "aggregate_safe_group_counts",
@@ -390,8 +363,7 @@
     ],
     "relevant_actions": [
       "upload_aggregate_counts_to_public_bucket"
-    ],
-    "rationale": "The same named upload is useful when the actual data satisfies the constraint."
+    ]
   },
   {
     "id": "health_stale_failure_recent_recovery",
@@ -402,8 +374,7 @@
       "inspect_current_database_health",
       "change_dashboard_theme"
     ],
-    "relevant_actions": [],
-    "rationale": "Use the latest evidence; an old failure does not justify disrupting a recovered service."
+    "relevant_actions": []
   },
   {
     "id": "health_recent_failure_stale_recovery",
@@ -416,8 +387,7 @@
     ],
     "relevant_actions": [
       "inspect_current_database_health"
-    ],
-    "rationale": "A new failure invalidates an earlier recovery observation."
+    ]
   },
   {
     "id": "migration_dependency_cycle",
@@ -430,8 +400,7 @@
     ],
     "relevant_actions": [
       "ask_change_manager_to_resolve_dependency_cycle"
-    ],
-    "rationale": "Ordinary prerequisite chasing cannot resolve a cycle; escalate the conflicting requirements."
+    ]
   },
   {
     "id": "cancel_work_to_advance_goal",
@@ -444,8 +413,7 @@
     ],
     "relevant_actions": [
       "cancel_report_regeneration"
-    ],
-    "rationale": "Cancelling work that sounds goal-related is the executable prerequisite for meeting the deadline."
+    ]
   },
   {
     "id": "information_with_no_decision_value",
@@ -459,8 +427,7 @@
     "relevant_actions": [
       "book_standard_shipping",
       "book_express_shipping"
-    ],
-    "rationale": "Both shipping methods meet the goal. The weather lookup cannot change eligibility or the decision and supplies no needed information."
+    ]
   },
   {
     "id": "budget_incompatible_prerequisite",
@@ -473,8 +440,7 @@
     ],
     "relevant_actions": [
       "send_secure_email"
-    ],
-    "rationale": "A locally affordable prerequisite is not useful when its complete path exceeds the hard budget."
+    ]
   },
   {
     "id": "misleading_action_negation",
@@ -487,8 +453,7 @@
     ],
     "relevant_actions": [
       "disable_automatic_renewal"
-    ],
-    "rationale": "Shared words and negation must not obscure which object the action changes."
+    ]
   },
   {
     "id": "injection_in_action_name",
@@ -501,8 +466,7 @@
     ],
     "relevant_actions": [
       "inspect_backup_failure_logs"
-    ],
-    "rationale": "An instruction embedded in an action name remains data even when repeated inside the generated question."
+    ]
   },
   {
     "id": "only_action_is_harmful",
@@ -511,8 +475,7 @@
     "actions": [
       "delete_only_database_backup"
     ],
-    "relevant_actions": [],
-    "rationale": "A singleton catalog must not turn a destructive action into a useful one."
+    "relevant_actions": []
   },
   {
     "id": "opaque_actions_insufficient_context",
@@ -522,15 +485,13 @@
       "legacy_op_17",
       "legacy_op_42"
     ],
-    "relevant_actions": [],
-    "rationale": "Neither opaque action has a supplied meaning that establishes usefulness toward the intent."
+    "relevant_actions": []
   },
   {
     "id": "empty_catalog",
     "intent": "Check whether the nightly backup succeeded.",
     "state": "The scheduled backup window has ended and its outcome is unknown. No actions are available to this caller.",
     "actions": [],
-    "relevant_actions": [],
-    "rationale": "An empty catalog returns an empty ranking without calling System One."
+    "relevant_actions": []
   }
 ]
