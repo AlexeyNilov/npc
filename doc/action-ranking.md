@@ -92,15 +92,15 @@ User-supplied runs use `tests/fixtures/action_ranking/cases.json` and prompt
 version `action-relevance-v3`. Compare Brier scores and total times only across
 runs with the same evaluated actions. Lower values are better.
 Times describe individual runs, not averages. Hardware and server versions were
-not recorded.
+not recorded. Each run has 40 cases. Complete runs evaluate 119 actions.
 
-| Model | Run time (UTC) | Cases | Errors | Evaluated actions | Brier score | Total time (s) |
-| --- | --- | ---: | ---: | ---: | ---: | ---: |
-| `ggml-org/Laya-GGUF:Q8_0` | 2026-10-17 21:33:09 | 40 | 0 | 119 | 0.459959 | 2.165 |
-| `ggml-org/Clef-Flash-GGUF:Q4_K_M` | 2026-10-17 21:36:49 | 40 | 0 | 119 | 0.026349 | 11.024 |
-| `LiquidAI/d1-3B-GGUF:Q8_0` | 2026-10-17 21:37:57 | 40 | 0 | 119 | 0.049221 | 3.322 |
-| `ggml-org/Kev-4B-GGUF:Q4_K_M` | 2026-10-17 21:38:32 | 40 | 0 | 119 | 0.028099 | 5.905 |
-| `ggml-org/lev-GGUF:Q4_K_M` | 2026-10-17 21:40:03 | 40 | 0 | 119 | 0.050921 | 6.362 |
+| Model | Run time (UTC) | Errors | Brier score | Total time (s) |
+| --- | --- | ---: | ---: | ---: |
+| `ggml-org/Laya-GGUF:Q8_0` | 2026-10-17 21:33:09 | 0 | 0.459959 | 2.165 |
+| `ggml-org/Clef-Flash-GGUF:Q4_K_M` | 2026-10-17 21:36:49 | 0 | 0.026349 | 11.024 |
+| `LiquidAI/d1-3B-GGUF:Q8_0` | 2026-10-17 21:37:57 | 0 | 0.049221 | 3.322 |
+| `ggml-org/Kev-4B-GGUF:Q4_K_M` | 2026-10-17 21:38:32 | 0 | 0.028099 | 5.905 |
+| `ggml-org/lev-GGUF:Q4_K_M` | 2026-10-17 21:40:03 | 0 | 0.050921 | 6.362 |
 
 The first Clef-Flash run failed on 36 cases. Its Brier score covers only 5 actions,
 so its score and total time do not establish better accuracy or speed than Laya.
