@@ -63,7 +63,7 @@ For example:
 
 ```sh
 .venv/bin/python -m pytest -q tests/test_package.py
-make mutation SCOPE='python_template.*'
+make mutation SCOPE='npc.*'
 ```
 
 The command reports counts only for the selected scope and lists review candidates:

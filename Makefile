@@ -24,9 +24,9 @@ test-integration:
 	$(PYTEST) -m integration
 
 # Explicit selection reruns cached mutations, including after test-only changes.
-# Usage: make mutation SCOPE='python_template.*'
+# Usage: make mutation SCOPE='npc.*'
 mutation:
-	$(if $(strip $(SCOPE)),,$(error Provide SCOPE, e.g. make mutation SCOPE='python_template.*'))
+	$(if $(strip $(SCOPE)),,$(error Provide SCOPE, e.g. make mutation SCOPE='npc.*'))
 	@$(PYTHON) scripts/mutation.py "$(SCOPE)"
 
 lint:
