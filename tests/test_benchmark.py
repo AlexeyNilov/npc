@@ -158,6 +158,7 @@ def test_cli_empty_catalog(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> N
     report = json.loads(output.read_text())
     assert report["results"][0]["ranking"] == []
     assert report["model_version"] == "fixture-model"
+    assert report["timeout_seconds"] == 30.0
     assert report["server_version"] == "fixture-server"
     assert report["endpoint"] == "http://127.0.0.1:1/v1/systemone"
 
@@ -312,3 +313,65 @@ def test_cli_missing_fixture(
     captured = capsys.readouterr()
     assert "absent.json" in captured.err
     assert captured.out == ""
+
+
+def test_elapsed_time_ids_and_optional_model(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Case IDs survive errors, durations use differences, and model metadata is optional."""
+
+    class NoMetadata:
+        def evaluate(
+            self, state: dict[str, str], questions: dict[str, Question]
+        ) -> object:
+            return {
+                "answers": {key: {"type": "noul", "noul": 0.5} for key in questions}
+            }
+
+    clock = iter([10.0, 10.25, 20.0, 20.5, 30.0, 30.75, 40.0, 41.0])
+    monkeypatch.setattr("npc.benchmark.perf_counter", lambda: next(clock))
+    cases = load_cases(FIXTURE)[:2]
+    success = run_benchmark(cases, evaluator=NoMetadata())
+    failure = run_benchmark(cases, evaluator=FailingEvaluator())
+    results = success["results"]
+    assert isinstance(results, list)
+    assert [
+        (result["id"], result["elapsed_seconds"], result["model"]) for result in results
+    ] == [(cases[0].id, 0.25, None), (cases[1].id, 0.5, None)]
+    failed = failure["results"]
+    assert isinstance(failed, list)
+    assert [(result["id"], result["elapsed_seconds"]) for result in failed] == [
+        (cases[0].id, 0.75),
+        (cases[1].id, 1.0),
+    ]
+
+
+def test_cli_requires_input(capsys: pytest.CaptureFixture[str]) -> None:
+    """The input fixture is required by argparse before command execution."""
+    with pytest.raises(SystemExit) as error:
+        main([])
+    assert error.value.code == 2
+    assert "--input" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("field", ["id", "intent", "state"])
+def test_standalone_blank_text(tmp_path: Path, field: str) -> None:
+    """Standalone cases reject blank text without relying on pair consistency checks."""
+    data = json.loads(FIXTURE.read_text())[-2:-1]
+    data[0][field] = " "
+    path = tmp_path / "cases.json"
+    path.write_text(json.dumps(data))
+    with pytest.raises(ValueError):
+        load_cases(path)
+
+
+def test_error_counts_and_invalid_metadata() -> None:
+    """Failed cases are not successful incomparable cases; metadata must be text."""
+    cases = load_cases(FIXTURE)[:2]
+    failed = run_benchmark(cases, evaluator=FailingEvaluator())
+    metrics = failed["metrics"]
+    assert isinstance(metrics, dict)
+    assert metrics["noncomparable_successful_cases"] == 0
+    evaluator = Evaluator([[0.1, 0.2, 0.9], [0.1, 0.9, 0.2]])
+    object.__setattr__(evaluator, "model", 123)
+    results = run_benchmark(cases, evaluator=evaluator)["results"]
+    assert isinstance(results, list)
+    assert all(result["model"] is None for result in results)

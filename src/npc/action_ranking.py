@@ -1,7 +1,6 @@
 """Rank available actions by contextual next-step relevance."""
 
 import json
-import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Protocol, TypedDict
@@ -64,7 +63,7 @@ def _probability(answer: object) -> float:
     value = answer.get("noul")
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise InvalidEvaluationError("Each noul probability must be numeric")
-    if not 0 <= value <= 1 or not math.isfinite(value):
+    if not 0 <= value <= 1:
         raise InvalidEvaluationError(
             "Each noul probability must be finite and in [0, 1]"
         )

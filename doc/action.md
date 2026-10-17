@@ -1,6 +1,6 @@
 # Action relevance ranking
 
-Proposed design; implementation has not started.
+Implemented as a Python API, HTTP adapter, and benchmark CLI.
 
 ## Purpose
 
@@ -106,9 +106,9 @@ Keep transport concerns out of the ranker. Invalid caller input raises
 raise an `InvalidEvaluationError` owned by the ranking module. Tests exercise
 these distinctions through the public interfaces.
 
-Add `httpx2` as a runtime dependency; its addition is approved. Start with a Python
-API and a small benchmark CLI. At CLI startup, load and validate the endpoint from
-the environment as documented in [installation](install.md#system-one-planned).
+Use `httpx2` as a runtime dependency, with a Python API and a small benchmark CLI.
+At CLI startup, load and validate the endpoint from
+the environment as documented in [installation](install.md#system-one).
 Pass configuration into the adapter, keeping environment access out of the
 ranking logic. Keep the benchmark CLI's arguments and usage in its `--help`.
 Add MCP exposure when a caller needs it.

@@ -87,7 +87,7 @@ def test_transport_errors(failure: type[httpx2.RequestError]) -> None:
         raise failure("unavailable", request=request)
 
     with httpx2.Client(transport=httpx2.MockTransport(handle)) as client:
-        with pytest.raises(SystemOneError, match="request failed"):
+        with pytest.raises(SystemOneError, match=failure.__name__):
             SystemOneClient(ENDPOINT, client=client).evaluate({}, QUESTIONS)
 
 
@@ -127,3 +127,10 @@ def test_https_and_default_timeout_and_metadata_reset() -> None:
     assert requests[0].extensions["timeout"] == dict(
         connect=30.0, read=30.0, write=30.0, pool=30.0
     )
+
+
+def test_short_positive_timeout() -> None:
+    """Positive subsecond timeouts are allowed and metadata starts absent."""
+    with httpx2.Client() as client:
+        adapter = SystemOneClient(ENDPOINT, client=client, timeout=0.1)
+        assert adapter.model is None

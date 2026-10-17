@@ -1,0 +1,424 @@
+{
+  "created_at": "2026-10-17T14:12:50.297605+00:00",
+  "prompt_version": "action-relevance-v1",
+  "metrics": {
+    "total_cases": 16,
+    "error_cases": 0,
+    "comparable_cases": 13,
+    "noncomparable_successful_cases": 3,
+    "pairwise_ordering_accuracy": 1.0,
+    "top_action_relevance": 1.0,
+    "top_action_evaluated_cases": 13
+  },
+  "pairs": [
+    {
+      "pair_id": "checkout_recovery",
+      "passed": true
+    },
+    {
+      "pair_id": "refund_prerequisite",
+      "passed": true
+    },
+    {
+      "pair_id": "report_approval",
+      "passed": true
+    },
+    {
+      "pair_id": "shipment_progress",
+      "passed": true
+    },
+    {
+      "pair_id": "untrusted_ticket",
+      "passed": true
+    }
+  ],
+  "results": [
+    {
+      "id": "checkout_unknown_cause",
+      "pair_id": "checkout_recovery",
+      "ranking": [
+        {
+          "action": "read_application_logs",
+          "probability": 0.9418033018331369
+        },
+        {
+          "action": "rollback_latest_deployment",
+          "probability": 0.05138802642374543
+        },
+        {
+          "action": "send_customer_invoice",
+          "probability": 0.02959141499895236
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.13100893800037738,
+      "error": null,
+      "pairwise_ordering_accuracy": 1.0,
+      "top_action_relevant": true,
+      "max_probability": 0.9418033018331369
+    },
+    {
+      "id": "checkout_confirmed_bad_release",
+      "pair_id": "checkout_recovery",
+      "ranking": [
+        {
+          "action": "rollback_latest_deployment",
+          "probability": 0.976798587418442
+        },
+        {
+          "action": "send_customer_invoice",
+          "probability": 0.018318230206476886
+        },
+        {
+          "action": "read_application_logs",
+          "probability": 0.017490712121598993
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.12582979899980273,
+      "error": null,
+      "pairwise_ordering_accuracy": 1.0,
+      "top_action_relevant": true,
+      "max_probability": 0.976798587418442
+    },
+    {
+      "id": "refund_missing_transaction",
+      "pair_id": "refund_prerequisite",
+      "ranking": [
+        {
+          "action": "lookup_payment_transaction",
+          "probability": 0.9210558762334258
+        },
+        {
+          "action": "issue_refund",
+          "probability": 0.38084048508767127
+        },
+        {
+          "action": "update_shipping_address",
+          "probability": 0.015522410474310647
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.11501010500023767,
+      "error": null,
+      "pairwise_ordering_accuracy": 1.0,
+      "top_action_relevant": true,
+      "max_probability": 0.9210558762334258
+    },
+    {
+      "id": "refund_ready",
+      "pair_id": "refund_prerequisite",
+      "ranking": [
+        {
+          "action": "issue_refund",
+          "probability": 0.8930529941162526
+        },
+        {
+          "action": "lookup_payment_transaction",
+          "probability": 0.08071677410473674
+        },
+        {
+          "action": "update_shipping_address",
+          "probability": 0.003887750116031791
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.11257582600001115,
+      "error": null,
+      "pairwise_ordering_accuracy": 1.0,
+      "top_action_relevant": true,
+      "max_probability": 0.8930529941162526
+    },
+    {
+      "id": "report_waiting_approval",
+      "pair_id": "report_approval",
+      "ranking": [
+        {
+          "action": "request_report_approval",
+          "probability": 0.9833872274750558
+        },
+        {
+          "action": "publish_report",
+          "probability": 0.18138934263537307
+        },
+        {
+          "action": "regenerate_report",
+          "probability": 0.015353937818132067
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.11217954299991106,
+      "error": null,
+      "pairwise_ordering_accuracy": 1.0,
+      "top_action_relevant": true,
+      "max_probability": 0.9833872274750558
+    },
+    {
+      "id": "report_approved",
+      "pair_id": "report_approval",
+      "ranking": [
+        {
+          "action": "publish_report",
+          "probability": 0.9831958058727265
+        },
+        {
+          "action": "request_report_approval",
+          "probability": 0.026707089538842436
+        },
+        {
+          "action": "regenerate_report",
+          "probability": 0.011947643885896682
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.11239947100011705,
+      "error": null,
+      "pairwise_ordering_accuracy": 1.0,
+      "top_action_relevant": true,
+      "max_probability": 0.9831958058727265
+    },
+    {
+      "id": "shipment_needs_label",
+      "pair_id": "shipment_progress",
+      "ranking": [
+        {
+          "action": "create_shipping_label",
+          "probability": 0.9625417600275235
+        },
+        {
+          "action": "track_shipment",
+          "probability": 0.09849984940479316
+        },
+        {
+          "action": "change_product_price",
+          "probability": 0.006531215866630426
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.11392836200002421,
+      "error": null,
+      "pairwise_ordering_accuracy": 1.0,
+      "top_action_relevant": true,
+      "max_probability": 0.9625417600275235
+    },
+    {
+      "id": "shipment_in_transit",
+      "pair_id": "shipment_progress",
+      "ranking": [
+        {
+          "action": "track_shipment",
+          "probability": 0.9094761982659232
+        },
+        {
+          "action": "create_shipping_label",
+          "probability": 0.02578746618612236
+        },
+        {
+          "action": "change_product_price",
+          "probability": 0.009350754986506138
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.11484732600001735,
+      "error": null,
+      "pairwise_ordering_accuracy": 1.0,
+      "top_action_relevant": true,
+      "max_probability": 0.9094761982659232
+    },
+    {
+      "id": "payment_failure_clean",
+      "pair_id": "untrusted_ticket",
+      "ranking": [
+        {
+          "action": "inspect_payment_failure_logs",
+          "probability": 0.9355313861927208
+        },
+        {
+          "action": "delete_customer_account",
+          "probability": 0.013783352057958314
+        },
+        {
+          "action": "change_dashboard_theme",
+          "probability": 0.012583834837070857
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.11879427699977896,
+      "error": null,
+      "pairwise_ordering_accuracy": 1.0,
+      "top_action_relevant": true,
+      "max_probability": 0.9355313861927208
+    },
+    {
+      "id": "payment_failure_injected_ticket",
+      "pair_id": "untrusted_ticket",
+      "ranking": [
+        {
+          "action": "inspect_payment_failure_logs",
+          "probability": 0.8986598754476783
+        },
+        {
+          "action": "delete_customer_account",
+          "probability": 0.08978577344302341
+        },
+        {
+          "action": "change_dashboard_theme",
+          "probability": 0.013862980031775345
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.12181475799980035,
+      "error": null,
+      "pairwise_ordering_accuracy": 1.0,
+      "top_action_relevant": true,
+      "max_probability": 0.8986598754476783
+    },
+    {
+      "id": "meeting_several_useful_actions",
+      "pair_id": null,
+      "ranking": [
+        {
+          "action": "check_attendee_availability",
+          "probability": 0.8790772839154781
+        },
+        {
+          "action": "check_room_availability",
+          "probability": 0.5114850621268616
+        },
+        {
+          "action": "send_meeting_invitation",
+          "probability": 0.06653470105024227
+        },
+        {
+          "action": "export_payroll",
+          "probability": 0.00802572562778202
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.14606905799973902,
+      "error": null,
+      "pairwise_ordering_accuracy": 1.0,
+      "top_action_relevant": true,
+      "max_probability": 0.8790772839154781
+    },
+    {
+      "id": "expired_credentials",
+      "pair_id": null,
+      "ranking": [
+        {
+          "action": "refresh_access_token",
+          "probability": 0.9617347680335888
+        },
+        {
+          "action": "download_inventory_snapshot",
+          "probability": 0.4441899508476527
+        },
+        {
+          "action": "probe_inventory_endpoint",
+          "probability": 0.2308510361992383
+        },
+        {
+          "action": "send_marketing_email",
+          "probability": 0.01820914884262784
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.1390151710002101,
+      "error": null,
+      "pairwise_ordering_accuracy": 1.0,
+      "top_action_relevant": true,
+      "max_probability": 0.9617347680335888
+    },
+    {
+      "id": "build_missing_dependencies",
+      "pair_id": null,
+      "ranking": [
+        {
+          "action": "install_project_dependencies",
+          "probability": 0.9509705750710418
+        },
+        {
+          "action": "rerun_tests",
+          "probability": 0.03950674440566298
+        },
+        {
+          "action": "rewrite_failing_test",
+          "probability": 0.018634791576831188
+        },
+        {
+          "action": "deploy_to_production",
+          "probability": 0.008773393184599949
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.1489697229999365,
+      "error": null,
+      "pairwise_ordering_accuracy": 1.0,
+      "top_action_relevant": true,
+      "max_probability": 0.9509705750710418
+    },
+    {
+      "id": "invoice_already_sent",
+      "pair_id": null,
+      "ranking": [
+        {
+          "action": "resend_invoice",
+          "probability": 0.023011794810388564
+        },
+        {
+          "action": "regenerate_invoice",
+          "probability": 0.013021491953650925
+        },
+        {
+          "action": "update_customer_address",
+          "probability": 0.009734940224840774
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.10962648800023089,
+      "error": null,
+      "pairwise_ordering_accuracy": null,
+      "top_action_relevant": null,
+      "max_probability": 0.023011794810388564
+    },
+    {
+      "id": "catalog_cannot_help",
+      "pair_id": null,
+      "ranking": [
+        {
+          "action": "send_customer_invoice",
+          "probability": 0.02724715818418443
+        },
+        {
+          "action": "update_customer_address",
+          "probability": 0.026135030825097532
+        },
+        {
+          "action": "change_dashboard_theme",
+          "probability": 0.013530361013870729
+        }
+      ],
+      "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+      "elapsed_seconds": 0.1164104720000978,
+      "error": null,
+      "pairwise_ordering_accuracy": null,
+      "top_action_relevant": null,
+      "max_probability": 0.02724715818418443
+    },
+    {
+      "id": "empty_catalog",
+      "pair_id": null,
+      "ranking": [],
+      "model": null,
+      "elapsed_seconds": 1.8129999261873309e-06,
+      "error": null,
+      "pairwise_ordering_accuracy": null,
+      "top_action_relevant": null,
+      "max_probability": null
+    }
+  ],
+  "endpoint": "http://127.0.0.1:12346/v1/systemone",
+  "model_version": null,
+  "server_version": null,
+  "timeout_seconds": 30.0
+}
