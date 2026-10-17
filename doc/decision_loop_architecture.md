@@ -1,7 +1,9 @@
 # Tool assessment: recognizing indirect next steps
 
-Status: implemented experiment, separate from existing action ranking. Model
-quality and cutoff calibration remain unevaluated.
+Status: implemented experiment, separate from existing action ranking. The
+[initial evaluation](experiments/tool-assessment-2026-10-17/README.md) tied
+held-out accuracy with relevance ranking at higher token cost; readiness's
+benefit and production cutoff calibration remain unestablished.
 
 Implementation: [`assess_tools`](../src/npc/tool_assessment.py) returns immutable
 scores in catalog order and an optional exact tool name. Both cutoffs are

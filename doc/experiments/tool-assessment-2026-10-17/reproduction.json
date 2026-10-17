@@ -1,0 +1,17 @@
+{
+  "git_commit": "695a6211eb6ab2c1e0906f0116d1a5bf32badd3e",
+  "server_build": "b11706-f74e2fa6a",
+  "model_alias": "ggml-org/Kev-4B-GGUF:Q4_K_M",
+  "model_path": "/home/lexa/.cache/huggingface/hub/models--ggml-org--Kev-4B-GGUF/snapshots/d924f2e2c3872da8b8aaf3eb4453b4126deceb79/Kev-4B-Q4_K_M.gguf",
+  "model_sha256": "33ae6b18926502b2209a1bf7d3b61a350d65938441515c686bb87d226a19eff9",
+  "model_size_bytes": 3033489824,
+  "files_sha256": {
+    "src/npc/tool_assessment.py": "50596ec0004d0a55aa3a95a970eb706f7959a490bc2ff2a3e97201983a03d7f2",
+    "src/npc/tool_assessment_experiment.py": "730a1cc888836b7fdca6d54332b28679d1d52dbae710200e275a12510781f163",
+    "src/npc/action_ranking.py": "d30dfa420512adfed9a5fa9149bd43d10f53b52fd08b2d6e18504d8e363d2e66",
+    "src/npc/system_one.py": "6b197fd56d01bbe253d50793ed5acd5ffcddc5ff71a7db21293c900fa1da9406",
+    "tests/fixtures/tool_assessment/cases.json": "6db03e6764936f29f182ee86b1c8c7ed97322e756f93eec35f47f2912ce69b11",
+    "tests/fixtures/tool_assessment/prompt.json": "eb4a9511de603ce7fbaa3bc4a45aede2d399574d0bdbbd5871234f0f0a8cf03a"
+  },
+  "system_one_parameters": "The driver sends state and questions only. Server /props generation settings are preserved; their applicability to typed probabilities is not established by this evaluation."
+}
