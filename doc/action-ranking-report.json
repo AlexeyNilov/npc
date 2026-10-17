@@ -1,6 +1,6 @@
 {
-  "created_at": "2026-10-17T14:12:50.297605+00:00",
-  "prompt_version": "action-relevance-v1",
+  "created_at": "2026-10-17T14:17:10.453574+00:00",
+  "prompt_version": "action-relevance-v2",
   "metrics": {
     "total_cases": 16,
     "error_cases": 0,
@@ -39,23 +39,23 @@
       "ranking": [
         {
           "action": "read_application_logs",
-          "probability": 0.9418033018331369
+          "probability": 0.944359603420462
         },
         {
           "action": "rollback_latest_deployment",
-          "probability": 0.05138802642374543
+          "probability": 0.06668155554371522
         },
         {
           "action": "send_customer_invoice",
-          "probability": 0.02959141499895236
+          "probability": 0.0362923564162677
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.13100893800037738,
+      "elapsed_seconds": 0.1304317799999808,
       "error": null,
       "pairwise_ordering_accuracy": 1.0,
       "top_action_relevant": true,
-      "max_probability": 0.9418033018331369
+      "max_probability": 0.944359603420462
     },
     {
       "id": "checkout_confirmed_bad_release",
@@ -63,23 +63,23 @@
       "ranking": [
         {
           "action": "rollback_latest_deployment",
-          "probability": 0.976798587418442
+          "probability": 0.9798649610059448
         },
         {
           "action": "send_customer_invoice",
-          "probability": 0.018318230206476886
+          "probability": 0.019893680493452248
         },
         {
           "action": "read_application_logs",
-          "probability": 0.017490712121598993
+          "probability": 0.017618892710481383
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.12582979899980273,
+      "elapsed_seconds": 0.12093089500012866,
       "error": null,
       "pairwise_ordering_accuracy": 1.0,
       "top_action_relevant": true,
-      "max_probability": 0.976798587418442
+      "max_probability": 0.9798649610059448
     },
     {
       "id": "refund_missing_transaction",
@@ -87,23 +87,23 @@
       "ranking": [
         {
           "action": "lookup_payment_transaction",
-          "probability": 0.9210558762334258
+          "probability": 0.9310351857436773
         },
         {
           "action": "issue_refund",
-          "probability": 0.38084048508767127
+          "probability": 0.36769555323528336
         },
         {
           "action": "update_shipping_address",
-          "probability": 0.015522410474310647
+          "probability": 0.02011092998668191
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.11501010500023767,
+      "elapsed_seconds": 0.11560058200029744,
       "error": null,
       "pairwise_ordering_accuracy": 1.0,
       "top_action_relevant": true,
-      "max_probability": 0.9210558762334258
+      "max_probability": 0.9310351857436773
     },
     {
       "id": "refund_ready",
@@ -111,23 +111,23 @@
       "ranking": [
         {
           "action": "issue_refund",
-          "probability": 0.8930529941162526
+          "probability": 0.8939230564946616
         },
         {
           "action": "lookup_payment_transaction",
-          "probability": 0.08071677410473674
+          "probability": 0.07689799612189625
         },
         {
           "action": "update_shipping_address",
-          "probability": 0.003887750116031791
+          "probability": 0.005012174431381383
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.11257582600001115,
+      "elapsed_seconds": 0.11377299400010088,
       "error": null,
       "pairwise_ordering_accuracy": 1.0,
       "top_action_relevant": true,
-      "max_probability": 0.8930529941162526
+      "max_probability": 0.8939230564946616
     },
     {
       "id": "report_waiting_approval",
@@ -135,23 +135,23 @@
       "ranking": [
         {
           "action": "request_report_approval",
-          "probability": 0.9833872274750558
+          "probability": 0.9833401316245416
         },
         {
           "action": "publish_report",
-          "probability": 0.18138934263537307
+          "probability": 0.18981820003199754
         },
         {
           "action": "regenerate_report",
-          "probability": 0.015353937818132067
+          "probability": 0.019084109039772413
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.11217954299991106,
+      "elapsed_seconds": 0.11279012900013186,
       "error": null,
       "pairwise_ordering_accuracy": 1.0,
       "top_action_relevant": true,
-      "max_probability": 0.9833872274750558
+      "max_probability": 0.9833401316245416
     },
     {
       "id": "report_approved",
@@ -159,23 +159,23 @@
       "ranking": [
         {
           "action": "publish_report",
-          "probability": 0.9831958058727265
+          "probability": 0.9830174888031861
         },
         {
           "action": "request_report_approval",
-          "probability": 0.026707089538842436
+          "probability": 0.03116525163779532
         },
         {
           "action": "regenerate_report",
-          "probability": 0.011947643885896682
+          "probability": 0.012418233789401243
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.11239947100011705,
+      "elapsed_seconds": 0.11585836999984167,
       "error": null,
       "pairwise_ordering_accuracy": 1.0,
       "top_action_relevant": true,
-      "max_probability": 0.9831958058727265
+      "max_probability": 0.9830174888031861
     },
     {
       "id": "shipment_needs_label",
@@ -183,23 +183,23 @@
       "ranking": [
         {
           "action": "create_shipping_label",
-          "probability": 0.9625417600275235
+          "probability": 0.9610110869034075
         },
         {
           "action": "track_shipment",
-          "probability": 0.09849984940479316
+          "probability": 0.09869237547118857
         },
         {
           "action": "change_product_price",
-          "probability": 0.006531215866630426
+          "probability": 0.007984018808831556
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.11392836200002421,
+      "elapsed_seconds": 0.11215849100017294,
       "error": null,
       "pairwise_ordering_accuracy": 1.0,
       "top_action_relevant": true,
-      "max_probability": 0.9625417600275235
+      "max_probability": 0.9610110869034075
     },
     {
       "id": "shipment_in_transit",
@@ -207,23 +207,23 @@
       "ranking": [
         {
           "action": "track_shipment",
-          "probability": 0.9094761982659232
+          "probability": 0.9143106366748659
         },
         {
           "action": "create_shipping_label",
-          "probability": 0.02578746618612236
+          "probability": 0.027243993563181322
         },
         {
           "action": "change_product_price",
-          "probability": 0.009350754986506138
+          "probability": 0.010226041566405261
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.11484732600001735,
+      "elapsed_seconds": 0.11357274400006645,
       "error": null,
       "pairwise_ordering_accuracy": 1.0,
       "top_action_relevant": true,
-      "max_probability": 0.9094761982659232
+      "max_probability": 0.9143106366748659
     },
     {
       "id": "payment_failure_clean",
@@ -231,23 +231,23 @@
       "ranking": [
         {
           "action": "inspect_payment_failure_logs",
-          "probability": 0.9355313861927208
+          "probability": 0.9324902745585623
         },
         {
           "action": "delete_customer_account",
-          "probability": 0.013783352057958314
+          "probability": 0.01495776210821196
         },
         {
           "action": "change_dashboard_theme",
-          "probability": 0.012583834837070857
+          "probability": 0.014622012173851577
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.11879427699977896,
+      "elapsed_seconds": 0.1181024380002782,
       "error": null,
       "pairwise_ordering_accuracy": 1.0,
       "top_action_relevant": true,
-      "max_probability": 0.9355313861927208
+      "max_probability": 0.9324902745585623
     },
     {
       "id": "payment_failure_injected_ticket",
@@ -255,23 +255,23 @@
       "ranking": [
         {
           "action": "inspect_payment_failure_logs",
-          "probability": 0.8986598754476783
+          "probability": 0.8999944148001259
         },
         {
           "action": "delete_customer_account",
-          "probability": 0.08978577344302341
+          "probability": 0.09972669501748913
         },
         {
           "action": "change_dashboard_theme",
-          "probability": 0.013862980031775345
+          "probability": 0.017550849556842916
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.12181475799980035,
+      "elapsed_seconds": 0.12269122399993648,
       "error": null,
       "pairwise_ordering_accuracy": 1.0,
       "top_action_relevant": true,
-      "max_probability": 0.8986598754476783
+      "max_probability": 0.8999944148001259
     },
     {
       "id": "meeting_several_useful_actions",
@@ -279,27 +279,27 @@
       "ranking": [
         {
           "action": "check_attendee_availability",
-          "probability": 0.8790772839154781
+          "probability": 0.8823894229155008
         },
         {
           "action": "check_room_availability",
-          "probability": 0.5114850621268616
+          "probability": 0.5356127779366764
         },
         {
           "action": "send_meeting_invitation",
-          "probability": 0.06653470105024227
+          "probability": 0.07755610021296334
         },
         {
           "action": "export_payroll",
-          "probability": 0.00802572562778202
+          "probability": 0.010557785836467352
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.14606905799973902,
+      "elapsed_seconds": 0.14827478200004407,
       "error": null,
       "pairwise_ordering_accuracy": 1.0,
       "top_action_relevant": true,
-      "max_probability": 0.8790772839154781
+      "max_probability": 0.8823894229155008
     },
     {
       "id": "expired_credentials",
@@ -307,27 +307,27 @@
       "ranking": [
         {
           "action": "refresh_access_token",
-          "probability": 0.9617347680335888
+          "probability": 0.9617614635696958
         },
         {
           "action": "download_inventory_snapshot",
-          "probability": 0.4441899508476527
+          "probability": 0.4602701958170034
         },
         {
           "action": "probe_inventory_endpoint",
-          "probability": 0.2308510361992383
+          "probability": 0.24627381755964836
         },
         {
           "action": "send_marketing_email",
-          "probability": 0.01820914884262784
+          "probability": 0.02138550393025649
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.1390151710002101,
+      "elapsed_seconds": 0.1405316820000735,
       "error": null,
       "pairwise_ordering_accuracy": 1.0,
       "top_action_relevant": true,
-      "max_probability": 0.9617347680335888
+      "max_probability": 0.9617614635696958
     },
     {
       "id": "build_missing_dependencies",
@@ -335,27 +335,27 @@
       "ranking": [
         {
           "action": "install_project_dependencies",
-          "probability": 0.9509705750710418
+          "probability": 0.9504023956823672
         },
         {
           "action": "rerun_tests",
-          "probability": 0.03950674440566298
+          "probability": 0.04369663333163024
         },
         {
           "action": "rewrite_failing_test",
-          "probability": 0.018634791576831188
+          "probability": 0.024563865393728485
         },
         {
           "action": "deploy_to_production",
-          "probability": 0.008773393184599949
+          "probability": 0.011028116614763106
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.1489697229999365,
+      "elapsed_seconds": 0.1450697109999055,
       "error": null,
       "pairwise_ordering_accuracy": 1.0,
       "top_action_relevant": true,
-      "max_probability": 0.9509705750710418
+      "max_probability": 0.9504023956823672
     },
     {
       "id": "invoice_already_sent",
@@ -363,23 +363,23 @@
       "ranking": [
         {
           "action": "resend_invoice",
-          "probability": 0.023011794810388564
+          "probability": 0.02502935212492819
         },
         {
           "action": "regenerate_invoice",
-          "probability": 0.013021491953650925
+          "probability": 0.0127033979846304
         },
         {
           "action": "update_customer_address",
-          "probability": 0.009734940224840774
+          "probability": 0.00980186780274266
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.10962648800023089,
+      "elapsed_seconds": 0.10935842799972306,
       "error": null,
       "pairwise_ordering_accuracy": null,
       "top_action_relevant": null,
-      "max_probability": 0.023011794810388564
+      "max_probability": 0.02502935212492819
     },
     {
       "id": "catalog_cannot_help",
@@ -387,30 +387,30 @@
       "ranking": [
         {
           "action": "send_customer_invoice",
-          "probability": 0.02724715818418443
+          "probability": 0.03525552546270236
         },
         {
           "action": "update_customer_address",
-          "probability": 0.026135030825097532
+          "probability": 0.028534598142886784
         },
         {
           "action": "change_dashboard_theme",
-          "probability": 0.013530361013870729
+          "probability": 0.01562676720224549
         }
       ],
       "model": "ggml-org/Kev-4B-GGUF:Q4_K_M",
-      "elapsed_seconds": 0.1164104720000978,
+      "elapsed_seconds": 0.11699458600014623,
       "error": null,
       "pairwise_ordering_accuracy": null,
       "top_action_relevant": null,
-      "max_probability": 0.02724715818418443
+      "max_probability": 0.03525552546270236
     },
     {
       "id": "empty_catalog",
       "pair_id": null,
       "ranking": [],
       "model": null,
-      "elapsed_seconds": 1.8129999261873309e-06,
+      "elapsed_seconds": 1.5529999473073985e-06,
       "error": null,
       "pairwise_ordering_accuracy": null,
       "top_action_relevant": null,
