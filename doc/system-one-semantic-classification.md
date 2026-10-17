@@ -61,10 +61,3 @@ The result is easier to test and audit. Tests can assert the exact questions sen
 to the model and feed controlled probabilities into the deterministic selection
 logic. Exact requests are also cached, so repeated analysis avoids another model
 call.
-
-## References
-
-See [`jira_ids.py`](../src/ai_assisted_troubleshooting/cli/jira_ids.py) for the
-CLI flow, [`id_decision.py`](../src/ai_assisted_troubleshooting/id_decision.py)
-for question construction and selection, and the pinned
-[System One API reference](system-one-api.md) for the request and response types.
