@@ -25,7 +25,11 @@ class RankedPlan:
     probability: float
 
 
-def _validate(intent: str, state: str, plans: Sequence[str]) -> list[str]:
+def validate_ranking_inputs(intent: str, state: str, plans: Sequence[str]) -> list[str]:
+    """Validate context and up to MAX_PLANS texts, unique after trimming.
+
+    Returns trimmed texts. Raises ValueError for invalid inputs.
+    """
     if isinstance(plans, str):
         raise ValueError("plans must be a sequence of plan texts")
     if len(plans) > MAX_PLANS:
@@ -84,7 +88,7 @@ def rank_plans(
         InvalidEvaluationError: Invalid answer structure, type, or requested IDs.
             Dependency failures propagate unchanged.
     """
-    plans = _validate(intent, state, plans)
+    plans = validate_ranking_inputs(intent, state, plans)
     if not plans:
         return []
     questions = {f"plan_{i}": _question(plan) for i, plan in enumerate(plans)}

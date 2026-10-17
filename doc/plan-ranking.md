@@ -44,6 +44,9 @@ The evaluator can be a caller-owned `SystemOneClient`; connection configuration
 belongs to [installation](install.md). The API docstring owns the input and error
 contract.
 
+`npc-rank-plans` exposes the same ranking through JSON files or standard input.
+Run `npc-rank-plans --help` for its request format, options, and exit codes.
+
 ## Shape
 
 `plan_ranking.py` owns `rank_plans` and immutable `RankedPlan(plan, probability)`.
