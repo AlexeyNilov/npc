@@ -5,8 +5,14 @@ usefulness as the next step toward an intent, given the current state.
 
 ## Rationale
 
-System One judges contextual usefulness. `rank_actions` validates inputs and
-responses, preserves action identity, and sorts the results.
+`rank_actions` gives NPC agents a simple way to evaluate available actions.
+It is designed for fast assessment through one batch of semantic questions,
+as a building block for a broader NPC decision loop.
+
+The [semantic classification approach](system-one-semantic-classification.md)
+explains the design: the model judges context, while code validates answers and
+applies decision policy. `rank_actions` returns a ranking for the decision loop
+to use when selecting an action.
 
 ## Flow
 
@@ -25,4 +31,4 @@ responses, preserves action identity, and sorts the results.
 ## Benchmark
 
 The [benchmark cases](../tests/fixtures/action_ranking/cases.json) compare rankings
-with human-authored ordering tiers and useful-action labels. 
+with human-authored ordering tiers and useful-action labels.
