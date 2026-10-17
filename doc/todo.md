@@ -1,3 +1,2 @@
-simplify
-explain action code
+plan validation
 limit to N actions
