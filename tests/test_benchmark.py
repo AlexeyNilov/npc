@@ -346,11 +346,15 @@ def test_elapsed_time_ids_and_optional_model(monkeypatch: pytest.MonkeyPatch) ->
                 "answers": {key: {"type": "noul", "noul": 0.5} for key in questions}
             }
 
-    clock = iter([10.0, 10.25, 20.0, 20.5, 30.0, 30.75, 40.0, 41.0])
+    clock = iter(
+        [9.0, 10.0, 10.25, 20.0, 20.5, 22.0, 29.0, 30.0, 30.75, 40.0, 41.0, 43.0]
+    )
     monkeypatch.setattr("npc.benchmark.perf_counter", lambda: next(clock))
     cases = load_cases(FIXTURE)[:2]
     success = run_benchmark(cases, evaluator=NoMetadata())
     failure = run_benchmark(cases, evaluator=FailingEvaluator())
+    assert success["elapsed_seconds"] == 13.0
+    assert failure["elapsed_seconds"] == 14.0
     results = success["results"]
     assert isinstance(results, list)
     assert [

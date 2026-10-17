@@ -124,6 +124,7 @@ def run_benchmark(
     are better. Each evaluated action has equal weight in the overall mean.
     Labels stay local. Empty catalogs and failed requests contribute no scores.
     """
+    started = perf_counter()
     results = [_evaluate(case, evaluator) for case in cases]
     evaluated_actions = sum(len(result.ranking) for result in results)
     squared_error = sum(
@@ -134,6 +135,7 @@ def run_benchmark(
     return {
         "created_at": datetime.now(UTC).isoformat(),
         "prompt_version": PROMPT_VERSION,
+        "elapsed_seconds": perf_counter() - started,
         "metrics": {
             "total_cases": len(results),
             "error_cases": sum(result.error is not None for result in results),

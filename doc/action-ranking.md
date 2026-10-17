@@ -73,6 +73,10 @@ not useful is 0. A score of 0 is perfect; 1 is maximally wrong. The overall scor
 weights every evaluated action equally. Empty catalogs and failed requests have
 no score; failures are counted separately.
 
+The report's `elapsed_seconds` measures total evaluation and scoring time,
+including failed requests. Each result also has its own `elapsed_seconds`.
+Total time excludes loading the fixture and writing the report.
+
 There are no ordering tiers or usefulness cutoffs. Multiple actions can be useful,
 even when their costs or expected benefits differ. Cases where every action is
 useless measure whether scores stay near zero, including singleton catalogs.
