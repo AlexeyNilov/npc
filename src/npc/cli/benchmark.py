@@ -1,4 +1,4 @@
-"""Run labeled action-ranking scenarios against a System One endpoint."""
+"""Measure action usefulness probabilities against binary labels with Brier scores."""
 
 import argparse
 import json
@@ -21,12 +21,15 @@ def _parser() -> argparse.ArgumentParser:
             "npc-benchmark --input tests/fixtures/action_ranking/cases.json "
             "--output /tmp/action-ranking-report.json. "
             "Exit codes: 0 completed, 1 configuration/I/O error, "
-            "2 report saved with case errors. Ranking mismatches are measurements "
+            "2 report saved with case errors. Brier scores measure probability error "
             "and do not change the exit code."
         ),
     )
     parser.add_argument(
-        "--input", required=True, type=Path, help="UTF-8 JSON array of benchmark cases"
+        "--input",
+        required=True,
+        type=Path,
+        help="UTF-8 JSON cases with id, intent, state, actions, and relevant_actions",
     )
     parser.add_argument(
         "--output", type=Path, help="Write JSON report to this file (default: stdout)"

@@ -1,4 +1,4 @@
-"""Benchmark comparisons, fixture loading and command-line behavior."""
+"""Usefulness probabilities, fixture loading and command-line behavior."""
 
 import json
 from pathlib import Path
@@ -34,26 +34,24 @@ class Evaluator:
 
 
 def test_fixture_labels_are_complete() -> None:
-    """Every shipped case has a complete ranking and valid relevance annotations."""
+    """Every shipped scenario loads with valid usefulness annotations."""
     cases = load_cases(FIXTURE)
     assert len(cases) == 39
     assert len({case.id for case in cases}) == 39
-    assert sum(case.pair_id is not None for case in cases) == 24
     assert cases[-1].actions == []
 
 
 def test_metrics_and_no_label_leakage() -> None:
-    """Scores determine ordering, ties fail strict preferences, and labels stay local."""
+    """Every probability is scored against usefulness; labels stay local."""
     cases = load_cases(FIXTURE)[:2]
     evaluator = Evaluator([[0.1, 0.2, 0.9], [0.2, 0.9, 0.9]])
     report = run_benchmark(cases, evaluator=evaluator)
-    metrics = report["metrics"]
-    assert isinstance(metrics, dict)
-    assert metrics["pairwise_ordering_accuracy"] == 0.75
-    assert metrics["top_action_relevance"] == 1.0
-    assert metrics["comparable_cases"] == 2
-    assert metrics["error_cases"] == 0
-    assert report["pairs"] == [{"pair_id": "checkout_recovery", "passed": False}]
+    assert report["metrics"] == {
+        "total_cases": 2,
+        "error_cases": 0,
+        "evaluated_actions": 6,
+        "brier_score": pytest.approx(0.92 / 6),
+    }
     results = report["results"]
     assert isinstance(results, list)
     assert results[0]["model"] == "test-model"
@@ -61,7 +59,9 @@ def test_metrics_and_no_label_leakage() -> None:
         "action": "read_application_logs",
         "probability": 0.9,
     }
-    assert results[1]["pairwise_ordering_accuracy"] == 0.5
+    assert results[0]["relevant_actions"] == ["read_application_logs"]
+    assert results[0]["brier_score"] == pytest.approx(0.02)
+    assert results[1]["brier_score"] == pytest.approx(0.86 / 3)
     assert results[0]["elapsed_seconds"] >= 0
     assert evaluator.states == [
         {
@@ -73,8 +73,8 @@ def test_metrics_and_no_label_leakage() -> None:
     ]
 
 
-def test_abstention_empty_and_failures() -> None:
-    """No-useful-action scores and empty catalogs remain distinct from failed requests."""
+def test_no_useful_actions_empty_and_failures() -> None:
+    """All-negative cases count; empty catalogs and errors invent no probabilities."""
     cases = [
         case
         for case in load_cases(FIXTURE)
@@ -84,16 +84,57 @@ def test_abstention_empty_and_failures() -> None:
     report = run_benchmark(cases, evaluator=evaluator)
     results = report["results"]
     assert isinstance(results, list)
-    assert [result["max_probability"] for result in results] == [0.8, 0.4, None]
+    assert [result["brier_score"] for result in results] == [
+        pytest.approx(0.69 / 3),
+        pytest.approx(0.29 / 3),
+        None,
+    ]
+    assert report["metrics"] == {
+        "total_cases": 3,
+        "error_cases": 0,
+        "evaluated_actions": 6,
+        "brier_score": pytest.approx(0.98 / 6),
+    }
     assert results[-1]["ranking"] == []
     assert results[-1]["model"] is None
     assert len(evaluator.states) == 2
     failed = run_benchmark(load_cases(FIXTURE)[:2], evaluator=FailingEvaluator())
-    metrics = failed["metrics"]
-    assert isinstance(metrics, dict)
-    assert metrics["error_cases"] == 2
-    assert metrics["pairwise_ordering_accuracy"] is None
-    assert failed["pairs"] == [{"pair_id": "checkout_recovery", "passed": False}]
+    assert failed["metrics"] == {
+        "total_cases": 2,
+        "error_cases": 2,
+        "evaluated_actions": 0,
+        "brier_score": None,
+    }
+
+
+def test_useful_alternatives_need_no_preference_order() -> None:
+    """Both useful delivery methods can score equally well despite different costs."""
+    cases = [case for case in load_cases(FIXTURE) if case.id == "report_delivery_cost"]
+    report = run_benchmark(cases, evaluator=Evaluator([[1.0, 1.0]]))
+    assert report["metrics"] == {
+        "total_cases": 1,
+        "error_cases": 0,
+        "evaluated_actions": 2,
+        "brier_score": 0.0,
+    }
+
+
+def test_action_weighted_score_and_uncertainty() -> None:
+    """Each action has equal weight, including a singleton and uncertain predictions."""
+    from dataclasses import replace
+
+    base = load_cases(FIXTURE)[0]
+    cases = [
+        replace(base, actions=["help"], relevant_actions=["help"]),
+        replace(base, actions=["a", "b", "c"], relevant_actions=[]),
+    ]
+    report = run_benchmark(cases, evaluator=Evaluator([[0.0], [0.5, 0.5, 0.5]]))
+    assert report["metrics"] == {
+        "total_cases": 2,
+        "error_cases": 0,
+        "evaluated_actions": 4,
+        "brier_score": pytest.approx(1.75 / 4),
+    }
 
 
 class FailingEvaluator:
@@ -108,7 +149,8 @@ class FailingEvaluator:
     [
         "duplicate_id",
         "duplicate_action",
-        "missing_tier_action",
+        "missing_relevance_labels",
+        "duplicate_relevant_action",
         "unknown_relevant_action",
         "blank_intent",
     ],
@@ -120,8 +162,10 @@ def test_invalid_fixture(tmp_path: Path, change: str) -> None:
         data[1]["id"] = data[0]["id"]
     elif change == "duplicate_action":
         data[0]["actions"].append(data[0]["actions"][0])
-    elif change == "missing_tier_action":
-        data[0]["expected_tiers"][0] = []
+    elif change == "missing_relevance_labels":
+        del data[0]["relevant_actions"]
+    elif change == "duplicate_relevant_action":
+        data[0]["relevant_actions"] *= 2
     elif change == "unknown_relevant_action":
         data[0]["relevant_actions"] = ["unknown"]
     else:
@@ -172,35 +216,25 @@ def test_cli_empty_catalog(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> N
     assert report["endpoint"] == "http://127.0.0.1:1/v1/systemone"
 
 
-def test_successful_pairs_and_false_top_action() -> None:
-    """Perfect ordering passes a controlled pair; a wrong top action is measured."""
+def test_report_metadata() -> None:
+    """Reports identify the prompt and use an unambiguous timestamp."""
     from datetime import datetime
 
     from npc.action_ranking import PROMPT_VERSION
 
-    cases = load_cases(FIXTURE)[:2]
-    perfect = run_benchmark(
-        cases, evaluator=Evaluator([[0.1, 0.2, 0.9], [0.1, 0.9, 0.2]])
-    )
-    assert perfect["pairs"] == [{"pair_id": "checkout_recovery", "passed": True}]
-    assert perfect["prompt_version"] == PROMPT_VERSION
-    assert isinstance(perfect["created_at"], str)
-    assert datetime.fromisoformat(perfect["created_at"]).utcoffset() is not None
-    wrong = run_benchmark(
-        cases, evaluator=Evaluator([[0.9, 0.2, 0.1], [0.1, 0.9, 0.2]])
-    )
-    assert wrong["metrics"] == {
-        "total_cases": 2,
+    report = run_benchmark([], evaluator=Evaluator([]))
+    assert report["prompt_version"] == PROMPT_VERSION
+    assert isinstance(report["created_at"], str)
+    assert datetime.fromisoformat(report["created_at"]).utcoffset() is not None
+    assert report["metrics"] == {
+        "total_cases": 0,
         "error_cases": 0,
-        "comparable_cases": 2,
-        "noncomparable_successful_cases": 0,
-        "pairwise_ordering_accuracy": 0.5,
-        "top_action_relevance": 0.5,
-        "top_action_evaluated_cases": 2,
+        "evaluated_actions": 0,
+        "brier_score": None,
     }
 
 
-@pytest.mark.parametrize("payload", [None, {}, [None], [{"expected_tiers": None}]])
+@pytest.mark.parametrize("payload", [None, {}, [None], [{}]])
 def test_invalid_fixture_shapes(tmp_path: Path, payload: object) -> None:
     """Malformed JSON structures produce fixture validation errors."""
     path = tmp_path / "cases.json"
@@ -209,46 +243,11 @@ def test_invalid_fixture_shapes(tmp_path: Path, payload: object) -> None:
         load_cases(path)
 
 
-@pytest.mark.parametrize("field", ["actions", "expected_tiers", "relevant_actions"])
+@pytest.mark.parametrize("field", ["actions", "relevant_actions"])
 def test_invalid_fixture_lists(tmp_path: Path, field: str) -> None:
-    """Fixture names and tier lists must be actual lists rather than strings."""
+    """Action names and usefulness labels must be lists rather than strings."""
     data = json.loads(FIXTURE.read_text())[:2]
     data[0][field] = "invalid"
-    path = tmp_path / "cases.json"
-    path.write_text(json.dumps(data))
-    with pytest.raises(ValueError):
-        load_cases(path)
-
-
-@pytest.mark.parametrize(
-    "change",
-    [
-        "count",
-        "intent",
-        "actions",
-        "same_state",
-        "tier_identity",
-        "tier_duplicate",
-        "blank_pair",
-    ],
-)
-def test_inconsistent_pairs_and_labels(tmp_path: Path, change: str) -> None:
-    """Controlled comparisons require matching inputs, changed states, and exact labels."""
-    data = json.loads(FIXTURE.read_text())[:2]
-    if change == "count":
-        data.pop()
-    elif change == "same_state":
-        data[1]["state"] = data[0]["state"]
-    elif change == "tier_identity":
-        data[0]["expected_tiers"][0] = ["unknown"]
-    elif change == "tier_duplicate":
-        data[0]["expected_tiers"][0] = [data[0]["expected_tiers"][1][0]]
-    elif change == "blank_pair":
-        data[0]["pair_id"] = " "
-    elif change == "actions":
-        data[1]["actions"].reverse()
-    else:
-        data[1]["intent"] = "Different intent"
     path = tmp_path / "cases.json"
     path.write_text(json.dumps(data))
     with pytest.raises(ValueError):
@@ -275,14 +274,15 @@ def test_case_error_continues_without_zero_scores() -> None:
     assert isinstance(results, list)
     assert results[0]["error"].startswith("InvalidEvaluationError: ")
     assert results[0]["ranking"] == []
-    assert results[0]["max_probability"] is None
+    assert results[0]["relevant_actions"] == ["read_application_logs"]
+    assert results[0]["brier_score"] is None
     assert results[1]["error"] is None
     metrics = report["metrics"]
     assert isinstance(metrics, dict)
     assert metrics["total_cases"] == 2
     assert metrics["error_cases"] == 1
-    assert metrics["comparable_cases"] == 1
-    assert metrics["pairwise_ordering_accuracy"] == 1.0
+    assert metrics["evaluated_actions"] == 3
+    assert metrics["brier_score"] == pytest.approx(0.02)
 
 
 def test_cli_stdout_and_case_errors(
@@ -374,7 +374,7 @@ def test_cli_requires_input(capsys: pytest.CaptureFixture[str]) -> None:
 
 @pytest.mark.parametrize("field", ["id", "intent", "state"])
 def test_standalone_blank_text(tmp_path: Path, field: str) -> None:
-    """Standalone cases reject blank text without relying on pair consistency checks."""
+    """Cases reject blank identifiers and context before evaluation."""
     data = json.loads(FIXTURE.read_text())[-2:-1]
     data[0][field] = " "
     path = tmp_path / "cases.json"
@@ -384,12 +384,12 @@ def test_standalone_blank_text(tmp_path: Path, field: str) -> None:
 
 
 def test_error_counts_and_invalid_metadata() -> None:
-    """Failed cases are not successful incomparable cases; metadata must be text."""
+    """Failed cases contribute no predictions; model metadata must be text."""
     cases = load_cases(FIXTURE)[:2]
     failed = run_benchmark(cases, evaluator=FailingEvaluator())
     metrics = failed["metrics"]
     assert isinstance(metrics, dict)
-    assert metrics["noncomparable_successful_cases"] == 0
+    assert metrics["evaluated_actions"] == 0
     evaluator = Evaluator([[0.1, 0.2, 0.9], [0.1, 0.9, 0.2]])
     object.__setattr__(evaluator, "model", 123)
     results = run_benchmark(cases, evaluator=evaluator)["results"]
