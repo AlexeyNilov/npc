@@ -19,7 +19,7 @@ class SystemOneEvaluator(Protocol):
     """Evaluate typed questions without coupling ranking to a transport."""
 
     def evaluate(self, state: dict[str, str], questions: dict[str, Question]) -> object:
-        """Return the System One response, including its answers mapping."""
+        """Return answers with finite numeric noul probabilities in [0, 1]."""
         ...
 
 
@@ -32,7 +32,7 @@ class RankedAction:
 
 
 class InvalidEvaluationError(ValueError):
-    """The evaluator returned an incomplete or invalid set of probabilities."""
+    """The evaluator returned an invalid answer structure or mismatched IDs."""
 
 
 def _validate_inputs(intent: str, state: str, actions: Sequence[str]) -> None:
@@ -63,14 +63,9 @@ def _question(action: str) -> Question:
 def _probability(answer: object) -> float:
     if not isinstance(answer, dict) or answer.get("type") != "noul":
         raise InvalidEvaluationError("Each answer must have type noul")
-    value = answer.get("noul")
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise InvalidEvaluationError("Each noul probability must be numeric")
-    if not 0 <= value <= 1:
-        raise InvalidEvaluationError(
-            "Each noul probability must be finite and in [0, 1]"
-        )
-    return float(value)
+    if "noul" not in answer:
+        raise InvalidEvaluationError("Each answer must include a noul probability")
+    return float(answer["noul"])
 
 
 def _answers(payload: object, questions: dict[str, Question]) -> dict[str, object]:
@@ -95,14 +90,15 @@ def rank_actions(
         intent: Nonblank goal to advance.
         state: Nonblank description of the current situation.
         actions: Unique, nonblank action names; an empty sequence avoids evaluation.
-        evaluator: Injected typed-question evaluator.
+        evaluator: Injected typed-question evaluator that guarantees finite numeric
+            probabilities in [0, 1].
 
     Returns:
         Every action with its raw relevance probability, without normalization.
 
     Raises:
         ValueError: An input is blank or action names are duplicated.
-        InvalidEvaluationError: The response fails the probability contract.
+        InvalidEvaluationError: The answer structure or requested IDs do not match.
     """
     _validate_inputs(intent, state, actions)
     if not actions:

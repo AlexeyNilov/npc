@@ -253,8 +253,19 @@ def test_inconsistent_pairs_and_labels(tmp_path: Path, change: str) -> None:
 
 def test_case_error_continues_without_zero_scores() -> None:
     """An invalid response is reported while later cases still receive real scores."""
+
+    class MissingAnswer(Evaluator):
+        def evaluate(
+            self, state: dict[str, str], questions: dict[str, Question]
+        ) -> object:
+            payload = super().evaluate(state, questions)
+            if len(self.states) == 1:
+                return {"answers": {}}
+            return payload
+
     report = run_benchmark(
-        load_cases(FIXTURE)[:2], evaluator=Evaluator([[0.1, 0.2, 2.0], [0.1, 0.9, 0.2]])
+        load_cases(FIXTURE)[:2],
+        evaluator=MissingAnswer([[0.1, 0.2, 0.9], [0.1, 0.9, 0.2]]),
     )
     results = report["results"]
     assert isinstance(results, list)
