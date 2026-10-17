@@ -63,3 +63,30 @@ without executing them.
 
 The [benchmark cases](../tests/fixtures/action_ranking/cases.json) compare rankings
 with human-authored ordering tiers and useful-action labels.
+
+The cases probe prerequisites across multiple steps, dependency cycles, uncertain
+payment outcomes, validation of changed artifacts, recovery deadlines, expected
+payoffs, disclosure constraints, and the order of timestamped evidence. Other
+cases cover cancelling obstructive work, information with no decision value,
+budgets for complete action sequences, similar action names, instructions embedded
+in action names, harmful singleton catalogs, and names with unknown meanings.
+Each case includes a rationale for its labels. Controlled pairs keep the intent
+and action catalog fixed while changing the state.
+
+Tiers express strict preferences between groups; actions within a tier have no
+required relative order. Useful-action labels can include a less preferred action
+that still advances the intent. These labels deliberately test whether probability
+of usefulness also captures preferences based on cost, deadlines, and payoff.
+
+Interpret the report with these limits:
+
+- A tie between different tiers fails that ordering comparison. Scores within a
+  tier need not be equal.
+- Cases with no useful actions expose `max_probability` for inspection. They have
+  no abstention threshold and do not contribute to `top_action_relevance`.
+- A single-tier case has no ordering comparisons. A controlled pair containing
+  such a case reports `passed: false` regardless of its scores. The disclosure
+  and timestamped-health pairs exercise this reporting limitation.
+- Overall ordering accuracy averages comparable cases. Inspect individual
+  rankings to distinguish choosing the wrong next action from misordering lower
+  choices. Repeated runs are needed to assess model variability.
