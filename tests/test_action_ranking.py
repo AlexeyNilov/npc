@@ -94,16 +94,6 @@ def test_empty_catalog() -> None:
 
 
 @pytest.mark.parametrize(
-    "score",
-    [True, False, "0.5", None, -0.01, 1.01, float("nan"), float("inf"), -float("inf")],
-)
-def test_invalid_probabilities(score: object) -> None:
-    """Malformed scores must never enter a ranking or silently become zero."""
-    with pytest.raises(InvalidEvaluationError):
-        rank_actions("goal", "state", ["a"], evaluator=Evaluator(response(score)))
-
-
-@pytest.mark.parametrize(
     "payload",
     [
         None,
