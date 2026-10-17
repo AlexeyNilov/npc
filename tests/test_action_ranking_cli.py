@@ -144,6 +144,32 @@ def test_empty(
     assert output.err == ""
 
 
+def test_oversized_catalog(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Oversized input is diagnosed before endpoint configuration or client creation."""
+    monkeypatch.delenv("SYSTEM_ONE", raising=False)
+    monkeypatch.setattr(
+        "sys.stdin",
+        io.StringIO(
+            json.dumps(
+                {**REQUEST, "actions": [f"action_{index}" for index in range(11)]}
+            )
+        ),
+    )
+
+    def unexpected_client() -> None:
+        pytest.fail("An oversized catalog must not create an HTTP client")
+
+    monkeypatch.setattr("npc.cli.action_ranking.httpx2.Client", unexpected_client)
+    assert main([]) == 2
+    output = capsys.readouterr()
+    assert output.out == ""
+    assert "Invalid input:" in output.err
+    assert "11" in output.err
+    assert "10" in output.err
+
+
 @pytest.mark.parametrize("endpoint", [None, "bad-url"])
 def test_configuration(
     endpoint: str | None,
@@ -235,6 +261,7 @@ def test_help(capsys: pytest.CaptureFixture[str]) -> None:
         "SYSTEM_ONE",
         "Exit codes",
         "30",
+        "10",
         "stdin",
     ):
         assert term in output.out

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Protocol, TypedDict
 
 PROMPT_VERSION = "action-relevance-v3"
+MAX_ACTIONS = 10
 
 
 class Question(TypedDict):
@@ -38,9 +39,14 @@ class InvalidEvaluationError(ValueError):
 def validate_ranking_inputs(
     intent: str, state: str, actions: Sequence[str]
 ) -> list[str]:
-    """Validate context and return trimmed action names, unique after trimming."""
+    """Validate context and at most MAX_ACTIONS names, unique after trimming.
+
+    Returns trimmed names. Raises ValueError for invalid inputs.
+    """
     if isinstance(actions, str):
         raise ValueError("actions must be a sequence of action names")
+    if len(actions) > MAX_ACTIONS:
+        raise ValueError(f"received {len(actions)} actions; maximum is {MAX_ACTIONS}")
     for value in (intent, state, *actions):
         if not isinstance(value, str) or not value.strip():
             raise ValueError("intent, state, and action names must be nonblank strings")
@@ -94,8 +100,8 @@ def rank_actions(
     Args:
         intent: Nonblank goal to advance.
         state: Nonblank description of the current situation.
-        actions: Nonblank action names, unique after trimming. Returned names are
-            trimmed; an empty sequence avoids evaluation.
+        actions: At most MAX_ACTIONS nonblank names, unique after trimming.
+            Returned names are trimmed; an empty sequence avoids evaluation.
         evaluator: Injected typed-question evaluator that guarantees finite numeric
             probabilities in [0, 1].
 
@@ -103,7 +109,7 @@ def rank_actions(
         Every action with its raw relevance probability, without normalization.
 
     Raises:
-        ValueError: An input is blank or action names are duplicated.
+        ValueError: An input is invalid or more than MAX_ACTIONS actions are supplied.
         InvalidEvaluationError: The answer structure or requested IDs do not match.
     """
     actions = validate_ranking_inputs(intent, state, actions)

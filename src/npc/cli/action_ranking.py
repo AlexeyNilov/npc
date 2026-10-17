@@ -11,6 +11,7 @@ from pathlib import Path
 import httpx2
 
 from npc.action_ranking import (
+    MAX_ACTIONS,
     InvalidEvaluationError,
     RankedAction,
     rank_actions,
@@ -35,6 +36,7 @@ def _parser() -> argparse.ArgumentParser:
         epilog=(
             'Input: one JSON object with required nonblank string fields "intent" '
             'and "state", and "actions": an array of unique nonblank strings. '
+            f"At most {MAX_ACTIONS} actions are accepted. "
             "Action names are trimmed and must be unique after trimming. "
             "Unknown fields are rejected. Output: a JSON array of action/score objects, "
             "sorted by descending relevance probability, preserving ties and raw scores. "

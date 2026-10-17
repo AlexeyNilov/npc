@@ -122,6 +122,32 @@ def test_empty_catalog() -> None:
     assert evaluator.calls == []
 
 
+def test_action_limit_accepts_ten() -> None:
+    """The maximum catalog is fully ranked rather than rejected or truncated."""
+    names = [f"action_{index}" for index in range(10)]
+    evaluator = Evaluator(response(*([0.5] * 10)))
+    result = rank_actions("goal", "state", names, evaluator=evaluator)
+    assert [(item.action, item.probability) for item in result] == [
+        (name, 0.5) for name in names
+    ]
+    assert len(evaluator.calls) == 1
+
+
+def test_action_limit_rejects_eleven() -> None:
+    """Oversized catalogs fail as caller errors before consuming model resources."""
+    evaluator = Evaluator(response(*([0.5] * 11)))
+    with pytest.raises(ValueError) as error:
+        rank_actions(
+            "goal",
+            "state",
+            [f"action_{index}" for index in range(11)],
+            evaluator=evaluator,
+        )
+    assert "11" in str(error.value)
+    assert "10" in str(error.value)
+    assert evaluator.calls == []
+
+
 @pytest.mark.parametrize(
     "payload",
     [
