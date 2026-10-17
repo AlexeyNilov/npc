@@ -69,9 +69,9 @@ The [benchmark cases](../tests/fixtures/action_ranking/cases.json) use the same
 
 | Model | Request errors | Failed cases | Failed actions | Brier score | Total time (s) |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| [ggml-org/Clef-Flash-GGUF:Q4_K_M](benchmark-results/2026-10-17/clef_flash.json) | 0 | 13 | 17 | 0.063012 | 18.620 |
-| [ggml-org/vllm-d3-mini-GGUF:Q4_K_M](benchmark-results/2026-10-17/d3_mini.json) | 0 | 12 | 22 | 0.072490 | 15.233 |
-| [ggml-org/Kev-4B-GGUF:Q4_K_M](benchmark-results/2026-10-17/kev.json) | 0 | 14 | 22 | 0.078522 | 9.759 |
-| [ggml-org/lev-GGUF:Q4_K_M](benchmark-results/2026-10-17/lev.json) | 0 | 15 | 24 | 0.102554 | 10.450 |
-| [LiquidAI/d1-3B-GGUF:Q8_0](benchmark-results/2026-10-17/d1.json) | 0 | 19 | 34 | 0.113632 | 5.450 |
-| [ggml-org/Laya-GGUF:Q8_0](benchmark-results/2026-10-17/laya.json) | 0 | 58 | 119 | 0.467099 | 4.678 |
+| `ggml-org/Clef-Flash-GGUF:Q4_K_M` | 0 | 13 | 17 | 0.063012 | 18.620 |
+| `ggml-org/vllm-d3-mini-GGUF:Q4_K_M` | 0 | 12 | 22 | 0.072490 | 15.233 |
+| `ggml-org/Kev-4B-GGUF:Q4_K_M` | 0 | 14 | 22 | 0.078522 | 9.759 |
+| `ggml-org/lev-GGUF:Q4_K_M` | 0 | 15 | 24 | 0.102554 | 10.450 |
+| `LiquidAI/d1-3B-GGUF:Q8_0` | 0 | 19 | 34 | 0.113632 | 5.450 |
+| `ggml-org/Laya-GGUF:Q8_0` | 0 | 58 | 119 | 0.467099 | 4.678 |
