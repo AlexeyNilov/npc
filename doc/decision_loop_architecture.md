@@ -1,6 +1,18 @@
 # Tool assessment: recognizing indirect next steps
 
-Status: proposed experiment, separate from existing action ranking.
+Status: implemented experiment, separate from existing action ranking. Model
+quality and cutoff calibration remain unevaluated.
+
+Implementation: [`assess_tools`](../src/npc/tool_assessment.py) returns immutable
+scores in catalog order and an optional exact tool name. Both cutoffs are
+required, inclusive probabilities in `[0, 1]`. Invalid caller inputs raise
+`ValueError`; malformed model answers raise `InvalidEvaluationError`; transport
+failures propagate as `SystemOneError`.
+
+Run the comparison driver through `python -m npc.tool_assessment_experiment`;
+its `--help` owns arguments and examples. The
+[experiment fixtures](../tests/fixtures/tool_assessment/README.md) describe
+labels, development/held-out splits, and report interpretation.
 
 ## Goal and reasoning
 
