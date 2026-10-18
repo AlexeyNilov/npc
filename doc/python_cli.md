@@ -36,6 +36,9 @@ This document captures the reusable structure of Python CLI repository.
   external clients where needed for testing.
 - Return `0` for success and a nonzero code for failures. Send results to stdout
   and actionable errors to stderr. Handle expected failures at the CLI boundary.
+- User-initiated interruption, such as Ctrl+C, aborts execution. Exit status,
+  diagnostics, cleanup, and output completeness are unspecified. Files and
+  streamed output may be incomplete.
 - Support stdin and `--input PATH` with `-` meaning stdin when the command
   processes streamable input. Use UTF-8 for text files. Choose JSON or JSON Lines
   when structured output is required; keep diagnostics out of that output.
