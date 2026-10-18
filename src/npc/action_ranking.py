@@ -12,7 +12,7 @@ MAX_ACTIONS = 10
 
 @dataclass(frozen=True)
 class RankedAction:
-    """An action and its unnormalized model probability of next-step relevance."""
+    """An action and its model probability, interpreted by the supplying ranker."""
 
     action: str
     probability: float
