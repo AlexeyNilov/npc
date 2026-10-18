@@ -11,7 +11,7 @@ from npc.cli.benchmark import main
 from npc.model.evaluation import Question, State
 from npc.system_one import InvalidEvaluationError
 
-FIXTURE = Path("tests/fixtures/action_ranking/cases.json")
+FIXTURE = Path("benchmarks/action_ranking.json")
 
 
 class Evaluator:
@@ -422,7 +422,7 @@ def test_elapsed_time_ids_and_optional_model(monkeypatch: pytest.MonkeyPatch) ->
     clock = iter(
         [9.0, 10.0, 10.25, 20.0, 20.5, 22.0, 29.0, 30.0, 30.75, 40.0, 41.0, 43.0]
     )
-    monkeypatch.setattr("npc.benchmark.perf_counter", lambda: next(clock))
+    monkeypatch.setattr("npc.benchmarks.runner.perf_counter", lambda: next(clock))
     cases = load_cases(FIXTURE)[:2]
     success = run_benchmark(cases, evaluator=NoMetadata())
     failure = run_benchmark(cases, evaluator=FailingEvaluator())
@@ -499,3 +499,47 @@ def test_prediction_failure_boundary(probability: float, useful: bool) -> None:
     assert metrics["failed_cases"] == int(failed)
     assert metrics["failed_actions"] == int(failed)
     assert metrics["request_error_cases"] == 0
+
+
+def test_dataset_identity() -> None:
+    """In-memory dataset identity changes with inputs or labels, not predictions."""
+    from dataclasses import replace
+
+    case = load_cases(FIXTURE)[0]
+    baseline = run_benchmark([case], evaluator=Evaluator([[0.1, 0.2, 0.9]]))
+    repeated = run_benchmark([case], evaluator=Evaluator([[0.9, 0.2, 0.1]]))
+    assert repeated["dataset_hash"] == baseline["dataset_hash"]
+    reordered = replace(case, state=dict(reversed(list(case.state.items()))))
+    assert (
+        run_benchmark([reordered], evaluator=Evaluator([[0.1, 0.2, 0.9]]))[
+            "dataset_hash"
+        ]
+        == baseline["dataset_hash"]
+    )
+    for changed in [
+        replace(case, id="different"),
+        replace(case, state={**case.state, "situation": "Changed circumstances"}),
+        replace(case, actions=["other", *case.actions[1:]]),
+        replace(case, relevant_actions=[]),
+    ]:
+        report = run_benchmark([changed], evaluator=Evaluator([[0.1, 0.2, 0.9]]))
+        assert report["dataset_hash"] != baseline["dataset_hash"]
+
+
+def test_file_identity_and_action_inputs(tmp_path: Path) -> None:
+    """Action file reports identify the original bytes and retain inputs in order."""
+    from hashlib import sha256
+
+    from npc.benchmarks.action_ranking import run
+
+    data = json.loads(FIXTURE.read_text())[:1]
+    path = tmp_path / "cases.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    report = run(path, evaluator=Evaluator([[0.1, 0.2, 0.9]]))
+    assert report["benchmark"] == "action-ranking"
+    assert report["dataset_hash"] == sha256(path.read_bytes()).hexdigest()
+    results = report["results"]
+    assert isinstance(results, list)
+    assert results[0]["id"] == data[0]["id"]
+    assert results[0]["state"] == data[0]["state"]
+    assert results[0]["actions"] == data[0]["actions"]

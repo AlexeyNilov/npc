@@ -37,3 +37,6 @@ mutants/
 .vscode
 
 tmp
+
+# Generated benchmark reports
+runs/

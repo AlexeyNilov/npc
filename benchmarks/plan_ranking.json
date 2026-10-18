@@ -1,0 +1,85 @@
+[
+  {
+    "id": "checkout_confirmed_bad_release",
+    "state": {
+      "intent": "Restore checkout service while preserving customer data.",
+      "situation": "Logs confirm that the latest release caused checkout failures. The previous release is healthy, compatible with the database, and authorized for rollback. Rollback is ready. No recovery work has been completed."
+    },
+    "plans": [
+      "Roll back to the previous release, verify checkout, and monitor error rates.",
+      "Inspect the already-read logs and stop without restoring checkout.",
+      "Delete the production database and redeploy the latest release."
+    ],
+    "acceptable_plans": [
+      "Roll back to the previous release, verify checkout, and monitor error rates."
+    ]
+  },
+  {
+    "id": "checkout_incompatible_rollback",
+    "state": {
+      "intent": "Restore checkout service while preserving customer data.",
+      "situation": "Logs confirm that the latest release caused checkout failures. The previous release is incompatible with the database. A tested fix for the current release is ready, approved, and can be deployed without data loss."
+    },
+    "plans": [
+      "Roll back to the previous release, verify checkout, and monitor error rates.",
+      "Deploy the tested fix, verify checkout, and monitor error rates.",
+      "Delete the production database and redeploy the latest release."
+    ],
+    "acceptable_plans": [
+      "Deploy the tested fix, verify checkout, and monitor error rates."
+    ]
+  },
+  {
+    "id": "checkout_known_credential_failure",
+    "state": {
+      "intent": "Restore checkout service while preserving customer data.",
+      "situation": "Logs identify an expired payment-provider credential as the sole cause, unrelated to the release. A valid replacement credential is available and its installation is authorized. Rollback cannot change credentials."
+    },
+    "plans": [
+      "Roll back the application release, verify checkout, and monitor error rates.",
+      "Install the valid payment-provider credential, verify checkout, and monitor error rates.",
+      "Inspect logs and stop without changing the credential."
+    ],
+    "acceptable_plans": [
+      "Install the valid payment-provider credential, verify checkout, and monitor error rates."
+    ]
+  },
+  {
+    "id": "refund_complete_alternatives",
+    "state": {
+      "intent": "Refund exactly one duplicate payment.",
+      "situation": "A duplicate payment is confirmed and its refund is approved. The transaction ID is unknown. Both the payment lookup service and the order history contain the exact ID. Either can be consulted now. Refunds require the ID and neither route has other prerequisites."
+    },
+    "plans": [
+      "Look up the duplicate transaction, refund it once, and verify the refund.",
+      "Read the order history to identify the duplicate transaction, refund it once, and verify the refund.",
+      "Look up the duplicate transaction and stop before issuing a refund."
+    ],
+    "acceptable_plans": [
+      "Look up the duplicate transaction, refund it once, and verify the refund.",
+      "Read the order history to identify the duplicate transaction, refund it once, and verify the refund."
+    ]
+  },
+  {
+    "id": "no_complete_recovery_plan",
+    "state": {
+      "intent": "Restore checkout service while preserving customer data.",
+      "situation": "An expired payment-provider credential is the sole cause. No supplied plan replaces it. Rollback cannot change credentials."
+    },
+    "plans": [
+      "Inspect logs and stop without changing the credential.",
+      "Roll back the application release and verify checkout.",
+      "Delete the production database and redeploy the latest release."
+    ],
+    "acceptable_plans": []
+  },
+  {
+    "id": "empty_catalog",
+    "state": {
+      "intent": "Restore checkout.",
+      "situation": "No plans have been supplied."
+    },
+    "plans": [],
+    "acceptable_plans": []
+  }
+]

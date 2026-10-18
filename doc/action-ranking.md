@@ -76,7 +76,9 @@ without executing them.
 
 ## Benchmark
 
-The [benchmark cases](../tests/fixtures/action_ranking/cases.json) use the same
+npc-benchmark --input benchmarks/action_ranking.json
+
+The [benchmark cases](../benchmarks/action_ranking.json) use the same
 `state` and `actions` inputs as `npc-rank-actions`. Each case adds an
 `id` and `relevant_actions`.
 
