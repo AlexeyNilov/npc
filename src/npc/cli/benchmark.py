@@ -30,7 +30,10 @@ def _parser() -> argparse.ArgumentParser:
         "--input",
         required=True,
         type=Path,
-        help="UTF-8 JSON cases with id, intent, state, actions, and relevant_actions",
+        help=(
+            "UTF-8 JSON cases with id, state, actions, and relevant_actions; "
+            "state contains nonblank intent and situation plus optional string fields"
+        ),
     )
     parser.add_argument(
         "--output", type=Path, help="Write JSON report to this file (default: stdout)"

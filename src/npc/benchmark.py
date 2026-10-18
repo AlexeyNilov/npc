@@ -5,13 +5,14 @@ from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from time import perf_counter
+from typing import cast
 
 from npc.action_ranking import (
     PROMPT_VERSION,
     RankedAction,
     rank_actions,
 )
-from npc.model.evaluation import Evaluator
+from npc.model.evaluation import Evaluator, State, validate_ranking_state
 from npc.system_one import InvalidEvaluationError, SystemOneError
 
 USEFULNESS_THRESHOLD = 0.5
@@ -22,8 +23,7 @@ class BenchmarkCase:
     """Ranking inputs and local-only usefulness labels."""
 
     id: str
-    intent: str
-    state: str
+    state: State
     actions: list[str]
     relevant_actions: list[str]
 
@@ -61,11 +61,11 @@ def _case(value: object) -> BenchmarkCase:
         raise ValueError("Expected a benchmark case object")
     case = BenchmarkCase(
         id=_text(value.get("id")),
-        intent=_text(value.get("intent")),
-        state=_text(value.get("state")),
+        state=cast(State, value.get("state")),
         actions=_names(value.get("actions")),
         relevant_actions=_names(value.get("relevant_actions")),
     )
+    validate_ranking_state(case.state, "available_actions")
     if not set(case.relevant_actions) <= set(case.actions):
         raise ValueError(f"{case.id}: relevance labels must name available actions")
     return case
@@ -85,9 +85,7 @@ def load_cases(path: Path) -> list[BenchmarkCase]:
 def _evaluate(case: BenchmarkCase, evaluator: Evaluator) -> CaseResult:
     started = perf_counter()
     try:
-        ranking = rank_actions(
-            case.intent, case.state, case.actions, evaluator=evaluator
-        )
+        ranking = rank_actions(case.state, case.actions, evaluator=evaluator)
     except (SystemOneError, InvalidEvaluationError) as error:
         return CaseResult(
             case.id,

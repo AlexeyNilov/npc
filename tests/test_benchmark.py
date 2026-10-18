@@ -8,7 +8,7 @@ import pytest
 
 from npc.benchmark import load_cases, run_benchmark
 from npc.cli.benchmark import main
-from npc.model.evaluation import Question
+from npc.model.evaluation import Question, State
 from npc.system_one import InvalidEvaluationError
 
 FIXTURE = Path("tests/fixtures/action_ranking/cases.json")
@@ -19,10 +19,10 @@ class Evaluator:
 
     def __init__(self, scores: list[list[float] | None]) -> None:
         self.scores = iter(scores)
-        self.states: list[dict[str, str]] = []
+        self.states: list[State] = []
 
     def evaluate(
-        self, state: dict[str, str], questions: dict[str, Question]
+        self, state: State, questions: dict[str, Question]
     ) -> dict[str, float]:
         self.states.append(state)
         scores = next(self.scores)
@@ -87,8 +87,7 @@ def test_metrics_and_no_label_leakage() -> None:
     assert results[0]["elapsed_seconds"] >= 0
     assert evaluator.states == [
         {
-            "intent": case.intent,
-            "situation": case.state,
+            **case.state,
             "available_actions": json.dumps(case.actions),
         }
         for case in cases
@@ -175,7 +174,7 @@ def test_action_weighted_score_and_uncertainty() -> None:
 
 class FailingEvaluator:
     def evaluate(
-        self, state: dict[str, str], questions: dict[str, Question]
+        self, state: State, questions: dict[str, Question]
     ) -> dict[str, float]:
         from npc.system_one import SystemOneError
 
@@ -207,7 +206,41 @@ def test_invalid_fixture(tmp_path: Path, change: str) -> None:
     elif change == "unknown_relevant_action":
         data[0]["relevant_actions"] = ["unknown"]
     else:
-        data[0]["intent"] = " "
+        data[0]["state"]["intent"] = " "
+    path = tmp_path / "cases.json"
+    path.write_text(json.dumps(data))
+    with pytest.raises(ValueError):
+        load_cases(path)
+
+
+def test_extended_fixture_state_reaches_evaluation(tmp_path: Path) -> None:
+    """Benchmark loading preserves added context while keeping labels local."""
+    data = json.loads(FIXTURE.read_text())[:1]
+    data[0]["state"]["recent_events"] = "A release just completed."
+    path = tmp_path / "cases.json"
+    path.write_text(json.dumps(data))
+    cases = load_cases(path)
+    evaluator = Evaluator([[0.1, 0.2, 0.9]])
+    run_benchmark(cases, evaluator=evaluator)
+    assert evaluator.states == [
+        {**data[0]["state"], "available_actions": json.dumps(data[0]["actions"])}
+    ]
+    assert cases[0].state == data[0]["state"]
+
+
+@pytest.mark.parametrize(
+    "state",
+    [
+        {"intent": "goal", "situation": "circumstances", "available_actions": "[]"},
+        {"intent": "goal", "situation": "circumstances", "extra": 1},
+        {"intent": "goal"},
+        "old situation input",
+    ],
+)
+def test_invalid_fixture_state(tmp_path: Path, state: object) -> None:
+    """Malformed or conflicting state fails at loading before benchmark execution."""
+    data = json.loads(FIXTURE.read_text())[:1]
+    data[0]["state"] = state
     path = tmp_path / "cases.json"
     path.write_text(json.dumps(data))
     with pytest.raises(ValueError):
@@ -300,7 +333,7 @@ def test_case_error_continues_without_zero_scores() -> None:
 
     class MissingAnswer(Evaluator):
         def evaluate(
-            self, state: dict[str, str], questions: dict[str, Question]
+            self, state: State, questions: dict[str, Question]
         ) -> dict[str, float]:
             payload = super().evaluate(state, questions)
             if len(self.states) == 1:
@@ -382,7 +415,7 @@ def test_elapsed_time_ids_and_optional_model(monkeypatch: pytest.MonkeyPatch) ->
 
     class NoMetadata:
         def evaluate(
-            self, state: dict[str, str], questions: dict[str, Question]
+            self, state: State, questions: dict[str, Question]
         ) -> dict[str, float]:
             return {key: 0.5 for key in questions}
 
@@ -421,7 +454,10 @@ def test_cli_requires_input(capsys: pytest.CaptureFixture[str]) -> None:
 def test_standalone_blank_text(tmp_path: Path, field: str) -> None:
     """Cases reject blank identifiers and context before evaluation."""
     data = json.loads(FIXTURE.read_text())[-2:-1]
-    data[0][field] = " "
+    if field == "intent":
+        data[0]["state"][field] = " "
+    else:
+        data[0][field] = " "
     path = tmp_path / "cases.json"
     path.write_text(json.dumps(data))
     with pytest.raises(ValueError):

@@ -1,7 +1,7 @@
 # Action relevance ranking
 
 [`rank_actions`](../src/npc/action_ranking.py) ranks available action names by
-usefulness as the next step toward an intent, given the current state.
+usefulness as the next step toward an intent, given an evaluation state.
 
 ## Rationale
 
@@ -15,15 +15,29 @@ explains the design: the model judges context, while code applies decision polic
 `[0, 1]` for exactly the requested question IDs. It returns a ranking for the
 decision loop to use when selecting an action.
 
+## Evaluation state
+
+[`State`](../src/npc/model/evaluation.py) is the domain type for all content
+supplied to an evaluator. It is a mapping of string keys to string values.
+For ranking, `intent` describes the goal and `situation` describes current
+circumstances. Additional fields, such as `recent_events` or `constraints`,
+reach the evaluator unchanged. Additional fields can contain empty strings.
+
+The ranker supplies `available_actions`; including that field in the input state
+is an error. The ranking API docstring owns the input and error contract.
+The System One adapter sends the complete evaluation state as the HTTP request's
+`state` field. Questions remain separate from state.
+
 ## Flow
 
 `rank_actions` follows this sequence:
 
-1. Validate nonblank intent, state, and action names. Trim action names and require
-   uniqueness after trimming. Preserve intent and state as supplied.
+1. Validate a state with nonblank `intent` and `situation` fields, and validate
+   action names. Trim action names and require uniqueness after trimming.
+   Preserve all state fields and leave the caller's mapping unchanged.
 2. Create one question per action.
-3. Call `evaluator.evaluate` once with all questions. Shared context contains
-   `intent`, `situation`, and the complete JSON-encoded `available_actions` list.
+3. Copy the state and add the complete JSON-encoded `available_actions` list.
+   Call `evaluator.evaluate` once with this state and all questions.
 4. Map returned probabilities to their original actions and return `RankedAction` objects in
    descending probability order. Preserve ties in input order and keep scores
    without normalization or rounding.
@@ -37,8 +51,11 @@ decision loop to use when selecting an action.
 ```sh
 npc-rank-actions <<'JSON'
 {
-	"intent": "Restore checkout service.",
-	"state": "Checkout fails. The cause is unknown, and logs are available but unread.",
+	"state": {
+		"intent": "Restore checkout service.",
+		"situation": "Checkout fails. The cause is unknown, and logs are available but unread.",
+		"recent_events": "A release just completed."
+	},
 	"actions": ["inspect_logs", "rollback_release", "change_dashboard_theme"]
 }
 JSON
@@ -60,7 +77,7 @@ without executing them.
 ## Benchmark
 
 The [benchmark cases](../tests/fixtures/action_ranking/cases.json) use the same
-`intent`, `state`, and `actions` inputs as `npc-rank-actions`. Each case adds an
+`state` and `actions` inputs as `npc-rank-actions`. Each case adds an
 `id` and `relevant_actions`.
 
 ### Model comparison

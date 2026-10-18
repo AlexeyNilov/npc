@@ -5,7 +5,7 @@ from urllib.parse import urlsplit
 
 import httpx2
 
-from npc.model.evaluation import Question
+from npc.model.evaluation import Question, State
 
 
 class InvalidEvaluationError(ValueError):
@@ -69,7 +69,7 @@ class SystemOneClient:
         self.model: str | None = None
 
     def evaluate(
-        self, state: dict[str, str], questions: dict[str, Question]
+        self, state: State, questions: dict[str, Question]
     ) -> dict[str, float]:
         """POST one batch and decode domain probabilities, preserving dependency failures."""
         self.model = None

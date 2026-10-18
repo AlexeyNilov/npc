@@ -10,9 +10,14 @@ import pytest
 
 from npc.cli.plan_ranking import main
 
-REQUEST = {
+STATE = {
     "intent": " Restore checkout ",
-    "state": " Cause unknown ",
+    "situation": " Cause unknown ",
+    "recent_events": "A release just completed.",
+}
+
+REQUEST = {
+    "state": STATE,
     "plans": [
         " Read café logs, fix the cause, then verify checkout. ",
         "Roll back the release, then verify checkout.",
@@ -89,8 +94,7 @@ def test_ranking(
     assert len(requests) == 1
     assert str(requests[0].url) == "http://example.test/rank"
     assert json.loads(requests[0].content)["state"] == {
-        "intent": REQUEST["intent"],
-        "situation": REQUEST["state"],
+        **STATE,
         "available_plans": json.dumps(
             [
                 "Read café logs, fix the cause, then verify checkout.",
@@ -113,9 +117,12 @@ def test_ranking(
         [],
         {},
         {**REQUEST, "extra": 1},
+        {**REQUEST, "state": "old situation input"},
+        {**REQUEST, "state": {**STATE, "extra": 1}},
+        {**REQUEST, "state": {**STATE, "available_plans": "[]"}},
         *[{k: v for k, v in REQUEST.items() if k != field} for field in REQUEST],
         *[{**REQUEST, "plans": value} for value in INVALID_ARRAYS],
-        {**REQUEST, "intent": "", "plans": []},
+        {**REQUEST, "state": {**STATE, "intent": ""}, "plans": []},
     ],
 )
 def test_invalid_input(
@@ -297,7 +304,10 @@ def test_help(capsys: pytest.CaptureFixture[str]) -> None:
         "--input",
         "--timeout",
         "intent",
+        "situation",
         "state",
+        "Additional state fields",
+        "available_plans",
         "plans",
         "score",
         "SYSTEM_ONE",
@@ -312,9 +322,12 @@ def test_help(capsys: pytest.CaptureFixture[str]) -> None:
 @pytest.mark.parametrize(
     ("value", "detail"),
     [
-        ({}, "intent, state, and plans"),
+        ({}, "state and plans"),
         ({**REQUEST, "plans": None}, "plans must be an array"),
-        ({**REQUEST, "state": " "}, "nonblank strings"),
+        (
+            {**REQUEST, "state": {"intent": "goal", "situation": " "}},
+            "nonblank strings",
+        ),
         ({**REQUEST, "plans": ["a", " a "]}, "unique"),
     ],
 )

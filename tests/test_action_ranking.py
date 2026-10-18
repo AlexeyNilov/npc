@@ -6,7 +6,7 @@ from collections.abc import Sequence
 import pytest
 
 from npc.action_ranking import rank_actions
-from npc.model.evaluation import Question
+from npc.model.evaluation import Question, State
 
 NONSTRING_VALUES: tuple[object, ...] = (None, 1, [])
 
@@ -14,10 +14,10 @@ NONSTRING_VALUES: tuple[object, ...] = (None, 1, [])
 class Evaluator:
     def __init__(self, response: dict[str, float]) -> None:
         self.response = response
-        self.calls: list[tuple[dict[str, str], dict[str, Question]]] = []
+        self.calls: list[tuple[State, dict[str, Question]]] = []
 
     def evaluate(
-        self, state: dict[str, str], questions: dict[str, Question]
+        self, state: State, questions: dict[str, Question]
     ) -> dict[str, float]:
         self.calls.append((state, questions))
         return self.response
@@ -32,7 +32,9 @@ def test_batch_mapping_and_stable_sort() -> None:
     evaluator = Evaluator(response(0.2, 0.9, 0.9))
     names = ["send_invoice", 'read_"logs"', "inspect_metrics"]
     result = rank_actions(
-        " Restore service ", " Errors observed ", names, evaluator=evaluator
+        {"intent": " Restore service ", "situation": " Errors observed "},
+        names,
+        evaluator=evaluator,
     )
     assert [(item.action, item.probability) for item in result] == [
         (names[1], 0.9),
@@ -64,29 +66,31 @@ def test_batch_mapping_and_stable_sort() -> None:
 
 
 @pytest.mark.parametrize(
-    ("intent", "state", "actions"),
+    ("intent", "situation", "actions"),
     [
-        (" ", "state", ["a"]),
+        (" ", "circumstances", ["a"]),
         ("goal", "\n", ["a"]),
-        ("goal", "state", [" "]),
-        ("goal", "state", ["a", "a"]),
-        ("", "state", []),
-        ("goal", "state", "action"),
-        *[(value, "state", ["a"]) for value in NONSTRING_VALUES],
+        ("goal", "circumstances", [" "]),
+        ("goal", "circumstances", ["a", "a"]),
+        ("", "circumstances", []),
+        ("goal", "circumstances", "action"),
+        *[(value, "circumstances", ["a"]) for value in NONSTRING_VALUES],
         *[("goal", value, ["a"]) for value in NONSTRING_VALUES],
-        *[("goal", "state", [value]) for value in NONSTRING_VALUES],
-        ("goal", "state", ["a", " a "]),
+        *[("goal", "circumstances", [value]) for value in NONSTRING_VALUES],
+        ("goal", "circumstances", ["a", " a "]),
     ],
 )
 def test_invalid_inputs_avoid_evaluation(
     intent: str,
-    state: str,
+    situation: str,
     actions: Sequence[str],
 ) -> None:
     """Caller errors fail before consuming model resources, even with no actions."""
     evaluator = Evaluator(response())
     with pytest.raises(ValueError):
-        rank_actions(intent, state, actions, evaluator=evaluator)
+        rank_actions(
+            {"intent": intent, "situation": situation}, actions, evaluator=evaluator
+        )
     assert evaluator.calls == []
 
 
@@ -94,7 +98,9 @@ def test_trimmed_tuple_actions_map_answers_by_id() -> None:
     """Sequence inputs yield trimmed names with scores matched by ID, not position."""
     evaluator = Evaluator({"action_1": 0.9, "action_0": 0.2})
     result = rank_actions(
-        "goal", "state", (" inspect_logs \n", " restart_service "), evaluator=evaluator
+        {"intent": "goal", "situation": "circumstances"},
+        (" inspect_logs \n", " restart_service "),
+        evaluator=evaluator,
     )
     assert [(item.action, item.probability) for item in result] == [
         ("restart_service", 0.9),
@@ -109,7 +115,12 @@ def test_trimmed_tuple_actions_map_answers_by_id() -> None:
 def test_empty_catalog() -> None:
     """No available actions means no request and no recommendation."""
     evaluator = Evaluator({})
-    assert rank_actions("goal", "state", [], evaluator=evaluator) == []
+    assert (
+        rank_actions(
+            {"intent": "goal", "situation": "circumstances"}, [], evaluator=evaluator
+        )
+        == []
+    )
     assert evaluator.calls == []
 
 
@@ -117,7 +128,9 @@ def test_action_limit_accepts_ten() -> None:
     """The maximum catalog is fully ranked rather than rejected or truncated."""
     names = [f"action_{index}" for index in range(10)]
     evaluator = Evaluator(response(*([0.5] * 10)))
-    result = rank_actions("goal", "state", names, evaluator=evaluator)
+    result = rank_actions(
+        {"intent": "goal", "situation": "circumstances"}, names, evaluator=evaluator
+    )
     assert [(item.action, item.probability) for item in result] == [
         (name, 0.5) for name in names
     ]
@@ -129,8 +142,7 @@ def test_action_limit_rejects_eleven() -> None:
     evaluator = Evaluator(response(*([0.5] * 11)))
     with pytest.raises(ValueError) as error:
         rank_actions(
-            "goal",
-            "state",
+            {"intent": "goal", "situation": "circumstances"},
             [f"action_{index}" for index in range(11)],
             evaluator=evaluator,
         )
@@ -142,7 +154,9 @@ def test_action_limit_rejects_eleven() -> None:
 def test_boundary_probabilities() -> None:
     """Zero and one are valid probabilities and remain unnormalized."""
     result = rank_actions(
-        "goal", "state", ["a", "b", "c"], evaluator=Evaluator(response(0, 1, 1))
+        {"intent": "goal", "situation": "circumstances"},
+        ["a", "b", "c"],
+        evaluator=Evaluator(response(0, 1, 1)),
     )
     assert [(item.action, item.probability) for item in result] == [
         ("b", 1),
@@ -156,9 +170,11 @@ def test_dependency_failure_propagates() -> None:
 
     class Broken:
         def evaluate(
-            self, state: dict[str, str], questions: dict[str, Question]
+            self, state: State, questions: dict[str, Question]
         ) -> dict[str, float]:
             raise RuntimeError("dependency unavailable")
 
     with pytest.raises(RuntimeError, match="dependency unavailable"):
-        rank_actions("goal", "state", ["a"], evaluator=Broken())
+        rank_actions(
+            {"intent": "goal", "situation": "circumstances"}, ["a"], evaluator=Broken()
+        )

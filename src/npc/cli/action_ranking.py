@@ -16,6 +16,7 @@ from npc.action_ranking import (
     rank_actions,
     validate_ranking_inputs,
 )
+from npc.model.evaluation import State
 from npc.system_one import (
     InvalidEvaluationError,
     SystemOneClient,
@@ -38,11 +39,14 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=__doc__,
         epilog=(
-            'Input: one JSON object with required nonblank string fields "intent" '
-            'and "state", and "actions": an array of unique nonblank strings. '
+            'Input: one JSON object with "state": an object of string fields '
+            'including nonblank "intent" and "situation", and "actions": '
+            "an array of unique nonblank strings. "
             f"At most {MAX_ACTIONS} actions are accepted. "
             "Action names are trimmed and must be unique after trimming. "
-            "Unknown fields are rejected. Output: a JSON array of action/score objects, "
+            "Additional state fields are preserved. State must omit available_actions; "
+            "the ranker supplies it. Unknown outer fields are rejected. "
+            "Output: a JSON array of action/score objects, "
             "sorted by descending relevance probability, preserving ties and raw scores. "
             "Scores need not sum to one. Requires SYSTEM_ONE containing the complete "
             "endpoint URL for nonempty actions. Empty actions return []. "
@@ -64,32 +68,27 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _request(text: str) -> tuple[str, str, list[str]]:
+def _request(text: str) -> tuple[State, list[str]]:
     payload = json.loads(text)
     if not isinstance(payload, dict) or payload.keys() != {
-        "intent",
         "state",
         "actions",
     }:
-        raise ValueError(
-            "Expected an object containing only intent, state, and actions"
-        )
-    intent, state, actions = payload["intent"], payload["state"], payload["actions"]
+        raise ValueError("Expected an object containing only state and actions")
+    state, actions = payload["state"], payload["actions"]
     if not isinstance(actions, list):
         raise ValueError("actions must be an array")
-    return intent, state, validate_ranking_inputs(intent, state, actions)
+    return state, validate_ranking_inputs(state, actions)
 
 
-def _rank(
-    intent: str, state: str, actions: list[str], timeout: float
-) -> list[RankedAction]:
+def _rank(state: State, actions: list[str], timeout: float) -> list[RankedAction]:
     # Validate the JSON before this shortcut so empty catalogs still require context.
     if not actions:
         return []
     endpoint = validate_endpoint(os.environ.get("SYSTEM_ONE", ""))
     with httpx2.Client() as client:
         evaluator = SystemOneClient(endpoint, client=client, timeout=timeout)
-        return rank_actions(intent, state, actions, evaluator=evaluator)
+        return rank_actions(state, actions, evaluator=evaluator)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -102,12 +101,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             else Path(args.input).read_text(encoding="utf-8")
         )
         try:
-            intent, state, actions = _request(text)
+            state, actions = _request(text)
         except ValueError as error:
             print(f"Invalid input: {error}", file=sys.stderr)
             return 2
         try:
-            ranking = _rank(intent, state, actions, args.timeout)
+            ranking = _rank(state, actions, args.timeout)
         except InvalidEvaluationError as error:
             print(f"Invalid response: {error}", file=sys.stderr)
             return 1

@@ -3,7 +3,7 @@
 ## Problem
 
 Action ranking asks whether an action is a useful next step. Plan ranking asks
-whether a complete proposed course of action suits the intent and current state.
+whether a complete proposed course of action suits the intent and current situation.
 A useful opening step alone cannot establish that a plan is feasible.
 
 ## Usage (caller's view)
@@ -14,8 +14,10 @@ Use the same injected evaluator as action ranking:
 from npc.plan_ranking import rank_plans
 
 ranking = rank_plans(
-    "Restore checkout",
-    "The latest release introduced errors. Rollback is available.",
+    {
+        "intent": "Restore checkout",
+        "situation": "The latest release introduced errors. Rollback is available.",
+    },
     [
         "Roll back the release, then verify checkout.",
         "Inspect logs, fix the cause, deploy, then verify checkout.",
@@ -29,8 +31,11 @@ The same interface accepts plans from another domain:
 
 ```python
 ranking = rank_plans(
-    "Equip the office",
-    "Budget is 3000. Desks have already been purchased.",
+    {
+        "intent": "Equip the office",
+        "situation": "Budget is 3000. Desks have already been purchased.",
+        "constraints": "Keep existing desks.",
+    },
     [
         "Order chairs within budget and arrange delivery.",
         "Purchase desks and chairs, then seek budget approval.",
@@ -41,7 +46,11 @@ scores = [(item.plan, item.probability) for item in ranking]
 ```
 
 The evaluator can be a caller-owned `SystemOneClient`; connection configuration
-belongs to [installation](install.md). The API docstring owns the input and error
+belongs to [installation](install.md). Both rankers use the same
+[evaluation state](action-ranking.md#evaluation-state). Plan ranking requires
+nonblank `intent` and `situation` fields and preserves additional string fields.
+It adds `available_plans` to a copy of the state. A caller-supplied
+`available_plans` field is an error. The API docstring owns the input and error
 contract.
 
 `npc-rank-plans` exposes the same ranking through JSON files or standard input.
@@ -55,9 +64,9 @@ considers feasibility, step order, prerequisites, costs, completed work, and
 the likely final outcome. Text remains opaque to code.
 
 One call handles input validation, question construction, batching, answer mapping,
-and stable descending sorting. `model/evaluation.py` owns `Question` and the
-provider-independent `Evaluator` contract, which returns probabilities by question
-ID. `system_one.py` owns HTTP transport and service response decoding, including
+and stable descending sorting. `model/evaluation.py` owns `State`, `Question`,
+and the provider-independent `Evaluator` contract. The evaluator returns
+probabilities by question ID. `system_one.py` owns HTTP transport and service response decoding, including
 answer structure, `noul` types, and exact ID validation. Callers own the HTTP client.
 Action ranking retains its next-step semantics.
 
@@ -65,8 +74,7 @@ The signature is:
 
 ```python
 def rank_plans(
-    intent: str,
-    state: str,
+    state: State,
     plans: Sequence[str],
     *,
     evaluator: Evaluator,

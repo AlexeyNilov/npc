@@ -4,7 +4,7 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from npc.model.evaluation import Evaluator, Question
+from npc.model.evaluation import Evaluator, Question, State, validate_ranking_state
 
 PROMPT_VERSION = "plan-suitability-v1"
 MAX_PLANS = 10
@@ -18,18 +18,19 @@ class RankedPlan:
     probability: float
 
 
-def validate_ranking_inputs(intent: str, state: str, plans: Sequence[str]) -> list[str]:
+def validate_ranking_inputs(state: State, plans: Sequence[str]) -> list[str]:
     """Validate context and up to MAX_PLANS texts, unique after trimming.
 
     Returns trimmed texts. Raises ValueError for invalid inputs.
     """
+    validate_ranking_state(state, "available_plans")
     if isinstance(plans, str):
         raise ValueError("plans must be a sequence of plan texts")
     if len(plans) > MAX_PLANS:
         raise ValueError(f"received {len(plans)} plans; maximum is {MAX_PLANS}")
-    for value in (intent, state, *plans):
+    for value in plans:
         if not isinstance(value, str) or not value.strip():
-            raise ValueError("intent, state, and plan texts must be nonblank strings")
+            raise ValueError("plan texts must be nonblank strings")
     texts = [plan.strip() for plan in plans]
     if len(set(texts)) != len(texts):
         raise ValueError("plan texts must be unique")
@@ -54,8 +55,7 @@ def _question(plan: str) -> Question:
 
 
 def rank_plans(
-    intent: str,
-    state: str,
+    state: State,
     plans: Sequence[str],
     *,
     evaluator: Evaluator,
@@ -63,8 +63,9 @@ def rank_plans(
     """Return all supplied plans in descending suitability order, preserving ties.
 
     Args:
-        intent: Nonblank goal to achieve, preserved as supplied.
-        state: Nonblank current situation, preserved as supplied.
+        state: Text fields including nonblank intent and situation. Additional
+            fields are preserved. The ranker supplies available_plans on a copy;
+            a caller-supplied available_plans field is invalid.
         plans: At most MAX_PLANS nonblank texts, unique after trimming.
             Returned texts are trimmed; internal whitespace remains unchanged.
             An empty sequence avoids evaluation after context validation.
@@ -80,14 +81,13 @@ def rank_plans(
     Raises:
         ValueError: Invalid context, plan texts, or more than MAX_PLANS plans.
     """
-    plans = validate_ranking_inputs(intent, state, plans)
+    plans = validate_ranking_inputs(state, plans)
     if not plans:
         return []
     questions = {f"plan_{i}": _question(plan) for i, plan in enumerate(plans)}
     answers = evaluator.evaluate(
         {
-            "intent": intent,
-            "situation": state,
+            **state,
             "available_plans": json.dumps(list(plans)),
         },
         questions,

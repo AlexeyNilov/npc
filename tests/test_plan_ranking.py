@@ -5,17 +5,17 @@ from collections.abc import Sequence
 
 import pytest
 
-from npc.model.evaluation import Question
+from npc.model.evaluation import Question, State
 from npc.plan_ranking import rank_plans
 
 
 class Evaluator:
     def __init__(self, payload: dict[str, float]) -> None:
         self.payload = payload
-        self.calls: list[tuple[dict[str, str], dict[str, Question]]] = []
+        self.calls: list[tuple[State, dict[str, Question]]] = []
 
     def evaluate(
-        self, state: dict[str, str], questions: dict[str, Question]
+        self, state: State, questions: dict[str, Question]
     ) -> dict[str, float]:
         self.calls.append((state, questions))
         return self.payload
@@ -34,7 +34,9 @@ def test_rank_complete_plans_in_one_batch() -> None:
     )
     evaluator = Evaluator(response(0.2, 0.9, 0.9))
     ranking = rank_plans(
-        " Restore checkout ", " Cause unknown ", plans, evaluator=evaluator
+        {"intent": " Restore checkout ", "situation": " Cause unknown "},
+        plans,
+        evaluator=evaluator,
     )
     assert [(item.plan, item.probability) for item in ranking] == [
         (plans[1], 0.9),
@@ -67,33 +69,40 @@ def test_rank_complete_plans_in_one_batch() -> None:
 
 
 @pytest.mark.parametrize(
-    ("intent", "state", "plans"),
+    ("intent", "situation", "plans"),
     [
-        ("", "state", []),
+        ("", "circumstances", []),
         ("goal", " ", ["plan"]),
-        ("goal", "state", "plan"),
-        ("goal", "state", [" "]),
-        ("goal", "state", ["plan", " plan "]),
-        ("goal", "state", [str(i) for i in range(11)]),
-        (None, "state", ["plan"]),
+        ("goal", "circumstances", "plan"),
+        ("goal", "circumstances", [" "]),
+        ("goal", "circumstances", ["plan", " plan "]),
+        ("goal", "circumstances", [str(i) for i in range(11)]),
+        (None, "circumstances", ["plan"]),
         ("goal", None, ["plan"]),
-        ("goal", "state", [None]),
+        ("goal", "circumstances", [None]),
     ],
 )
 def test_invalid_input_avoids_evaluation(
-    intent: str, state: str, plans: Sequence[str]
+    intent: str, situation: str, plans: Sequence[str]
 ) -> None:
     """Invalid context and catalogs fail before consuming model resources."""
     evaluator = Evaluator({})
     with pytest.raises(ValueError):
-        rank_plans(intent, state, plans, evaluator=evaluator)
+        rank_plans(
+            {"intent": intent, "situation": situation}, plans, evaluator=evaluator
+        )
     assert evaluator.calls == []
 
 
 def test_empty_plans_avoid_evaluation() -> None:
     """An empty catalog yields no recommendation and requires no dependency."""
     evaluator = Evaluator({})
-    assert rank_plans("goal", "state", [], evaluator=evaluator) == []
+    assert (
+        rank_plans(
+            {"intent": "goal", "situation": "circumstances"}, [], evaluator=evaluator
+        )
+        == []
+    )
     assert evaluator.calls == []
 
 
@@ -101,7 +110,9 @@ def test_ten_plans_and_boundary_scores() -> None:
     """The full supported catalog is returned without normalization or truncation."""
     plans = [str(i) for i in range(10)]
     ranking = rank_plans(
-        "goal", "state", plans, evaluator=Evaluator(response(0, *([1] * 9)))
+        {"intent": "goal", "situation": "circumstances"},
+        plans,
+        evaluator=Evaluator(response(0, *([1] * 9))),
     )
     assert [(item.plan, item.probability) for item in ranking] == [
         *((plan, 1) for plan in plans[1:]),
@@ -114,9 +125,13 @@ def test_dependency_failure_propagates() -> None:
 
     class Broken:
         def evaluate(
-            self, state: dict[str, str], questions: dict[str, Question]
+            self, state: State, questions: dict[str, Question]
         ) -> dict[str, float]:
             raise RuntimeError("unavailable")
 
     with pytest.raises(RuntimeError, match="unavailable"):
-        rank_plans("goal", "state", ["plan"], evaluator=Broken())
+        rank_plans(
+            {"intent": "goal", "situation": "circumstances"},
+            ["plan"],
+            evaluator=Broken(),
+        )

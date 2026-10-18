@@ -10,6 +10,7 @@ from pathlib import Path
 
 import httpx2
 
+from npc.model.evaluation import State
 from npc.plan_ranking import (
     MAX_PLANS,
     RankedPlan,
@@ -38,11 +39,14 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=__doc__,
         epilog=(
-            'Input: one JSON object with required nonblank string fields "intent" '
-            'and "state", and "plans": an array of unique nonblank strings. '
+            'Input: one JSON object with "state": an object of string fields '
+            'including nonblank "intent" and "situation", and "plans": '
+            "an array of unique nonblank strings. "
             f"At most {MAX_PLANS} plans are accepted. "
             "Plan texts are trimmed and must be unique after trimming. "
-            "Unknown fields are rejected. Output: a JSON array of plan/score objects, "
+            "Additional state fields are preserved. State must omit available_plans; "
+            "the ranker supplies it. Unknown outer fields are rejected. "
+            "Output: a JSON array of plan/score objects, "
             "sorted by descending suitability probability, preserving ties and raw scores. "
             "Scores need not sum to one. Requires SYSTEM_ONE containing the complete "
             "endpoint URL for nonempty plans. Empty plans return []. "
@@ -64,30 +68,27 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _request(text: str) -> tuple[str, str, list[str]]:
+def _request(text: str) -> tuple[State, list[str]]:
     payload = json.loads(text)
     if not isinstance(payload, dict) or payload.keys() != {
-        "intent",
         "state",
         "plans",
     }:
-        raise ValueError("Expected an object containing only intent, state, and plans")
-    intent, state, plans = payload["intent"], payload["state"], payload["plans"]
+        raise ValueError("Expected an object containing only state and plans")
+    state, plans = payload["state"], payload["plans"]
     if not isinstance(plans, list):
         raise ValueError("plans must be an array")
-    return intent, state, validate_ranking_inputs(intent, state, plans)
+    return state, validate_ranking_inputs(state, plans)
 
 
-def _rank(
-    intent: str, state: str, plans: list[str], timeout: float
-) -> list[RankedPlan]:
+def _rank(state: State, plans: list[str], timeout: float) -> list[RankedPlan]:
     # Validate the JSON before this shortcut so empty catalogs still require context.
     if not plans:
         return []
     endpoint = validate_endpoint(os.environ.get("SYSTEM_ONE", ""))
     with httpx2.Client() as client:
         evaluator = SystemOneClient(endpoint, client=client, timeout=timeout)
-        return rank_plans(intent, state, plans, evaluator=evaluator)
+        return rank_plans(state, plans, evaluator=evaluator)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -100,12 +101,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             else Path(args.input).read_text(encoding="utf-8")
         )
         try:
-            intent, state, plans = _request(text)
+            state, plans = _request(text)
         except ValueError as error:
             print(f"Invalid input: {error}", file=sys.stderr)
             return 2
         try:
-            ranking = _rank(intent, state, plans, args.timeout)
+            ranking = _rank(state, plans, args.timeout)
         except InvalidEvaluationError as error:
             print(f"Invalid response: {error}", file=sys.stderr)
             return 1
