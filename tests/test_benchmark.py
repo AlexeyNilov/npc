@@ -6,7 +6,7 @@ from pathlib import Path
 import httpx2
 import pytest
 
-from npc.benchmark import load_cases, run_benchmark
+from npc.benchmarks.action_ranking import load_cases, run_benchmark
 from npc.cli.benchmark import main
 from npc.model.evaluation import Question, State
 from npc.system_one import InvalidEvaluationError
