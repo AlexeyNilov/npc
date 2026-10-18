@@ -3,12 +3,26 @@
 import io
 import json
 import tomllib
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import httpx2
 import pytest
 
-from npc.cli.action_ranking import main
+from npc.cli.action_ranking import main_by_choice, main_by_relevance
+
+
+@pytest.fixture(params=["relevance", "choice"])
+def approach(request: pytest.FixtureRequest) -> str:
+    """Exercise both public commands through their shared contracts."""
+    return str(request.param)
+
+
+@pytest.fixture
+def main(approach: str) -> Callable[[Sequence[str]], int]:
+    """Select the command whose observable behavior is under test."""
+    return main_by_relevance if approach == "relevance" else main_by_choice
+
 
 STATE = {
     "intent": " Restore checkout ",
@@ -31,6 +45,8 @@ def stdin(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.mark.parametrize("source", ["stdin", "dash", "file", "default-timeout"])
 def test_ranking(
+    main: Callable[[Sequence[str]], int],
+    approach: str,
     source: str,
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -47,6 +63,17 @@ def test_ranking(
             200,
             json={
                 "answers": {
+                    "action_choice": {
+                        "type": "choice",
+                        "probabilities": {
+                            "action_0": 0.2,
+                            "action_1": 0.4,
+                            "action_2": 0.4,
+                        },
+                    }
+                }
+                if approach == "choice"
+                else {
                     f"action_{i}": {"type": "noul", "noul": score}
                     for i, score in enumerate([0.123456789, 1, 1])
                 }
@@ -76,9 +103,9 @@ def test_ranking(
     output = capsys.readouterr()
     assert output.err == ""
     assert json.loads(output.out) == [
-        {"action": "Roll back", "score": 1.0},
-        {"action": "Write docs", "score": 1.0},
-        {"action": "Read logs", "score": 0.123456789},
+        {"action": "Roll back", "score": 0.4 if approach == "choice" else 1.0},
+        {"action": "Write docs", "score": 0.4 if approach == "choice" else 1.0},
+        {"action": "Read logs", "score": 0.2 if approach == "choice" else 0.123456789},
     ]
     assert len(requests) == 1
     assert str(requests[0].url) == "http://example.test/rank"
@@ -109,7 +136,10 @@ def test_ranking(
     ],
 )
 def test_invalid_input(
-    value: object, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    main: Callable[[Sequence[str]], int],
+    value: object,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Bad JSON shapes and invalid domain inputs fail before HTTP configuration."""
     monkeypatch.delenv("SYSTEM_ONE", raising=False)
@@ -122,7 +152,10 @@ def test_invalid_input(
 
 @pytest.mark.parametrize("text", ["{", "{} {}", ""])
 def test_bad_json(
-    text: str, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    main: Callable[[Sequence[str]], int],
+    text: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Malformed or multiple documents produce an input error and no ranking."""
     monkeypatch.setattr("sys.stdin", io.StringIO(text))
@@ -133,7 +166,9 @@ def test_bad_json(
 
 
 def test_empty(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    main: Callable[[Sequence[str]], int],
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     """A valid empty catalog needs neither endpoint configuration nor a client."""
     monkeypatch.delenv("SYSTEM_ONE", raising=False)
@@ -152,7 +187,9 @@ def test_empty(
 
 
 def test_oversized_catalog(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    main: Callable[[Sequence[str]], int],
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Oversized input is diagnosed before endpoint configuration or client creation."""
     monkeypatch.delenv("SYSTEM_ONE", raising=False)
@@ -179,6 +216,7 @@ def test_oversized_catalog(
 
 @pytest.mark.parametrize("endpoint", [None, "bad-url"])
 def test_configuration(
+    main: Callable[[Sequence[str]], int],
     endpoint: str | None,
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -195,16 +233,23 @@ def test_configuration(
 
 
 @pytest.mark.parametrize("timeout", ["0", "-1", "inf", "nan", "text"])
-def test_timeout(timeout: str, capsys: pytest.CaptureFixture[str]) -> None:
+def test_timeout(
+    main: Callable[[Sequence[str]], int],
+    timeout: str,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """Invalid timeout arguments are rejected before reading stdin."""
     with pytest.raises(SystemExit) as error:
         main(["--timeout", timeout])
     assert error.value.code == 2
-    assert "timeout" in capsys.readouterr().err
+    detail = capsys.readouterr().err
+    assert "timeout" in detail
+    assert "positive" in detail and "finite" in detail
 
 
 @pytest.mark.parametrize("failure", ["http", "network", "json", "answers"])
 def test_evaluation_failure(
+    main: Callable[[Sequence[str]], int],
     failure: str,
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -232,7 +277,11 @@ def test_evaluation_failure(
     assert client.is_closed
 
 
-def test_file_errors(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_file_errors(
+    main: Callable[[Sequence[str]], int],
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """Unreadable files and invalid UTF-8 are reported as I/O errors."""
     path = tmp_path / "request.json"
     assert main(["--input", str(path)]) == 1
@@ -243,21 +292,32 @@ def test_file_errors(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None
     assert output.err.count("I/O error:") == 2
 
 
-def test_entrypoint() -> None:
+def test_entrypoint(main: Callable[[Sequence[str]], int], approach: str) -> None:
     """Installation exposes the agreed executable name and callable."""
     config = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
-    assert config["project"]["scripts"]["npc-rank-actions"] == (
-        "npc.cli.action_ranking:main"
+    assert (
+        config["project"]["scripts"][f"npc-rank-actions-by-{approach}"]
+        == f"npc.cli.action_ranking:main_by_{approach}"
     )
+    assert "npc-rank-actions" not in config["project"]["scripts"]
+    assert "npc-rank-actions-choice" not in config["project"]["scripts"]
 
 
-def test_help(capsys: pytest.CaptureFixture[str]) -> None:
+def test_help(
+    main: Callable[[Sequence[str]], int],
+    approach: str,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """Help documents the JSON contract and configuration without reading input."""
     with pytest.raises(SystemExit) as error:
         main(["--help"])
     assert error.value.code == 0
     output = capsys.readouterr()
     assert output.err == ""
+    assert f"npc-rank-actions-by-{approach}" in output.out
+    assert (
+        "relative preference" if approach == "choice" else "independent usefulness"
+    ) in " ".join(output.out.split())
     for term in (
         "--input",
         "--timeout",
@@ -290,6 +350,7 @@ def test_help(capsys: pytest.CaptureFixture[str]) -> None:
     ],
 )
 def test_actionable_input_error(
+    main: Callable[[Sequence[str]], int],
     value: object,
     detail: str,
     monkeypatch: pytest.MonkeyPatch,
@@ -302,7 +363,9 @@ def test_actionable_input_error(
 
 
 def test_output_failure(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    main: Callable[[Sequence[str]], int],
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     """A closed output pipe produces an I/O failure rather than a traceback."""
 

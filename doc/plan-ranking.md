@@ -111,7 +111,7 @@ necessary in the selected design.
 
 A shared ranking engine removes more repetition but adds an internal policy
 selector and thin domain facades. Its larger refactor brings little benefit for
-two operations. Passing plans directly to `rank_actions` hides the wrong question.
+two operations. Passing plans directly to `rank_actions_by_relevance` hides the wrong question.
 Copying response decoding creates two owners of the evaluator response contract.
 
 ## Open questions and risks

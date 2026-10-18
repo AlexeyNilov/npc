@@ -5,7 +5,7 @@ from typing import Protocol
 
 import pytest
 
-from npc.action_ranking import RankedAction, rank_actions
+from npc.action_ranking import RankedAction, rank_actions_by_relevance
 from npc.model.evaluation import Evaluator, Question, State
 from npc.plan_ranking import RankedPlan, rank_plans
 
@@ -29,7 +29,7 @@ class RecordingEvaluator:
 
 @pytest.mark.parametrize(
     ("rank", "catalog"),
-    [(rank_actions, "available_actions"), (rank_plans, "available_plans")],
+    [(rank_actions_by_relevance, "available_actions"), (rank_plans, "available_plans")],
 )
 def test_extended_state_is_preserved_without_mutation(
     rank: Ranker, catalog: str
@@ -49,7 +49,7 @@ def test_extended_state_is_preserved_without_mutation(
     assert state == original
 
 
-@pytest.mark.parametrize("rank", [rank_actions, rank_plans])
+@pytest.mark.parametrize("rank", [rank_actions_by_relevance, rank_plans])
 @pytest.mark.parametrize(
     "state",
     [
@@ -76,7 +76,7 @@ def test_invalid_state_fails_before_evaluation(rank: Ranker, state: State) -> No
 
 @pytest.mark.parametrize(
     ("rank", "catalog"),
-    [(rank_actions, "available_actions"), (rank_plans, "available_plans")],
+    [(rank_actions_by_relevance, "available_actions"), (rank_plans, "available_plans")],
 )
 @pytest.mark.parametrize("candidates", [[], ["inspect_logs"]])
 def test_catalog_conflict_is_rejected(

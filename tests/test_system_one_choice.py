@@ -5,9 +5,8 @@ import json
 import httpx2
 import pytest
 
-from npc.choice_action_ranking import ChoiceQuestion
-from npc.system_one import InvalidEvaluationError, SystemOneError
-from npc.system_one_choice import SystemOneChoiceClient
+from npc.model.evaluation import ChoiceQuestion
+from npc.system_one import InvalidEvaluationError, SystemOneClient, SystemOneError
 
 QUESTION = ChoiceQuestion("Choose the best next step", ('read_"logs"', "restart"))
 ANSWER = {
@@ -43,7 +42,7 @@ def test_wire_contract_and_lifetime() -> None:
         )
 
     with httpx2.Client(transport=httpx2.MockTransport(handle)) as client:
-        adapter = SystemOneChoiceClient(
+        adapter = SystemOneClient(
             "https://example.test/choice", client=client, timeout=0.5
         )
         assert adapter.model is None
@@ -93,10 +92,11 @@ def test_invalid_response(payload: object) -> None:
             lambda request: httpx2.Response(200, content=json.dumps(payload))
         )
     ) as client:
-        with pytest.raises(InvalidEvaluationError):
-            SystemOneChoiceClient(
+        with pytest.raises(InvalidEvaluationError) as error:
+            SystemOneClient(
                 "http://example.test/choice", client=client
             ).evaluate_choice({}, QUESTION)
+        assert str(error.value) not in {"", "None"}
 
 
 @pytest.mark.parametrize(
@@ -121,7 +121,7 @@ def test_failures_and_metadata_reset(failure: str, detail: str) -> None:
         return httpx2.Response(200, text="not json")
 
     with httpx2.Client(transport=httpx2.MockTransport(handle)) as client:
-        adapter = SystemOneChoiceClient("http://example.test/choice", client=client)
+        adapter = SystemOneClient("http://example.test/choice", client=client)
         adapter.evaluate_choice({}, QUESTION)
         with pytest.raises(SystemOneError) as error:
             adapter.evaluate_choice({}, QUESTION)
@@ -149,26 +149,10 @@ def test_default_timeout_metadata_and_raw_boundaries() -> None:
         )
 
     with httpx2.Client(transport=httpx2.MockTransport(handle)) as client:
-        adapter = SystemOneChoiceClient("http://example.test/choice", client=client)
+        adapter = SystemOneClient("http://example.test/choice", client=client)
         adapter.model = "stale"
         assert adapter.evaluate_choice({}, QUESTION) == {'read_"logs"': 0, "restart": 1}
         assert adapter.model is None
     assert requests[0].extensions["timeout"] == dict.fromkeys(
         ["connect", "read", "write", "pool"], 30.0
     )
-
-
-@pytest.mark.parametrize(
-    "endpoint", ["", "bad", "ftp://host", "http://host:bad", "http://ho st"]
-)
-def test_endpoint_validation(endpoint: str) -> None:
-    """Invalid complete URLs fail before a request can consume model resources."""
-    with httpx2.Client() as client, pytest.raises(ValueError):
-        SystemOneChoiceClient(endpoint, client=client)
-
-
-@pytest.mark.parametrize("timeout", [0, -1, float("inf"), float("nan")])
-def test_timeout_validation(timeout: float) -> None:
-    """Every choice request requires a positive finite timeout."""
-    with httpx2.Client() as client, pytest.raises(ValueError):
-        SystemOneChoiceClient("http://example.test", client=client, timeout=timeout)

@@ -1,4 +1,4 @@
-"""Rank available actions by their relevance as the next step toward an intent."""
+"""Rank available actions by independent relevance or comparative choice."""
 
 import argparse
 import json
@@ -7,13 +7,15 @@ import os
 import sys
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Literal
 
 import httpx2
 
 from npc.action_ranking import (
     MAX_ACTIONS,
     RankedAction,
-    rank_actions,
+    rank_actions_by_choice,
+    rank_actions_by_relevance,
     validate_ranking_inputs,
 )
 from npc.model.evaluation import State
@@ -23,6 +25,8 @@ from npc.system_one import (
     SystemOneError,
     validate_endpoint,
 )
+
+type Approach = Literal["relevance", "choice"]
 
 
 def _timeout(text: str) -> float:
@@ -35,9 +39,16 @@ def _timeout(text: str) -> float:
     raise argparse.ArgumentTypeError("timeout must be positive and finite")
 
 
-def _parser() -> argparse.ArgumentParser:
+def _parser(approach: Approach) -> argparse.ArgumentParser:
+    command = f"npc-rank-actions-by-{approach}"
+    meaning = (
+        "Scores sum to one and express relative preference among these actions. "
+        if approach == "choice"
+        else "Scores express independent usefulness and need not sum to one. "
+    )
     parser = argparse.ArgumentParser(
-        description=__doc__,
+        prog=command,
+        description=f"Rank available actions by {approach} as the next step toward an intent.",
         epilog=(
             'Input: one JSON object with "state": an object of string fields '
             'including nonblank "intent" and "situation", and "actions": '
@@ -47,11 +58,11 @@ def _parser() -> argparse.ArgumentParser:
             "Additional state fields are preserved. State must omit available_actions; "
             "the ranker supplies it. Unknown outer fields are rejected. "
             "Output: a JSON array of action/score objects, "
-            "sorted by descending relevance probability, preserving ties and raw scores. "
-            "Scores need not sum to one. Requires SYSTEM_ONE containing the complete "
+            "sorted by descending probability, preserving ties and raw scores. "
+            f"{meaning}Requires SYSTEM_ONE containing the complete "
             "endpoint URL for nonempty actions. Empty actions return []. "
-            "Examples: npc-rank-actions --input request.json; "
-            "cat request.json | npc-rank-actions. "
+            f"Examples: {command} --input request.json; "
+            f"cat request.json | {command}. "
             "Exit codes: 0 success, 1 configuration/I/O/dependency/response error, "
             "2 invalid arguments or input. Errors go to stderr."
         ),
@@ -81,19 +92,26 @@ def _request(text: str) -> tuple[State, list[str]]:
     return state, validate_ranking_inputs(state, actions)
 
 
-def _rank(state: State, actions: list[str], timeout: float) -> list[RankedAction]:
+def _rank(
+    state: State, actions: list[str], timeout: float, approach: Approach
+) -> list[RankedAction]:
     # Validate the JSON before this shortcut so empty catalogs still require context.
     if not actions:
         return []
     endpoint = validate_endpoint(os.environ.get("SYSTEM_ONE", ""))
     with httpx2.Client() as client:
         evaluator = SystemOneClient(endpoint, client=client, timeout=timeout)
-        return rank_actions(state, actions, evaluator=evaluator)
+        rank = (
+            rank_actions_by_choice
+            if approach == "choice"
+            else rank_actions_by_relevance
+        )
+        return rank(state, actions, evaluator=evaluator)
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def _main(argv: Sequence[str] | None, approach: Approach) -> int:
     """Read one request and write a complete ranking or a categorized error."""
-    args = _parser().parse_args(argv)
+    args = _parser(approach).parse_args(argv)
     try:
         text = (
             sys.stdin.read()
@@ -106,7 +124,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"Invalid input: {error}", file=sys.stderr)
             return 2
         try:
-            ranking = _rank(state, actions, args.timeout)
+            ranking = _rank(state, actions, args.timeout, approach)
         except InvalidEvaluationError as error:
             print(f"Invalid response: {error}", file=sys.stderr)
             return 1
@@ -126,5 +144,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     return 0
 
 
+def main_by_relevance(argv: Sequence[str] | None = None) -> int:
+    """Rank actions by independent usefulness."""
+    return _main(argv, "relevance")
+
+
+def main_by_choice(argv: Sequence[str] | None = None) -> int:
+    """Rank actions by relative preference among candidates."""
+    return _main(argv, "choice")
+
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main_by_relevance())

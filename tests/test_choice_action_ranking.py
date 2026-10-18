@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from npc.choice_action_ranking import ChoiceQuestion, rank_actions_by_choice
-from npc.model.evaluation import State
+from npc.action_ranking import rank_actions_by_choice
+from npc.model.evaluation import ChoiceQuestion, State
 
 STATE = {"intent": " Restore service ", "situation": "Cause unknown", "extra": ""}
 

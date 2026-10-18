@@ -1,11 +1,12 @@
 """Synchronous System One HTTP adapter backed by HTTPX2."""
 
 import math
+from collections.abc import Collection
 from urllib.parse import urlsplit
 
 import httpx2
 
-from npc.model.evaluation import Question, State
+from npc.model.evaluation import ChoiceQuestion, Question, State
 
 
 class InvalidEvaluationError(ValueError):
@@ -20,14 +21,38 @@ def _probability(answer: object) -> float:
     return float(answer["noul"])
 
 
-def _probabilities(payload: object, questions: dict[str, Question]) -> dict[str, float]:
-    """Decode exactly the requested answers, trusting upstream numeric guarantees."""
+def _answers(payload: object, question_ids: Collection[str]) -> dict[str, object]:
+    """Require exactly the requested answer identities before typed decoding."""
     if not isinstance(payload, dict) or not isinstance(payload.get("answers"), dict):
         raise InvalidEvaluationError("Expected an answers mapping")
     answers: dict[str, object] = payload["answers"]
-    if answers.keys() != questions.keys():
+    if answers.keys() != set(question_ids):
         raise InvalidEvaluationError("Answer IDs must match all requested question IDs")
+    return answers
+
+
+def _probabilities(payload: object, questions: dict[str, Question]) -> dict[str, float]:
+    """Decode exactly the requested answers, trusting upstream numeric guarantees."""
+    answers = _answers(payload, questions.keys())
     return {key: _probability(answers[key]) for key in questions}
+
+
+def _choice_probabilities(
+    payload: object, options: tuple[str, ...]
+) -> dict[str, float]:
+    """Match external question and option identities; trust numeric guarantees."""
+    answers = _answers(payload, {"action_choice"})
+    answer = answers["action_choice"]
+    if not isinstance(answer, dict) or answer.get("type") != "choice":
+        raise InvalidEvaluationError("Expected a choice answer")
+    probabilities = answer.get("probabilities")
+    if not isinstance(probabilities, dict) or probabilities.keys() != {
+        f"action_{i}" for i in range(len(options))
+    }:
+        raise InvalidEvaluationError(
+            "Probabilities must match all requested option IDs"
+        )
+    return {name: float(probabilities[f"action_{i}"]) for i, name in enumerate(options)}
 
 
 class SystemOneError(RuntimeError):
@@ -72,6 +97,30 @@ class SystemOneClient:
         self, state: State, questions: dict[str, Question]
     ) -> dict[str, float]:
         """POST one batch and decode domain probabilities, preserving dependency failures."""
+        return _probabilities(self._request(state, questions), questions)
+
+    def evaluate_choice(
+        self, state: State, question: ChoiceQuestion
+    ) -> dict[str, float]:
+        """POST one choice and return raw probabilities keyed by option name.
+
+        Questions contain nonempty unique options. HTTP and JSON failures raise
+        SystemOneError; mismatched answer identities or structure raise
+        InvalidEvaluationError. Numeric guarantees belong to the provider.
+        """
+        questions = {
+            "action_choice": {
+                "type": "choice",
+                "instructions": question.instructions,
+                "criteria": {
+                    f"action_{i}": name for i, name in enumerate(question.options)
+                },
+            }
+        }
+        return _choice_probabilities(self._request(state, questions), question.options)
+
+    def _request(self, state: State, questions: object) -> object:
+        """Own HTTP failures and metadata for either question type."""
         self.model = None
         try:
             response = self.client.post(
@@ -93,4 +142,4 @@ class SystemOneClient:
             raise SystemOneError("System One returned invalid JSON") from error
         if isinstance(payload, dict) and isinstance(payload.get("model"), str):
             self.model = payload["model"]
-        return _probabilities(payload, questions)
+        return payload

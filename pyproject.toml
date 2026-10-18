@@ -12,8 +12,8 @@ dependencies = ["httpx2>=2.13.1,<3"]
 
 [project.scripts]
 npc-benchmark = "npc.cli.benchmark:main"
-npc-rank-actions = "npc.cli.action_ranking:main"
-npc-rank-actions-choice = "npc.cli.action_ranking_choice:main"
+npc-rank-actions-by-relevance = "npc.cli.action_ranking:main_by_relevance"
+npc-rank-actions-by-choice = "npc.cli.action_ranking:main_by_choice"
 npc-rank-plans = "npc.cli.plan_ranking:main"
 
 [project.optional-dependencies]

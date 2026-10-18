@@ -6,7 +6,11 @@ from hashlib import sha256
 from pathlib import Path
 from typing import cast
 
-from npc.action_ranking import PROMPT_VERSION, rank_actions, validate_ranking_inputs
+from npc.action_ranking import (
+    RELEVANCE_PROMPT_VERSION,
+    rank_actions_by_relevance,
+    validate_ranking_inputs,
+)
 from npc.benchmarks.runner import Case, run_cases
 from npc.model.evaluation import Evaluator, State
 
@@ -77,11 +81,13 @@ def run_benchmark(
         ],
         predict=lambda case: [
             (item.action, item.probability)
-            for item in rank_actions(case.state, case.candidates, evaluator=evaluator)
+            for item in rank_actions_by_relevance(
+                case.state, case.candidates, evaluator=evaluator
+            )
         ],
         evaluator=evaluator,
         benchmark="action-ranking",
-        prompt_version=PROMPT_VERSION,
+        prompt_version=RELEVANCE_PROMPT_VERSION,
         candidate_name="action",
         label_name="relevant_actions",
     )

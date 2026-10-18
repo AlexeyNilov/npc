@@ -291,10 +291,10 @@ def test_report_metadata() -> None:
     """Reports identify the prompt and use an unambiguous timestamp."""
     from datetime import datetime
 
-    from npc.action_ranking import PROMPT_VERSION
+    from npc.action_ranking import RELEVANCE_PROMPT_VERSION
 
     report = run_benchmark([], evaluator=Evaluator([]))
-    assert report["prompt_version"] == PROMPT_VERSION
+    assert report["prompt_version"] == RELEVANCE_PROMPT_VERSION
     assert isinstance(report["created_at"], str)
     assert datetime.fromisoformat(report["created_at"]).utcoffset() is not None
     assert report["metrics"] == {

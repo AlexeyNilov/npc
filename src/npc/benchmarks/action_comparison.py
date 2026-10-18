@@ -2,14 +2,10 @@
 
 from typing import TypedDict, cast
 
+from npc.action_ranking import CHOICE_PROMPT_VERSION, rank_actions_by_choice
 from npc.benchmarks.action_ranking import BenchmarkCase, run_benchmark
 from npc.benchmarks.runner import USEFULNESS_THRESHOLD, Case, observe_cases
-from npc.choice_action_ranking import (
-    PROMPT_VERSION,
-    ChoiceEvaluator,
-    rank_actions_by_choice,
-)
-from npc.model.evaluation import Evaluator
+from npc.model.evaluation import ChoiceEvaluator, Evaluator
 
 
 class Prediction(TypedDict):
@@ -132,7 +128,7 @@ def run_comparison(
         "noul": noul,
         "choice": {
             "model": model,
-            "prompt_version": PROMPT_VERSION,
+            "prompt_version": CHOICE_PROMPT_VERSION,
             "elapsed_seconds": elapsed,
             "metrics": {
                 "request_error_cases": sum(

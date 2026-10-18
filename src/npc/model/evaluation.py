@@ -1,5 +1,6 @@
 """Questions and the domain contract for evaluating their probabilities."""
 
+from dataclasses import dataclass
 from typing import Protocol, TypedDict
 
 type State = dict[str, str]
@@ -46,4 +47,22 @@ class Evaluator(Protocol):
         self, state: State, questions: dict[str, Question]
     ) -> dict[str, float]:
         """Return exactly the requested IDs with finite probabilities in [0, 1]."""
+        ...
+
+
+@dataclass(frozen=True)
+class ChoiceQuestion:
+    """Instructions and ordered action options for a comparative decision."""
+
+    instructions: str
+    options: tuple[str, ...]
+
+
+class ChoiceEvaluator(Protocol):
+    """Evaluate one choice without exposing provider request types."""
+
+    def evaluate_choice(
+        self, state: State, question: ChoiceQuestion
+    ) -> dict[str, float]:
+        """Return exactly the option names with finite probabilities totaling one."""
         ...

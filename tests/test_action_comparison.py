@@ -9,7 +9,6 @@ import pytest
 from npc.benchmarks.action_comparison import run_comparison
 from npc.benchmarks.action_ranking import BenchmarkCase
 from npc.system_one import SystemOneClient
-from npc.system_one_choice import SystemOneChoiceClient
 
 STATE = {"intent": "goal", "situation": "context"}
 
@@ -87,7 +86,7 @@ def test_comparison_and_label_isolation() -> None:
         report = run_comparison(
             cases,
             evaluator=SystemOneClient("http://test/rank", client=client),
-            choice_evaluator=SystemOneChoiceClient("http://test/rank", client=client),
+            choice_evaluator=SystemOneClient("http://test/rank", client=client),
         )
     report = json.loads(json.dumps(report))
     assert len(requests) == 18
@@ -149,7 +148,7 @@ def test_errors_are_retained_and_excluded_from_paired_scores(
         report = run_comparison(
             [BenchmarkCase("x", STATE, ["a"], ["a"])],
             evaluator=SystemOneClient("http://test/rank", client=client),
-            choice_evaluator=SystemOneChoiceClient("http://test/rank", client=client),
+            choice_evaluator=SystemOneClient("http://test/rank", client=client),
         )
     report = json.loads(json.dumps(report))
     assert report["comparison"]["paired_cases"] == 0
@@ -177,9 +176,7 @@ def test_report_preserves_reproducible_observations() -> None:
                 run_comparison(
                     [BenchmarkCase("unicode", STATE, ["réparer"], ["réparer"])],
                     evaluator=SystemOneClient("http://test/rank", client=client),
-                    choice_evaluator=SystemOneChoiceClient(
-                        "http://test/rank", client=client
-                    ),
+                    choice_evaluator=SystemOneClient("http://test/rank", client=client),
                 )
             )
         )

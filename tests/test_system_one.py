@@ -5,13 +5,41 @@ import json
 import httpx2
 import pytest
 
-from npc.model.evaluation import Question
+from npc.model.evaluation import ChoiceQuestion, Question
 from npc.system_one import InvalidEvaluationError, SystemOneClient, SystemOneError
 
 ENDPOINT = "http://127.0.0.1:12346/v1/systemone"
 QUESTIONS: dict[str, Question] = {
     "action_0": {"type": "noul", "instructions": "Useful?"}
 }
+
+
+def test_one_client_can_alternate_question_types() -> None:
+    """Both methods share transport ownership and reset metadata on each request."""
+    payloads = [
+        {"model": "first", "answers": {"action_0": {"type": "noul", "noul": 0.8}}},
+        {
+            "answers": {
+                "action_choice": {"type": "choice", "probabilities": {"action_0": 1}}
+            }
+        },
+        {"model": "third", "answers": {"action_0": {"type": "noul", "noul": 0.2}}},
+    ]
+    with httpx2.Client(
+        transport=httpx2.MockTransport(
+            lambda request: httpx2.Response(200, json=payloads.pop(0))
+        )
+    ) as client:
+        evaluator = SystemOneClient(ENDPOINT, client=client)
+        assert evaluator.evaluate({}, QUESTIONS) == {"action_0": 0.8}
+        assert evaluator.model == "first"
+        assert evaluator.evaluate_choice(
+            {}, ChoiceQuestion("Choose", ("inspect",))
+        ) == {"inspect": 1.0}
+        assert evaluator.model is None
+        assert evaluator.evaluate({}, QUESTIONS) == {"action_0": 0.2}
+        assert evaluator.model == "third"
+        assert not client.is_closed
 
 
 def test_exact_request_and_metadata() -> None:
@@ -50,11 +78,19 @@ def test_exact_request_and_metadata() -> None:
 
 @pytest.mark.parametrize(
     "endpoint",
-    ["", " ", "/v1/systemone", "ftp://host/path", "http://", "http://host:bad/path"],
+    [
+        "",
+        " ",
+        "/v1/systemone",
+        "ftp://host/path",
+        "http://ho st",
+        "http://",
+        "http://host:bad/path",
+    ],
 )
 def test_invalid_endpoint(endpoint: str) -> None:
     """Configuration errors are rejected before sending a request."""
-    with httpx2.Client() as client, pytest.raises(ValueError):
+    with httpx2.Client() as client, pytest.raises(ValueError, match="(?i)HTTP"):
         SystemOneClient(endpoint, client=client)
 
 
@@ -162,8 +198,9 @@ def test_invalid_answer_contract(payload: object) -> None:
             lambda request: httpx2.Response(200, content=json.dumps(payload))
         )
     ) as client:
-        with pytest.raises(InvalidEvaluationError):
+        with pytest.raises(InvalidEvaluationError) as error:
             SystemOneClient(ENDPOINT, client=client).evaluate({}, QUESTIONS)
+        assert str(error.value) not in {"", "None"}
 
 
 def test_decoded_probabilities_match_ids_and_preserve_boundaries() -> None:

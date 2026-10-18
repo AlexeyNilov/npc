@@ -12,7 +12,6 @@ import httpx2
 from npc.benchmarks.action_comparison import run_comparison
 from npc.benchmarks.action_ranking import load_cases
 from npc.system_one import SystemOneClient, validate_endpoint
-from npc.system_one_choice import SystemOneChoiceClient
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -55,14 +54,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         cases = load_cases(args.input)
         endpoint = validate_endpoint(os.environ.get("SYSTEM_ONE", ""))
         with httpx2.Client() as client:
+            evaluator = SystemOneClient(endpoint, client=client, timeout=args.timeout)
             report = run_comparison(
                 cases,
-                evaluator=SystemOneClient(
-                    endpoint, client=client, timeout=args.timeout
-                ),
-                choice_evaluator=SystemOneChoiceClient(
-                    endpoint, client=client, timeout=args.timeout
-                ),
+                evaluator=evaluator,
+                choice_evaluator=evaluator,
             )
         report.update(endpoint=endpoint, timeout_seconds=args.timeout)
         args.output.parent.mkdir(parents=True, exist_ok=True)
