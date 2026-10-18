@@ -6,9 +6,10 @@ from pathlib import Path
 import httpx2
 import pytest
 
-from npc.action_ranking import Question
 from npc.benchmark import load_cases, run_benchmark
 from npc.cli.benchmark import main
+from npc.model.evaluation import Question
+from npc.system_one import InvalidEvaluationError
 
 FIXTURE = Path("tests/fixtures/action_ranking/cases.json")
 
@@ -20,17 +21,14 @@ class Evaluator:
         self.scores = iter(scores)
         self.states: list[dict[str, str]] = []
 
-    def evaluate(self, state: dict[str, str], questions: dict[str, Question]) -> object:
+    def evaluate(
+        self, state: dict[str, str], questions: dict[str, Question]
+    ) -> dict[str, float]:
         self.states.append(state)
         scores = next(self.scores)
         if scores is None:
             raise httpx2.ConnectError("offline")
-        return {
-            "answers": {
-                key: {"type": "noul", "noul": score}
-                for key, score in zip(questions, scores, strict=True)
-            }
-        }
+        return dict(zip(questions, scores, strict=True))
 
 
 def test_fixture_labels_are_complete() -> None:
@@ -176,7 +174,9 @@ def test_action_weighted_score_and_uncertainty() -> None:
 
 
 class FailingEvaluator:
-    def evaluate(self, state: dict[str, str], questions: dict[str, Question]) -> object:
+    def evaluate(
+        self, state: dict[str, str], questions: dict[str, Question]
+    ) -> dict[str, float]:
         from npc.system_one import SystemOneError
 
         raise SystemOneError("offline")
@@ -301,10 +301,10 @@ def test_case_error_continues_without_zero_scores() -> None:
     class MissingAnswer(Evaluator):
         def evaluate(
             self, state: dict[str, str], questions: dict[str, Question]
-        ) -> object:
+        ) -> dict[str, float]:
             payload = super().evaluate(state, questions)
             if len(self.states) == 1:
-                return {"answers": {}}
+                raise InvalidEvaluationError("Missing answers")
             return payload
 
     report = run_benchmark(
@@ -383,10 +383,8 @@ def test_elapsed_time_ids_and_optional_model(monkeypatch: pytest.MonkeyPatch) ->
     class NoMetadata:
         def evaluate(
             self, state: dict[str, str], questions: dict[str, Question]
-        ) -> object:
-            return {
-                "answers": {key: {"type": "noul", "noul": 0.5} for key in questions}
-            }
+        ) -> dict[str, float]:
+            return {key: 0.5 for key in questions}
 
     clock = iter(
         [9.0, 10.0, 10.25, 20.0, 20.5, 22.0, 29.0, 30.0, 30.75, 40.0, 41.0, 43.0]

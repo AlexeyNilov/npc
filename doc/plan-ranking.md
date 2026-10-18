@@ -54,13 +54,14 @@ It treats each supplied text as an alternative complete plan. Its question
 considers feasibility, step order, prerequisites, costs, completed work, and
 the likely final outcome. Text remains opaque to code.
 
-One call hides input validation, question construction, batching, answer mapping,
-and stable descending sorting. The shared evaluator contract and response decoder
-have one owner in `_evaluation.py`, per single-source-of-truth and
-boundary-discipline. Transport stays in `SystemOneClient`; callers own its HTTP
-client. Action ranking retains its public imports and next-step semantics.
+One call handles input validation, question construction, batching, answer mapping,
+and stable descending sorting. `model/evaluation.py` owns `Question` and the
+provider-independent `Evaluator` contract, which returns probabilities by question
+ID. `system_one.py` owns HTTP transport and service response decoding, including
+answer structure, `noul` types, and exact ID validation. Callers own the HTTP client.
+Action ranking retains its next-step semantics.
 
-The planned signature is:
+The signature is:
 
 ```python
 def rank_plans(
@@ -68,9 +69,9 @@ def rank_plans(
     state: str,
     plans: Sequence[str],
     *,
-    evaluator: SystemOneEvaluator,
+    evaluator: Evaluator,
 ) -> list[RankedPlan]:
-    # Validate, build whole-plan questions, evaluate once, decode, and sort.
+    # Validate, build whole-plan questions, evaluate once, and sort.
     raise NotImplementedError
 ```
 
@@ -85,15 +86,14 @@ keep domain validation and semantics in their respective modules.
 An independent `gpt-6.1-sol` judge selected A for its domain ownership and smaller
 action-regression risk. Both requested design models were available. The red-flag
 review found no selector, intermediate result type, or public coordination steps
-necessary in the selected design. Python underscores mark the shared helper as
-internal without adding machinery to enforce private imports.
+necessary in the selected design.
 
 ## Tradeoffs accepted
 
 - We accept small repeated domain validation in exchange for independent action
   and plan contracts.
-- We accept compatibility imports in `action_ranking` to preserve existing callers
-  while giving shared evaluation checks one owner.
+- We keep the evaluator contract in the domain model and decode service responses
+  in `SystemOneClient`, so ranking depends only on probabilities by question ID.
 - We accept opaque text and model judgment in exchange for avoiding a step schema
   and execution simulator.
 - We retain the ten-candidate limit without imposing an unsupported text-length

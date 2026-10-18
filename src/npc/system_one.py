@@ -5,7 +5,29 @@ from urllib.parse import urlsplit
 
 import httpx2
 
-from npc._evaluation import Question
+from npc.model.evaluation import Question
+
+
+class InvalidEvaluationError(ValueError):
+    """The evaluator returned an invalid answer structure or mismatched IDs."""
+
+
+def _probability(answer: object) -> float:
+    if not isinstance(answer, dict) or answer.get("type") != "noul":
+        raise InvalidEvaluationError("Each answer must have type noul")
+    if "noul" not in answer:
+        raise InvalidEvaluationError("Each answer must include a noul probability")
+    return float(answer["noul"])
+
+
+def _probabilities(payload: object, questions: dict[str, Question]) -> dict[str, float]:
+    """Decode exactly the requested answers, trusting upstream numeric guarantees."""
+    if not isinstance(payload, dict) or not isinstance(payload.get("answers"), dict):
+        raise InvalidEvaluationError("Expected an answers mapping")
+    answers: dict[str, object] = payload["answers"]
+    if answers.keys() != questions.keys():
+        raise InvalidEvaluationError("Answer IDs must match all requested question IDs")
+    return {key: _probability(answers[key]) for key in questions}
 
 
 class SystemOneError(RuntimeError):
@@ -46,8 +68,10 @@ class SystemOneClient:
         self.timeout = timeout
         self.model: str | None = None
 
-    def evaluate(self, state: dict[str, str], questions: dict[str, Question]) -> object:
-        """POST one batch and return decoded JSON, preserving dependency failures."""
+    def evaluate(
+        self, state: dict[str, str], questions: dict[str, Question]
+    ) -> dict[str, float]:
+        """POST one batch and decode domain probabilities, preserving dependency failures."""
         self.model = None
         try:
             response = self.client.post(
@@ -69,4 +93,4 @@ class SystemOneClient:
             raise SystemOneError("System One returned invalid JSON") from error
         if isinstance(payload, dict) and isinstance(payload.get("model"), str):
             self.model = payload["model"]
-        return payload
+        return _probabilities(payload, questions)

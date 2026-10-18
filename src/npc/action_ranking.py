@@ -4,18 +4,7 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from npc._evaluation import (
-    InvalidEvaluationError as InvalidEvaluationError,
-)
-from npc._evaluation import (
-    Question as Question,
-)
-from npc._evaluation import (
-    SystemOneEvaluator as SystemOneEvaluator,
-)
-from npc._evaluation import (
-    probabilities,
-)
+from npc.model.evaluation import Evaluator, Question
 
 PROMPT_VERSION = "action-relevance-v3"
 MAX_ACTIONS = 10
@@ -69,7 +58,7 @@ def rank_actions(
     state: str,
     actions: Sequence[str],
     *,
-    evaluator: SystemOneEvaluator,
+    evaluator: Evaluator,
 ) -> list[RankedAction]:
     """Return all actions in descending relevance order, preserving ties.
 
@@ -79,20 +68,19 @@ def rank_actions(
         actions: At most MAX_ACTIONS nonblank names, unique after trimming.
             Returned names are trimmed; an empty sequence avoids evaluation.
         evaluator: Injected typed-question evaluator that guarantees finite numeric
-            probabilities in [0, 1].
+            probabilities in [0, 1] for exactly the requested question IDs.
 
     Returns:
         Every action with its raw relevance probability, without normalization.
 
     Raises:
         ValueError: An input is invalid or more than MAX_ACTIONS actions are supplied.
-        InvalidEvaluationError: The answer structure or requested IDs do not match.
     """
     actions = validate_ranking_inputs(intent, state, actions)
     if not actions:
         return []
     questions = {f"action_{i}": _question(action) for i, action in enumerate(actions)}
-    payload = evaluator.evaluate(
+    answers = evaluator.evaluate(
         {
             "intent": intent,
             "situation": state,
@@ -100,7 +88,6 @@ def rank_actions(
         },
         questions,
     )
-    answers = probabilities(payload, questions)
     ranked = [
         RankedAction(action, answers[f"action_{i}"]) for i, action in enumerate(actions)
     ]

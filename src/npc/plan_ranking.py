@@ -4,14 +4,7 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass
 
-from npc._evaluation import (
-    InvalidEvaluationError as InvalidEvaluationError,
-)
-from npc._evaluation import (
-    Question,
-    SystemOneEvaluator,
-    probabilities,
-)
+from npc.model.evaluation import Evaluator, Question
 
 PROMPT_VERSION = "plan-suitability-v1"
 MAX_PLANS = 10
@@ -65,7 +58,7 @@ def rank_plans(
     state: str,
     plans: Sequence[str],
     *,
-    evaluator: SystemOneEvaluator,
+    evaluator: Evaluator,
 ) -> list[RankedPlan]:
     """Return all supplied plans in descending suitability order, preserving ties.
 
@@ -76,7 +69,8 @@ def rank_plans(
             Returned texts are trimmed; internal whitespace remains unchanged.
             An empty sequence avoids evaluation after context validation.
         evaluator: Injected typed-question evaluator guaranteeing finite numeric
-            probabilities in [0, 1]. All plans are evaluated in one batch.
+            probabilities in [0, 1] for exactly the requested question IDs.
+            All plans are evaluated in one batch.
 
     Returns:
         Every plan with its raw suitability probability, without normalization
@@ -85,14 +79,12 @@ def rank_plans(
 
     Raises:
         ValueError: Invalid context, plan texts, or more than MAX_PLANS plans.
-        InvalidEvaluationError: Invalid answer structure, type, or requested IDs.
-            Dependency failures propagate unchanged.
     """
     plans = validate_ranking_inputs(intent, state, plans)
     if not plans:
         return []
     questions = {f"plan_{i}": _question(plan) for i, plan in enumerate(plans)}
-    payload = evaluator.evaluate(
+    answers = evaluator.evaluate(
         {
             "intent": intent,
             "situation": state,
@@ -100,6 +92,5 @@ def rank_plans(
         },
         questions,
     )
-    answers = probabilities(payload, questions)
     ranked = [RankedPlan(plan, answers[f"plan_{i}"]) for i, plan in enumerate(plans)]
     return sorted(ranked, key=lambda item: item.probability, reverse=True)

@@ -5,28 +5,26 @@ from collections.abc import Sequence
 
 import pytest
 
-from npc.action_ranking import InvalidEvaluationError, Question, rank_actions
+from npc.action_ranking import rank_actions
+from npc.model.evaluation import Question
 
 NONSTRING_VALUES: tuple[object, ...] = (None, 1, [])
 
 
 class Evaluator:
-    def __init__(self, response: object) -> None:
+    def __init__(self, response: dict[str, float]) -> None:
         self.response = response
         self.calls: list[tuple[dict[str, str], dict[str, Question]]] = []
 
-    def evaluate(self, state: dict[str, str], questions: dict[str, Question]) -> object:
+    def evaluate(
+        self, state: dict[str, str], questions: dict[str, Question]
+    ) -> dict[str, float]:
         self.calls.append((state, questions))
         return self.response
 
 
-def response(*scores: object) -> dict[str, object]:
-    return {
-        "answers": {
-            f"action_{i}": {"type": "noul", "noul": score}
-            for i, score in enumerate(scores)
-        }
-    }
+def response(*scores: float) -> dict[str, float]:
+    return {f"action_{i}": score for i, score in enumerate(scores)}
 
 
 def test_batch_mapping_and_stable_sort() -> None:
@@ -94,14 +92,7 @@ def test_invalid_inputs_avoid_evaluation(
 
 def test_trimmed_tuple_actions_map_answers_by_id() -> None:
     """Sequence inputs yield trimmed names with scores matched by ID, not position."""
-    evaluator = Evaluator(
-        {
-            "answers": {
-                "action_1": {"type": "noul", "noul": 0.9},
-                "action_0": {"type": "noul", "noul": 0.2},
-            }
-        }
-    )
+    evaluator = Evaluator({"action_1": 0.9, "action_0": 0.2})
     result = rank_actions(
         "goal", "state", (" inspect_logs \n", " restart_service "), evaluator=evaluator
     )
@@ -117,7 +108,7 @@ def test_trimmed_tuple_actions_map_answers_by_id() -> None:
 
 def test_empty_catalog() -> None:
     """No available actions means no request and no recommendation."""
-    evaluator = Evaluator(None)
+    evaluator = Evaluator({})
     assert rank_actions("goal", "state", [], evaluator=evaluator) == []
     assert evaluator.calls == []
 
@@ -148,27 +139,6 @@ def test_action_limit_rejects_eleven() -> None:
     assert evaluator.calls == []
 
 
-@pytest.mark.parametrize(
-    "payload",
-    [
-        None,
-        [],
-        {},
-        {"answers": []},
-        {"answers": {}},
-        {"answers": {"action_0": {"type": "choice", "noul": 0.5}}},
-        {"answers": {"action_0": {"noul": 0.5}}},
-        {"answers": {"action_0": None}},
-        {"answers": {"action_0": {"type": "noul"}}},
-        response(0.5, 0.8),
-    ],
-)
-def test_invalid_answer_contract(payload: object) -> None:
-    """Wrong shapes, missing answers and extra IDs invalidate the entire result."""
-    with pytest.raises(InvalidEvaluationError):
-        rank_actions("goal", "state", ["a"], evaluator=Evaluator(payload))
-
-
 def test_boundary_probabilities() -> None:
     """Zero and one are valid probabilities and remain unnormalized."""
     result = rank_actions(
@@ -187,7 +157,7 @@ def test_dependency_failure_propagates() -> None:
     class Broken:
         def evaluate(
             self, state: dict[str, str], questions: dict[str, Question]
-        ) -> object:
+        ) -> dict[str, float]:
             raise RuntimeError("dependency unavailable")
 
     with pytest.raises(RuntimeError, match="dependency unavailable"):

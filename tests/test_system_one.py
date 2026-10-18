@@ -5,8 +5,8 @@ import json
 import httpx2
 import pytest
 
-from npc.action_ranking import Question
-from npc.system_one import SystemOneClient, SystemOneError
+from npc.model.evaluation import Question
+from npc.system_one import InvalidEvaluationError, SystemOneClient, SystemOneError
 
 ENDPOINT = "http://127.0.0.1:12346/v1/systemone"
 QUESTIONS: dict[str, Question] = {
@@ -28,10 +28,9 @@ def test_exact_request_and_metadata() -> None:
 
     with httpx2.Client(transport=httpx2.MockTransport(handle)) as client:
         adapter = SystemOneClient(ENDPOINT, client=client, timeout=7.0)
-        assert (
-            adapter.evaluate({"intent": "goal", "situation": "state"}, QUESTIONS)
-            == payload
-        )
+        assert adapter.evaluate(
+            {"intent": "goal", "situation": "state"}, QUESTIONS
+        ) == {"action_0": 0.8}
         assert adapter.model == "decision-test"
         assert not client.is_closed
     assert client.is_closed
@@ -108,7 +107,6 @@ def test_https_and_default_timeout_and_metadata_reset() -> None:
         {"model": "first", "answers": {}},
         {"answers": {}},
         {"model": 123, "answers": {}},
-        [],
     ]
     requests: list[httpx2.Request] = []
 
@@ -120,7 +118,7 @@ def test_https_and_default_timeout_and_metadata_reset() -> None:
         adapter = SystemOneClient("https://example.test/v1/systemone", client=client)
         adapter.evaluate({}, {})
         assert adapter.model == "first"
-        for _ in range(3):
+        for _ in range(2):
             adapter.evaluate({}, {})
             assert adapter.model is None
     assert str(requests[0].url) == "https://example.test/v1/systemone"
@@ -134,3 +132,60 @@ def test_short_positive_timeout() -> None:
     with httpx2.Client() as client:
         adapter = SystemOneClient(ENDPOINT, client=client, timeout=0.1)
         assert adapter.model is None
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        None,
+        [],
+        {},
+        {"answers": []},
+        {"answers": {}},
+        {"answers": {"other_id": {"type": "noul", "noul": 0.5}}},
+        {"answers": {"action_0": {"type": "choice", "noul": 0.5}}},
+        {"answers": {"action_0": {"noul": 0.5}}},
+        {"answers": {"action_0": None}},
+        {"answers": {"action_0": {"type": "noul"}}},
+        {
+            "answers": {
+                "action_0": {"type": "noul", "noul": 0.5},
+                "extra": {"type": "noul", "noul": 0.8},
+            }
+        },
+    ],
+)
+def test_invalid_answer_contract(payload: object) -> None:
+    """Malformed, missing or extra service answers cannot escape as domain scores."""
+    with httpx2.Client(
+        transport=httpx2.MockTransport(
+            lambda request: httpx2.Response(200, content=json.dumps(payload))
+        )
+    ) as client:
+        with pytest.raises(InvalidEvaluationError):
+            SystemOneClient(ENDPOINT, client=client).evaluate({}, QUESTIONS)
+
+
+def test_decoded_probabilities_match_ids_and_preserve_boundaries() -> None:
+    """Service answers become raw domain probabilities regardless of response order."""
+    questions: dict[str, Question] = {
+        key: {"type": "noul", "instructions": "Useful?"}
+        for key in ("first", "second", "third")
+    }
+    payload = {
+        "answers": {
+            "third": {"type": "noul", "noul": 1},
+            "second": {"type": "noul", "noul": 0.25},
+            "first": {"type": "noul", "noul": 0},
+        }
+    }
+    with httpx2.Client(
+        transport=httpx2.MockTransport(
+            lambda request: httpx2.Response(200, content=json.dumps(payload))
+        )
+    ) as client:
+        assert SystemOneClient(ENDPOINT, client=client).evaluate({}, questions) == {
+            "first": 0.0,
+            "second": 0.25,
+            "third": 1.0,
+        }

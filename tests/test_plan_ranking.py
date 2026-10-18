@@ -5,27 +5,24 @@ from collections.abc import Sequence
 
 import pytest
 
-from npc.action_ranking import Question
-from npc.plan_ranking import InvalidEvaluationError, rank_plans
+from npc.model.evaluation import Question
+from npc.plan_ranking import rank_plans
 
 
 class Evaluator:
-    def __init__(self, payload: object) -> None:
+    def __init__(self, payload: dict[str, float]) -> None:
         self.payload = payload
         self.calls: list[tuple[dict[str, str], dict[str, Question]]] = []
 
-    def evaluate(self, state: dict[str, str], questions: dict[str, Question]) -> object:
+    def evaluate(
+        self, state: dict[str, str], questions: dict[str, Question]
+    ) -> dict[str, float]:
         self.calls.append((state, questions))
         return self.payload
 
 
-def response(*scores: float) -> dict[str, object]:
-    return {
-        "answers": {
-            f"plan_{i}": {"type": "noul", "noul": score}
-            for i, score in reversed(list(enumerate(scores)))
-        }
-    }
+def response(*scores: float) -> dict[str, float]:
+    return {f"plan_{i}": score for i, score in enumerate(scores)}
 
 
 def test_rank_complete_plans_in_one_batch() -> None:
@@ -87,7 +84,7 @@ def test_invalid_input_avoids_evaluation(
     intent: str, state: str, plans: Sequence[str]
 ) -> None:
     """Invalid context and catalogs fail before consuming model resources."""
-    evaluator = Evaluator(None)
+    evaluator = Evaluator({})
     with pytest.raises(ValueError):
         rank_plans(intent, state, plans, evaluator=evaluator)
     assert evaluator.calls == []
@@ -95,7 +92,7 @@ def test_invalid_input_avoids_evaluation(
 
 def test_empty_plans_avoid_evaluation() -> None:
     """An empty catalog yields no recommendation and requires no dependency."""
-    evaluator = Evaluator(None)
+    evaluator = Evaluator({})
     assert rank_plans("goal", "state", [], evaluator=evaluator) == []
     assert evaluator.calls == []
 
@@ -112,35 +109,13 @@ def test_ten_plans_and_boundary_scores() -> None:
     ]
 
 
-@pytest.mark.parametrize(
-    "payload",
-    [
-        None,
-        [],
-        {},
-        {"answers": []},
-        {"answers": {}},
-        {"answers": {"action_0": {"type": "noul", "noul": 0.5}}},
-        {"answers": {"plan_0": None}},
-        {"answers": {"plan_0": {"type": "choice", "noul": 0.5}}},
-        {"answers": {"plan_0": {"noul": 0.5}}},
-        {"answers": {"plan_0": {"type": "noul"}}},
-        response(0.5, 0.6),
-    ],
-)
-def test_invalid_response_rejects_entire_ranking(payload: object) -> None:
-    """Missing, extra or malformed answers cannot yield a partial recommendation."""
-    with pytest.raises(InvalidEvaluationError):
-        rank_plans("goal", "state", ["plan"], evaluator=Evaluator(payload))
-
-
 def test_dependency_failure_propagates() -> None:
     """Dependency errors remain distinguishable from invalid model responses."""
 
     class Broken:
         def evaluate(
             self, state: dict[str, str], questions: dict[str, Question]
-        ) -> object:
+        ) -> dict[str, float]:
             raise RuntimeError("unavailable")
 
     with pytest.raises(RuntimeError, match="unavailable"):

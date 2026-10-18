@@ -12,12 +12,16 @@ import httpx2
 
 from npc.plan_ranking import (
     MAX_PLANS,
-    InvalidEvaluationError,
     RankedPlan,
     rank_plans,
     validate_ranking_inputs,
 )
-from npc.system_one import SystemOneClient, SystemOneError, validate_endpoint
+from npc.system_one import (
+    InvalidEvaluationError,
+    SystemOneClient,
+    SystemOneError,
+    validate_endpoint,
+)
 
 
 def _timeout(text: str) -> float:

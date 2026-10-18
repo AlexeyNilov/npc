@@ -11,9 +11,9 @@ as a building block for a broader NPC decision loop.
 
 The [semantic classification approach](system-one-semantic-classification.md)
 explains the design: the model judges context, while code applies decision policy.
-`rank_actions` trusts System One to supply finite numeric probabilities in `[0, 1]`
-and checks answer structure and IDs. It returns a ranking for the decision loop
-to use when selecting an action.
+`rank_actions` trusts its evaluator to supply finite numeric probabilities in
+`[0, 1]` for exactly the requested question IDs. It returns a ranking for the
+decision loop to use when selecting an action.
 
 ## Flow
 
@@ -24,9 +24,7 @@ to use when selecting an action.
 2. Create one question per action.
 3. Call `evaluator.evaluate` once with all questions. Shared context contains
    `intent`, `situation`, and the complete JSON-encoded `available_actions` list.
-4. Require exactly the requested answer IDs. Each answer must have type `noul`
-   and include its `noul` score. Probability values rely on System One's guarantee.
-5. Map answers to their original actions and return `RankedAction` objects in
+4. Map returned probabilities to their original actions and return `RankedAction` objects in
    descending probability order. Preserve ties in input order and keep scores
    without normalization or rounding.
 

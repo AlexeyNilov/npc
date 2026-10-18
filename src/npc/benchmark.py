@@ -8,12 +8,11 @@ from time import perf_counter
 
 from npc.action_ranking import (
     PROMPT_VERSION,
-    InvalidEvaluationError,
     RankedAction,
-    SystemOneEvaluator,
     rank_actions,
 )
-from npc.system_one import SystemOneError
+from npc.model.evaluation import Evaluator
+from npc.system_one import InvalidEvaluationError, SystemOneError
 
 USEFULNESS_THRESHOLD = 0.5
 
@@ -83,7 +82,7 @@ def load_cases(path: Path) -> list[BenchmarkCase]:
     return cases
 
 
-def _evaluate(case: BenchmarkCase, evaluator: SystemOneEvaluator) -> CaseResult:
+def _evaluate(case: BenchmarkCase, evaluator: Evaluator) -> CaseResult:
     started = perf_counter()
     try:
         ranking = rank_actions(
@@ -121,7 +120,7 @@ def _evaluate(case: BenchmarkCase, evaluator: SystemOneEvaluator) -> CaseResult:
 def run_benchmark(
     cases: list[BenchmarkCase],
     *,
-    evaluator: SystemOneEvaluator,
+    evaluator: Evaluator,
 ) -> dict[str, object]:
     """Return rankings and Brier scores using the same evaluation as rank_actions.
 
