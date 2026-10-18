@@ -11,6 +11,9 @@ Both return every candidate as a `RankedAction`, sorted by descending probabilit
 with ties in input order. They preserve raw scores without rounding or
 normalization. Neither function executes an action or applies a selection policy.
 
+The [local-book research review](action-ranking-research.md) connects this design
+to agent programming and decision theory, with proposed evaluation experiments.
+
 ## Which approach to use
 
 | Decision needed | Preferred approach | Reason |
