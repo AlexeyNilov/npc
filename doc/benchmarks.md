@@ -4,6 +4,21 @@ Benchmarks measure action usefulness and complete-plan suitability through the
 production rankers. Maintained datasets live in [`benchmarks/`](../benchmarks/).
 Reports retain inputs, labels, predictions, errors, and dataset identity.
 
+Compare the two action rankers with
+`python -m experiments.action_ranking_comparison` from the project root.
+Its `--help` owns arguments and scoring details. The experiment reuses the
+maintained action dataset and preserves the current benchmark's native metrics.
+It adds paired top-action accuracy and mean reciprocal rank for both approaches.
+Higher values are better. These metrics include only cases with a useful action
+and successful requests from both approaches.
+
+Cases with no useful action appear separately. Choice always distributes
+probability among the supplied actions, so a high choice probability cannot
+establish usefulness. The current ranker can abstain when every relevance score
+is below its threshold. Binary Brier scores remain specific to the current ranker.
+The experiment runs the current ranker first, then choice; timing from a single
+run can reflect server load and warmup. The combined report is saved in `runs/`.
+
 Run `npc-benchmark --help` for commands, dataset formats, and scoring behavior.
 The default benchmark evaluates actions; select `plan-ranking` to evaluate plans.
 

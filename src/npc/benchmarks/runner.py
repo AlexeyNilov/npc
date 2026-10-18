@@ -139,7 +139,7 @@ def observe_cases(
     cases: list[Case],
     *,
     predict: Callable[[Case], list[tuple[str, float]]],
-    evaluator: Evaluator,
+    evaluator: object,
 ) -> tuple[list[Result], str | None, float]:
     """Collect raw observations for experiments without judging their correctness.
 
